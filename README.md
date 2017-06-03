@@ -1,2 +1,2 @@
 # chessProgram
-This is my chess implementation
+This is my chess implementation.
