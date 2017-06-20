@@ -1,0 +1,35 @@
+# Compiled class file
+*.class
+
+# Log file
+*.log
+
+# BlueJ files
+*.ctxt
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+# Package Files #
+*.jar
+*.war
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+hs_err_pid*
+workspace/.metadata/.log
+*.pydevsysteminfo
+*.zip
+*.zip
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/0/a073465b655100171c2ea40f99c25300
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/12/00ac743ffe4e001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/13/5035d64c8048001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/13/a08905636a5100171c2ea40f99c25300
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/14/e0bff9adcf4f001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/14/d0dadec5924d001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/14/005a814c1f4d001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/15/7054f564c44c001718aa9447d8a0594c
+workspace/.metadata/.plugins/org.eclipse.core.resources/.history/16/5053a8a4c84e001718aa9447d8a0594c
