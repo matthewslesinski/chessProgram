@@ -1,0 +1,7 @@
+package gamePlaying;
+
+public enum Player {
+
+	WHITE,
+	BLACK
+}
