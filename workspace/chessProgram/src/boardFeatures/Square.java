@@ -246,6 +246,14 @@ public enum Square {
 		return surroundingLines[dir.ordinal()];
 	}
 	
+	/**
+	 * Returns the element in the array at the index this square corresponds to
+	 * @param array The array to access. This should be of size 64
+	 * @return The element
+	 */
+	public <T> T getValueOfSquareInArray(T[] array) {
+		return array[this.getFile().getIndex() * 8 + this.getRank().getIndex()];
+	}
 	
 	/**
 	 * Gets the square by the intersection of which {@code File} and {@code Rank} it lies on

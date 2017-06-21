@@ -16,6 +16,14 @@ public enum PieceType {
 	}
 	
 	
+	/**
+	 * Gets the piece type given by the index
+	 * @param index The index to get
+	 * @return The {@code PieceType} at that index in the array of {@code PieceType}s
+	 */
+	public static PieceType getByIndex(int index) {
+		return values()[index];
+	}
 	
 	
 	@Override
