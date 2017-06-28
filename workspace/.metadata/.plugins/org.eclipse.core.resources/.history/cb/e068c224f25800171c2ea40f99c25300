@@ -1,0 +1,54 @@
+package pieces;
+
+import gamePlaying.Color;
+
+public enum Piece {
+
+	NONE,
+	WHITE_PAWN,
+	WHITE_KNIGHT,
+	WHITE_BISHOP,
+	WHITE_ROOK,
+	WHITE_QUEEN,
+	WHITE_KING,
+	BLACK_PAWN,
+	BLACK_KNIGHT,
+	BLACK_BISHOP,
+	BLACK_ROOK,
+	BLACK_QUEEN,
+	BLACK_KING;
+	
+	private final PieceType type;
+	private final Color color;
+	private final PieceUtility;
+	
+	private Piece() {
+		if (this.ordinal() == 0) {
+			this.type = null;
+			this.color = null;
+		} else {
+			this.type = PieceType.values()[(this.ordinal() - 1) % 6];
+			this.color = Color.getColor(this.ordinal() < 7);
+		}
+	}
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return the {@code PieceType} of this piece
+	 */
+	public PieceType getType() {
+		return type;
+	}
+	
+	/**
+	 * Gets the color of this piece
+	 * @return the {@code Color}
+	 */
+	public Color getColor() {
+		return color;
+	}
+	
+	public int getBitRepresentation() {
+		return this.ordinal();
+	}
+}

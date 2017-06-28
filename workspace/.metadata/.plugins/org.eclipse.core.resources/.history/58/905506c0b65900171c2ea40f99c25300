@@ -1,0 +1,15 @@
+package moves;
+
+import gamePlaying.Color;
+
+/**
+ * Represents a move in the game
+ * @author matthewslesinski
+ *
+ */
+public interface Move {
+
+	
+	
+
+}

@@ -1,13 +1,24 @@
 package immutableArrayBoard;
 
+
 import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import moves.Move;
 import pieces.Piece;
 import representation.Board;
+import representation.BoardBuilder;
 import representation.CastlingRights;
+import representation.MoveGenerator;
 
-public class ImmutableArrayBoard implements Board {
+/**
+ * This is the most intuitive representation of a board. It holds a place for each square (at some index and some bit in the {@code board} array) and
+ * the value at that square's place represents a piece. Furthermore, making a move to get to a new position will result in creating a new instance of
+ * this class. Whether or not there's a more efficient implementation (such as bitboards), this one is the easiest to work with as a starting point.
+ * @author matthewslesinski
+ *
+ */
+public class ImmutableArrayBoard extends Board {
 
 	private static final int FIRST_CASTLING_RIGHT_BIT = 0;
 	
@@ -15,7 +26,7 @@ public class ImmutableArrayBoard implements Board {
 	
 	private static final int ARRAY_SIZE = 9;
 	
-	private static final int COLOR_INDEX = 0x100;
+	private static final int COLOR_MASK = 0x100;
 	
 	private static final int EN_PASSANT_INDEX = 4;
 	
@@ -31,6 +42,8 @@ public class ImmutableArrayBoard implements Board {
 	 */
 	private final int[] board;
 	
+	private static final MoveGenerator<ImmutableArrayBoard> moveGenerator = new ImmutableArrayMoveGenerator();
+		
 	
 	private ImmutableArrayBoard(int[] board) {
 		this.board = board;
@@ -41,10 +54,37 @@ public class ImmutableArrayBoard implements Board {
 	public Piece getPieceAtSquare(Square square) {
 		return Piece.getPieceByBits(getBitsAtSquare(square, board));
 	}
+
+
+	@Override
+	public Color whoseMove() {
+		return Color.getColor(board[RIGHTS_INDEX] % 2 == 1);
+	}
+
 	
-	public static class Builder {
+	@Override
+	public Board performMove(Move move) {
+		BoardBuilder<ImmutableArrayBoard> builder = new Builder(this);
 		
-		private int[] board = null;
+		// TODO handle rights
+		return builder.build();
+	}
+
+
+	@Override
+	public void calculateMoves() {
+		legalMoves = moveGenerator.calculateMoves(this);
+	}
+	
+	@Override
+	public boolean isInCheck() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+	
+	public static class Builder extends BoardBuilder<ImmutableArrayBoard> {
+		
+		private int[] board = new int[ARRAY_SIZE];
 		
 		/**
 		 * Initializes the board based on another board
@@ -69,62 +109,35 @@ public class ImmutableArrayBoard implements Board {
 		 * @param pieces The array of pieces to put on the board
 		 * @param whoToMove Whose current move it is
 		 */
-		public Builder(Piece[] pieces, boolean whoToMove) {
-			this.board = new int[ARRAY_SIZE];
-			for (Square square : Square.values()) {
-				int bitRepresentation = square.getValueOfSquareInArray(pieces).getBitRepresentation();
-				setPieceAtSquare(bitRepresentation, square);
-			}
-			setRightsByBitMask(COLOR_INDEX, whoToMove);
-			
+		public Builder(Piece[] pieces, Color whoToMove) {
+			super(pieces, whoToMove);
 		}
 		
-		/**
-		 * Sets the color for this board to the given {@code Color}
-		 * @param color the {@code Color} to set
-		 * @return This builder
-		 */
+		@Override
 		public Builder withColorToMove(Color color) {
-			setRightsByBitMask(COLOR_INDEX, color.isWhite());
+			setRightsByBitMask(COLOR_MASK, color.isWhite());
 			return this;
 		}
 		
-		/**
-		 * Puts a piece on a square
-		 * @param piece The piece to put
-		 * @param square The square for the piece
-		 * @return This builder
-		 */
+		@Override
 		public Builder withPieceAtSquare(Piece piece, Square square) {
 			setPieceAtSquare(piece.getBitRepresentation(), square);
 			return this;
 		}
 		
-		/**
-		 * Sets the given {@code CastlingRight} to either allowed or not, depending on enabled
-		 * @param castlingRight The right to set
-		 * @param enabled Whether or not that type of castling should be allowed
-		 * @return This builder
-		 */
+		@Override
 		public Builder withCastlingRight(CastlingRights castlingRight, boolean enabled) {
 			setRightsByBitMask(0x1 << (castlingRight.ordinal() + FIRST_CASTLING_RIGHT_BIT), enabled);
 			return this;
 		}
 		
-		/**
-		 * Sets the en passant bit representation to the given file and a 1 in front if enabled
-		 * @param file If the last move was a pawn push 2 squares ahead, the file of that pawn, else null
-		 * @return This builder
-		 */
+		@Override
 		public Builder withEnPassant(File file) {
 			setRightsByBitMask(file != null ? (file.getIndex() | 0b1000) << EN_PASSANT_INDEX : ~0b11110000, file != null);
 			return this;
 		}
 		
-		/**
-		 * Builds the board from this builder
-		 * @return The {@code ImmutableArrayBoard} instance
-		 */
+		@Override
 		public ImmutableArrayBoard build() {
 			return new ImmutableArrayBoard(board);
 		}

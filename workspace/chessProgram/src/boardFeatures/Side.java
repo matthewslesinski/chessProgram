@@ -35,4 +35,13 @@ public enum Side {
 		return fileOrdinal >= (isKingside ? 4 : 0) &&
 				fileOrdinal <= (isKingside ? 7 : 3);
 	}
+	
+	/**
+	 * Retrieves the {@code Side} based on if it's the kingside or not
+	 * @param isKingside If the retrieved {@code Side} should be KINGSIDE
+	 * @return The {@code Side}
+	 */
+	public static Side getByBoolean(boolean isKingside) {
+		return isKingside ? KINGSIDE : QUEENSIDE;
+	}
 }

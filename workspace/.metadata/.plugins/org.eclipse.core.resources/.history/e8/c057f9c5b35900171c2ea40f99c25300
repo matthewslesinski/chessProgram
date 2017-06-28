@@ -1,0 +1,45 @@
+package pieces;
+
+import java.util.Set;
+
+import boardFeatures.Square;
+import representation.Board;
+import representation.Move;
+
+/**
+ * This class holds 
+ * @author matthewslesinski
+ *
+ */
+public abstract class PieceUtility {
+	
+	/**
+	 * The type of piece this is
+	 */
+	protected final PieceType pieceType;
+	
+	/**
+	 * Constructor for pieces in general. Establishes what piece this is for
+	 * @param color
+	 */
+	public PieceUtility(PieceType type) {
+		this.pieceType = type;
+	}
+	
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return The {@code PieceType} describing this piece
+	 */
+	public PieceType getType() {
+		return this.pieceType;
+	}
+	
+	
+	/**
+	 * Gets the {@code List} of moves for this piece
+	 * @return The {@code List} of {@code Square} at a {@code Square} on the {@code Board}
+	 */
+	public abstract Set<Move> getLegalMoves(Square square, Board board);
+	
+}

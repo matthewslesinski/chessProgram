@@ -1,0 +1,54 @@
+package immutableArrayBoard;
+
+import boardFeatures.Square;
+import moves.Move;
+import pieces.PieceType;
+
+public class BasicMove implements Move {
+
+	
+	
+	/**
+	 * Stores the important information about this move. The first 4 digits of the binary representation of this int will define the
+	 * type of piece making this move. The next 4 hold the type of captured piece if there is one. The next 6 hold the file and rank
+	 * (where rank populates the lower/righter digits) of the start square, and then the next 6 hold the file and rank of the end square.
+	 * The next 2 hold the castling rights ordinal if the move involves castling, and then the next 2 hold the type of promotion if it is one
+	 * (where 00 is knight, 01 is bishop, 10 is rook, and 11 is queen)
+	 */
+	protected int info;
+	
+	public BasicMove(PieceType piece, Square start, Square end) {
+		
+	}
+	
+	/**
+	 * Sets a bit string of the specified length and containing the specified value at the specified starting bit of the {@code info} value for this
+	 * class. It assumes that the binary digits that would potentially be overwritten are all already 0. 
+	 * @param startBit
+	 * @param length
+	 * @param value
+	 */
+	protected void setInfo(int startBit, int length, int value) {
+		int unshiftedValue = (~0 >>> (32 - length)) & value;
+		info |= (unshiftedValue << startBit);
+	}
+	
+	@Override
+	public PieceType getMovingPiece() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Square getStartSquare() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Square getEndSquare() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

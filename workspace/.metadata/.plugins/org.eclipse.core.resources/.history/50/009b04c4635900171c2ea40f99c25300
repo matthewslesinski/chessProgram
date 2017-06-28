@@ -1,0 +1,21 @@
+package pieces;
+
+import java.util.List;
+
+import boardFeatures.Square;
+import representation.Board;
+
+public class King extends PieceUtility {
+
+	
+	public King(Piece piece) {
+		super(piece);
+	}
+	
+	@Override
+	public List<Square> getLegalMoves(Square square, Board board) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

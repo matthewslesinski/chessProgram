@@ -1,0 +1,92 @@
+package pieces;
+
+import java.util.Set;
+import java.util.function.Function;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+import representation.Board;
+import representation.Move;
+
+public enum Piece {
+
+	NONE((piece) -> null),
+	WHITE_PAWN((piece) -> new Pawn(piece)),
+	WHITE_KNIGHT((piece) -> new Knight(piece)),
+	WHITE_BISHOP((piece) -> new Bishop(piece)),
+	WHITE_ROOK((piece) -> new Rook(piece)),
+	WHITE_QUEEN((piece) -> new Queen(piece)),
+	WHITE_KING((piece) -> new King(piece)),
+	BLACK_PAWN((piece) -> new Pawn(piece)),
+	BLACK_KNIGHT((piece) -> new Knight(piece)),
+	BLACK_BISHOP((piece) -> new Bishop(piece)),
+	BLACK_ROOK((piece) -> new Rook(piece)),
+	BLACK_QUEEN((piece) -> new Queen(piece)),
+	BLACK_KING((piece) -> new King(piece));
+	
+	private final PieceType type;
+	private final Color color;
+	private final PieceUtility pieceUtility;
+	
+	private Piece(Function<Piece, PieceUtility> constructor) {
+		if (this.ordinal() == 0) {
+			this.type = null;
+			this.color = null;
+		} else {
+			this.type = PieceType.values()[(this.ordinal() - 1) % 6];
+			this.color = Color.getColor(this.ordinal() < 7);
+		}
+		this.pieceUtility = constructor.apply(this);
+	}
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return the {@code PieceType} of this piece
+	 */
+	public PieceType getType() {
+		return type;
+	}
+	
+	/**
+	 * Gets the color of this piece
+	 * @return the {@code Color}
+	 */
+	public Color getColor() {
+		return color;
+	}
+	
+	/**
+	 * How to represent this {@code Piece} in bits
+	 * @return The representation
+	 */
+	public int getBitRepresentation() {
+		return this.ordinal();
+	}
+	
+	/**
+	 * Returns the piece that is represented by these bits
+	 * @param bits The bits representing a piece
+	 * @return The {@code Piece}
+	 */
+	public static Piece getPieceByBits(int bits) {
+		return values()[bits];
+	}
+	
+	/**
+	 * Gets the piece that has a color and a type
+	 * @param color The {@code Color} of the {@code Piece}
+	 * @param type The {@code PieceType} of the {@code Piece}
+	 * @return The {@code Piece} with that color and type
+	 */
+	public static Piece getByColorAndType(Color color, PieceType type) {
+		if (color == null || type == null) {
+			return NONE;
+		}
+		return values()[color.isWhite() ? 1 : 7 + type.ordinal()];
+	}
+	
+	public Set<Move> getLegalMoves(Square square, Board board) {
+		return pieceUtility.getLegalMoves(square, board);
+	}
+	
+}
