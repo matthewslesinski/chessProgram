@@ -1,0 +1,8 @@
+package representation;
+
+import java.util.List;
+
+public abstract class MoveGenerator<B extends Board> {
+
+	public abstract List<Move> calculateMoves(B board);
+}

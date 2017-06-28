@@ -1,0 +1,91 @@
+package moves;
+
+
+import boardFeatures.Square;
+import pieces.PieceType;
+
+public class BasicMove implements Move {
+
+	private static final Boolean[] BOOLEAN_OPTIONS = {false, true};
+	
+	private final PieceType movingPiece;
+	private final boolean isCapture;
+	private final PieceType capturedPiece;
+	private final Square start;
+	private final Square end;
+	private final boolean isCastle;
+	private final boolean isPromotion;
+	private final PieceType promotionPiece;
+	private final boolean isEnPassant;
+	
+	
+	public BasicMove(int compressedMove) {
+		movingPiece = getObject(PieceType.values(), MoveBitStringSection.MOVING_PIECE, compressedMove);
+		isCapture = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.IS_CAPTURE, compressedMove);
+		capturedPiece = isCapture ? getObject(PieceType.values(), MoveBitStringSection.CAPTURE_PIECE, compressedMove) : null;
+		start = getObject(Square.values(), MoveBitStringSection.START_SQUARE, compressedMove);
+		end = getObject(Square.values(), MoveBitStringSection.END_SQUARE, compressedMove);
+		isCastle = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.IS_CASTLE, compressedMove);
+		isPromotion = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.IS_PROMOTION, compressedMove);
+		promotionPiece = isPromotion ? getObject(PieceType.getPromotionPieces(), MoveBitStringSection.PROMOTION_TYPE, compressedMove) : null;
+		isEnPassant = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.IS_EN_PASSANT, compressedMove);	
+	}
+	
+	/**
+	 * Retrieves an index from an array, where the index is what the {@code section} of {@code compressedMove} holds
+	 * @param options The array to retrieve from
+	 * @param section The bit section of the int that has the index
+	 * @param compressedMove The compressed representation of this move.
+	 * @return
+	 */
+	private <T> T getObject(T[] options, MoveBitStringSection section, int compressedMove) {
+		return options[section.getValue(compressedMove)];
+	}
+	
+	@Override
+	public PieceType getMovingPiece() {
+		return movingPiece;
+	}
+	
+	@Override
+	public boolean isCapture() {
+		return isCapture;
+	}
+	
+	@Override
+	public PieceType getCapturedPiece() {
+		return capturedPiece;
+	}
+
+	@Override
+	public boolean isPromotion() {
+		return isPromotion;
+	}
+
+	@Override
+	public boolean isCastle() {
+		return isCastle;
+	}
+
+	@Override
+	public boolean isEnPassant() {
+		return isEnPassant;
+	}
+
+	@Override
+	public Square getStartSquare() {
+		return start;
+	}
+
+	@Override
+	public Square getEndSquare() {
+		return end;
+	}
+
+	@Override
+	public int compress() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+}

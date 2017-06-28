@@ -1,0 +1,84 @@
+package moves;
+
+import boardFeatures.Side;
+import boardFeatures.Square;
+import pieces.Piece;
+
+/**
+ * Represents a move in the game
+ * @author matthewslesinski
+ *
+ */
+public interface Move {
+
+	/**
+	 * Returns the {@code Piece} that gets moved
+	 * @return the {@code Piece} that moves
+	 */
+	public Piece getMovingPiece();
+	
+	/**
+	 * Gets the {@code Square} the {@code Piece} making this move starts from
+	 * @return The {@code Square}
+	 */
+	public Square getStartSquare();
+	
+	/**
+	 * Gets the {@code Square} the {@code Piece} making this move ends at
+	 * @return The {@code Square}
+	 */
+	public Square getEndSquare();
+	
+	/**
+	 * Does this piece involve capturing another piece?
+	 * @return if it involves capturing
+	 */
+	public default boolean isCapture() {
+		return getCapturedPiece() == Piece.NONE;
+	}
+	
+	/**
+	 * Gets the captured piece for this move.
+	 * @return The {@code Piece}
+	 */
+	public default Piece getCapturedPiece() {
+		return Piece.NONE;
+	}
+	
+	/**
+	 * Determines if this move is an en passant
+	 * @return true iff it is
+	 */
+	public default boolean isEnPassant() {
+		return false;
+	}
+	
+	/**
+	 * Gets the square that the en passant capture happens on, if this is an en passant move, otherwise null
+	 * @return The {@code Square}
+	 */
+	public default Square getEnPassantCaptureSquare() {
+		if (!isEnPassant()) {
+			return null;
+		}
+		return Square.getByFileAndRank(getEndSquare().getFile(), getStartSquare().getRank());
+	}
+	
+	/**
+	 * Determines if this move involves castling or not
+	 * @return true iff it does
+	 */
+	public default boolean isCastle() {
+		return getCastlingSide() == null;
+	}
+	
+	/**
+	 * If this move is castling, determines which of the {@code Side}s of the board the castling is towards.
+	 * @return The {@code Side} that represent which side this castling is towards.
+	 */
+	public default Side getCastlingSide() {
+		return null;
+	}
+	
+	
+}

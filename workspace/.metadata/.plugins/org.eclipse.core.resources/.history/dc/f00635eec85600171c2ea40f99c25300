@@ -1,0 +1,15 @@
+package representation;
+
+import gamePlaying.Color;
+import immutableArrayBoard.ImmutableArrayBoard.Builder;
+
+public abstract class BoardBuilder<B extends Board<B>> {
+
+	
+	/**
+	 * Sets the color for this board to the given {@code Color}
+	 * @param color the {@code Color} to set
+	 * @return This builder
+	 */
+	public abstract Builder withColorToMove(Color color);
+}

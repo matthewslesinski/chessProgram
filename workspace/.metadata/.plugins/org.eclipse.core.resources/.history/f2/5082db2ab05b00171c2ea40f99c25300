@@ -1,0 +1,18 @@
+package moves;
+
+import pieces.PieceType;
+
+public interface Promotion extends Move {
+
+		
+	@Override
+	public default PieceType getMovingPiece() {
+		return PieceType.PAWN;
+	}
+
+	@Override
+	public default boolean isPromotion() {
+		return true;
+	}
+
+}

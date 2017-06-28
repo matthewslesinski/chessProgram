@@ -4,6 +4,13 @@ import java.util.List;
 
 import support.BadArgumentException;
 
+/**
+ * Used to represent a straight line on the board, so every instance of a line could potentially contain the two squares in a queen's move.
+ * It would be really nice if this could be an abstract class, so that its static methods could be inherited and so that some other things could
+ * be specified, but it needs to be an interface since enums already extend the {@code Enum} class implicitly.
+ * @author matthewslesinski
+ *
+ */
 public interface Line {
 
 	/**

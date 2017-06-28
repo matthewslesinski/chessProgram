@@ -1,0 +1,6 @@
+package moves;
+
+public interface EnPassant extends Move {
+
+	
+}

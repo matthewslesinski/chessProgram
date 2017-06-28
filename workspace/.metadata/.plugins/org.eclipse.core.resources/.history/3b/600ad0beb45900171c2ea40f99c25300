@@ -1,0 +1,46 @@
+package pieces;
+
+import java.util.function.Function;
+
+public enum PieceType {
+
+	PAWN("pawn", Pawn::new),
+	KNIGHT("knight", Knight::new),
+	BISHOP("bishop", Bishop::new),
+	ROOK("rook", Rook::new),
+	QUEEN("queen", Queen::new),
+	KING("king", King::new);
+	
+	private final String readableForm;
+	
+	private final PieceUtility utilityInstance;
+	
+	private PieceType(String readableForm, Function<PieceType, PieceUtility> constructor) {
+		this.readableForm = readableForm;
+		utilityInstance = constructor.apply(this);
+	}
+	
+	
+	/**
+	 * Gets the piece type given by the index
+	 * @param index The index to get
+	 * @return The {@code PieceType} at that index in the array of {@code PieceType}s
+	 */
+	public static PieceType getByIndex(int index) {
+		return values()[index];
+	}
+	
+	/**
+	 * Gets the utility class instance for this type
+	 * @return The {@code PieceUtility}
+	 */
+	public PieceUtility getUtilityInstance() {
+		return utilityInstance;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return this.readableForm;
+	}
+}

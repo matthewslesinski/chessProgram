@@ -1,0 +1,17 @@
+package moves;
+
+import pieces.PieceType;
+
+public interface Castling extends Move {
+	
+	
+	@Override
+	public default PieceType getMovingPiece() {
+		return PieceType.KING;
+	}
+
+	@Override
+	public default boolean isCastle() {
+		return true;
+	}
+}

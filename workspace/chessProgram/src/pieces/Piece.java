@@ -1,124 +1,115 @@
 package pieces;
 
-import java.util.List;
-
+import java.util.Set;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import moves.Move;
 import representation.Board;
 import support.BadArgumentException;
 
-public abstract class Piece {
+public enum Piece {
+
+	NONE,
+	WHITE_PAWN,
+	WHITE_KNIGHT,
+	WHITE_BISHOP,
+	WHITE_ROOK,
+	WHITE_QUEEN,
+	WHITE_KING,
+	BLACK_PAWN,
+	BLACK_KNIGHT,
+	BLACK_BISHOP,
+	BLACK_ROOK,
+	BLACK_QUEEN,
+	BLACK_KING;
 	
-	/**
-	 * The color, white or black, of this piece
-	 */
-	protected final Color color;
+	private final PieceType type;
+	private final Color color;
 	
-	/**
-	 * The type of piece this is
-	 */
-	protected final PieceType pieceType;
-	
-	/**
-	 * The byte that represents this piece 
-	 */
-	protected final int bitRepresentation;
-	
-	/**
-	 * Constructor for pieces in general. Establishes the color of the piece
-	 * @param color
-	 */
-	public Piece(Color color, PieceType pieceType, int bitRepresentation) {
-		this.color = color;
-		this.pieceType = pieceType;
-		this.bitRepresentation = bitRepresentation;
-	}
-	
-	/**
-	 * Gets this piece's color
-	 * @return the {@code Color}
-	 */
-	public Color getColor() {
-		return this.color;
+	private Piece() {
+		if (this.ordinal() == 0) {
+			this.type = null;
+			this.color = null;
+		} else {
+			this.type = PieceType.values()[(this.ordinal() - 1) % 6];
+			this.color = Color.getColor(this.ordinal() < 7);
+		}
 	}
 	
 	/**
 	 * Gets the type of piece this is
-	 * @return The {@code PieceType} describing this piece
+	 * @return the {@code PieceType} of this piece
 	 */
 	public PieceType getType() {
-		return this.pieceType;
+		return type;
 	}
 	
 	/**
-	 * Returns the bit representation of this piece
-	 * @return The byte with the bits
+	 * Gets the color of this piece
+	 * @return the {@code Color}
+	 */
+	public Color getColor() {
+		return color;
+	}
+	
+	/**
+	 * How to represent this {@code Piece} in bits
+	 * @return The representation
 	 */
 	public int getBitRepresentation() {
-		return this.bitRepresentation;
+		return this.ordinal();
 	}
 	
 	/**
-	 * Gets the {@code List} of moves for this piece
-	 * @return The {@code List} of {@code Square} at a {@code Square} on the {@code Board}
-	 */
-	public abstract List<Square> getLegalMoves(Square square, Board board);
-	
-	/**
-	 * Calculates which piece is represented by the bit string, which should have only its first four bits set to anything.
-	 * If the bit string is 0, the piece is empty. If it's between 1 and 6 inclusive, it's a white piece. And if it's between
-	 * 7 and 12 it's a black piece
-	 * @param bits The bits representing the piece
-	 * @return The piece represented by the bits
+	 * Returns the piece that is represented by these bits
+	 * @param bits The bits representing a piece
+	 * @return The {@code Piece}
 	 */
 	public static Piece getPieceByBits(int bits) {
-		if (bits > 12) {
+		if (bits >= values().length) {
 			throw new BadArgumentException(bits, int.class, "The bit string cannot represent a piece because it is too high");
 		}
 		if (bits == 0) {
 			return null;
 		}
-		return getPieceByTypeAndColor(PieceType.getByIndex((bits - 1) % 6), Color.getColor(bits <= 6));
+		return values()[bits];
 	}
 	
 	/**
-	 * Retrieves a {@code Piece} by its type and its color
-	 * @param type The type of piece
-	 * @param color Its color
-	 * @return The physical piece
+	 * Gets the piece that has a color and a type
+	 * @param color The {@code Color} of the {@code Piece}
+	 * @param type The {@code PieceType} of the {@code Piece}
+	 * @return The {@code Piece} with that color and type
 	 */
-	public static Piece getPieceByTypeAndColor(PieceType type, Color color) {
-		if (type == null || color == null) {
-			return null;
+	public static Piece getByColorAndType(Color color, PieceType type) {
+		if (color == null || type == null) {
+			return NONE;
 		}
-		// TODO
-		return null;
+		return values()[color.isWhite() ? 1 : 7 + type.ordinal()];
 	}
 	
+	/**
+	 * Gets the legal moves of this piece in any situation.
+	 * @param square The {@code Square} mapping to this piece in the {@code Board}
+	 * @param board The {@code Board} to get the moves from
+	 * @return The {@code Set} of the legal {@code Move}s
+	 */
+	public Set<Move> getLegalMoves(Square square, Board board) {
+		if (!board.isPieceAtSquare(this, square)) {
+			throw new BadArgumentException(square, Square.class, "Can't get legal moves for a different piece than what is on the provided square");
+		}
+		if (board.whoseMove() != this.color) {
+			throw new BadArgumentException(this, Piece.class, "Can't calculate legal moves for a piece of the wrong color");
+		}
+		if (this == NONE) {
+			throw new BadArgumentException(this, Piece.class, "Can't calculate legal moves for an empty square");
+		}
+		return type.getUtilityInstance().getLegalMoves(square, board);
+	}
 	
 	@Override
 	public String toString() {
-		return this.pieceType.toString();
+		return this.type.toString();
 	}
-
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((color == null) ? 0 : color.hashCode());
-		result = prime * result + ((pieceType == null) ? 0 : pieceType.hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Piece))
-			return false;
-		Piece other = (Piece) obj;
-		return color == other.color && pieceType == other.pieceType;
-	}
+	
 }

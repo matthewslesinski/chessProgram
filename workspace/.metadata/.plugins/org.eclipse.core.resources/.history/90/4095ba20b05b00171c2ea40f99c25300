@@ -1,0 +1,17 @@
+package moves;
+
+import pieces.PieceType;
+
+public interface EnPassant extends Capture {
+
+	
+	@Override
+	public default PieceType getCapturedPiece() {
+		return PieceType.PAWN;
+	}
+	
+	@Override
+	public default boolean isEnPassant() {
+		return true;
+	}
+}
