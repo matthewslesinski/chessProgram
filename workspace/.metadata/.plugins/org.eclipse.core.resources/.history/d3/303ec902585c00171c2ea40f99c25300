@@ -2,7 +2,6 @@ package representation;
 
 import java.util.Set;
 
-import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.State;
 import moves.Move;
@@ -50,13 +49,6 @@ public abstract class Board implements State {
 	 * @return If it's allowed
 	 */
 	public abstract boolean canCastle(CastlingRights right);
-
-	/**
-	 * Gets the {@code File} the current player can capture onto with an en passant, or null if none/not allowed
-	 * @return The destination {@code File} for the pawn
-	 */
-	public abstract File enPassantCaptureFile();
-
 	
 	@Override
 	public Set<Move> getLegalMoves() {

@@ -1,0 +1,77 @@
+package immutableArrayBoard;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.Move;
+import representation.Board;
+import representation.MoveGenerator;
+
+/**
+ * Calculates the moves for a given position. This is a mutable object, and 
+ * @author matthewslesinski
+ *
+ */
+public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
+
+	private static class FixedSizeList {
+		private final Square[] squares;
+		private final int[] indices = new int[Square.values().length];
+		int firstOpenSpot = 0;
+		private FixedSizeList(int maxSize) {
+			this.squares = new Square[maxSize];
+		}
+		
+		private void add(Square square) {
+			squares[firstOpenSpot] = square;
+			indices[square.getIndex()] = firstOpenSpot++;
+		}
+		
+	}
+	private class PreProcessing {
+		
+		
+		private List<Square>[] piecesAndSquares = new ArrayList[13];
+		private 
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
+		clear();
+		toMove = board.whoseMove();
+		this.board = board;
+	}
+	
+	/**
+	 * Resets the MoveGenerator to its original state
+	 */
+	// TODO finish this
+	private void clear() {
+		toMove = null;
+		board = null;
+	}
+
+}

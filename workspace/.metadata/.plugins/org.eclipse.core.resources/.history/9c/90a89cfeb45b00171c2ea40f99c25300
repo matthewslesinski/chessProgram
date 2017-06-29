@@ -48,14 +48,6 @@ public enum PieceType {
 	}
 	
 	/**
-	 * Detemrines if this piece can move far across the board in one turn.
-	 * @return true iff it can
-	 */
-	public boolean isLongRange() {
-		return this.ordinal() >= 2 && this.ordinal() <= 4;
-	}
-	
-	/**
 	 * Determines if the piece can be promoted to
 	 * @return true iff so
 	 */

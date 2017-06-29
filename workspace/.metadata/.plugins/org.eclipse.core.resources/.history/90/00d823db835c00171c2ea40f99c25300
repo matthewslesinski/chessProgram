@@ -1,8 +1,6 @@
 package immutableArrayBoard;
 
 import java.util.Set;
-
-import moves.DecompressedBoard;
 import moves.Move;
 import representation.MoveGenerator;
 
@@ -13,12 +11,10 @@ import representation.MoveGenerator;
  */
 public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
 	
-	private DecompressedBoard<ImmutableArrayBoard> preprocessing;
 	
 	@Override
 	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
 		clear();
-		preprocessing = new DecompressedBoard<>(board);
 		// TODO
 		return null;
 	}

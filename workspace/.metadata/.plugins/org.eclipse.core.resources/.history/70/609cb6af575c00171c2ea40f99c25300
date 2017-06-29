@@ -30,8 +30,6 @@ public class ImmutableArrayBoard extends Board {
 	
 	private static final int EN_PASSANT_INDEX = 4;
 	
-	private static final int EN_PASSANT_PERMISSION_MASK = 0b1000;
-	
 	private static final int NUMBER_OF_BITS_PER_PIECE = 4;
 	
 	/**
@@ -60,19 +58,7 @@ public class ImmutableArrayBoard extends Board {
 
 	@Override
 	public Color whoseMove() {
-		return Color.getColor((board[RIGHTS_INDEX] & COLOR_MASK) != 0);
-	}
-	
-	@Override
-	public boolean canCastle(CastlingRights right) {
-		return board[RIGHTS_INDEX] >>> (FIRST_CASTLING_RIGHT_BIT + right.ordinal()) % 2 == 1;
-	}
-
-	@Override
-	public File enPassantCaptureFile() {
-		int relevantInfo = board[RIGHTS_INDEX] >>> EN_PASSANT_INDEX;
-		return File.getByIndex((relevantInfo & EN_PASSANT_PERMISSION_MASK) != 0 ?
-				relevantInfo & 0b111 : null);
+		return Color.getColor(board[RIGHTS_INDEX] % 2 == 1);
 	}
 
 	
@@ -143,7 +129,7 @@ public class ImmutableArrayBoard extends Board {
 		
 		@Override
 		public Builder withEnPassant(File file) {
-			setRightsByBitMask(file != null ? (file.getIndex() | EN_PASSANT_PERMISSION_MASK) << EN_PASSANT_INDEX : ~0b11110000, file != null);
+			setRightsByBitMask(file != null ? (file.getIndex() | 0b1000) << EN_PASSANT_INDEX : ~0b11110000, file != null);
 			return this;
 		}
 		
