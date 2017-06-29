@@ -18,7 +18,7 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 	@Override
 	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
 		clear();
-		preprocessing = new IntensivePreProcessing<>(board);
+		preprocessing = new DecompressedBoard<>(board);
 		// TODO
 		return null;
 	}
