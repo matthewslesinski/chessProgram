@@ -8,3 +8,5 @@
 1498534294345	Rename type 'IntMoveBitInfo'
 1498534316764	Rename type 'MoveBitStringStructure'
 1498562916122	Move compilation unit
+1498710339627	Rename type 'DecompressedImmutableArrayBoard'
+1498710345949	Move compilation unit

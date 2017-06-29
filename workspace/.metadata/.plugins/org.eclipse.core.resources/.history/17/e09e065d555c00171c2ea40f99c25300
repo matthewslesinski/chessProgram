@@ -1,0 +1,118 @@
+package immutableArrayBoard;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.Move;
+import representation.Board;
+import representation.MoveGenerator;
+import support.BadArgumentException;
+
+/**
+ * Calculates the moves for a given position. This is a mutable object, and 
+ * @author matthewslesinski
+ *
+ */
+public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
+
+	private static class FixedSizeList {
+		private final Square[] squares;
+		private final int[] indices = new int[Square.values().length];
+		int size = 0;
+		
+		private FixedSizeList(int maxSize) {
+			this.squares = new Square[maxSize];
+		}
+		
+		private void add(Square square) {
+			squares[size] = square;
+			indices[square.getIndex()] = size++;
+		}
+		
+		private boolean contains(Square square) {
+			return squares[indices[square.getIndex()]] == square;
+		}
+		
+		/**
+		 * Gets the square in this list that is a certain number of other squares removed from the current one
+		 * @param square The current square
+		 * @param diff The number of squares removed the other one is
+		 * @return The square a certain number of other squares removed
+		 */
+		private Square getNeighbor(Square square, int diff) {
+			if (!contains(square)) {
+				throw new BadArgumentException(square, FixedSizeList.class, "This square is not in this list");
+			}
+			int index = indices[square.getIndex()] + diff;
+			if (index < 0 || index >= size) {
+				return null;
+			}
+			return squares[index];
+		}
+		
+		/**
+		 * Gets the next square in this list
+		 * @param square The current square
+		 * @return The next one
+		 */
+		private Square getNext(Square square) {
+			return getNeighbor(square, 1);
+		}
+		
+		/**
+		 * Gets the previous square in this list
+		 * @param square The current square
+		 * @return The previous one
+		 */
+		private Square getPrevious(Square square) {
+			return getNeighbor(square, -1);
+		}
+		
+	}
+	private class PreProcessing {
+		
+		
+		private List<Square>[] piecesAndSquares = new ArrayList[13];
+		 
+		
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	@Override
+	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
+		clear();
+		toMove = board.whoseMove();
+		this.board = board;
+	}
+	
+	/**
+	 * Resets the MoveGenerator to its original state
+	 */
+	// TODO finish this
+	private void clear() {
+		toMove = null;
+		board = null;
+	}
+
+}

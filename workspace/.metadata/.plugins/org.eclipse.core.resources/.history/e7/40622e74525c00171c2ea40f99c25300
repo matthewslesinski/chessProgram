@@ -143,14 +143,6 @@ public enum Square {
 	}
 	
 	/**
-	 * Gets the number square this is, in the order it appears in the enum
-	 * @return The index
-	 */
-	public int getIndex() {
-		return this.ordinal();
-	}
-	
-	/**
 	 * Gets the {@code File} containing this square
 	 * @return the {@code File}
 	 */

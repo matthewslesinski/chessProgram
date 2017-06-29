@@ -29,8 +29,8 @@ public interface Line {
 	 * Gets the length of this line
 	 * @return The length
 	 */
-	public default int getLength() {
-		return getContainedSquares().size();
+	public default byte getLength() {
+		return (byte) getContainedSquares().size();
 	}
 	
 	/**
@@ -38,7 +38,7 @@ public interface Line {
 	 * @param index The index to check
 	 * @return If it's in the bounds of the line
 	 */
-	public default boolean indexInBounds(int index) {
+	public default boolean indexInBounds(byte index) {
 		return index >= 0 && index < getLength();
 	}
 
