@@ -1,14 +1,20 @@
 package moves;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import boardFeatures.Direction;
+import boardFeatures.DownRightDiagonal;
 import boardFeatures.File;
+import boardFeatures.Rank;
 import boardFeatures.Square;
+import boardFeatures.UpRightDiagonal;
 import gamePlaying.Color;
 import pieces.Piece;
 import representation.Board;
 import representation.CastlingRights;
+import support.BadArgumentException;
 
 /**
  * Used to preprocess a board before calculating the moves, so that calculating them is easier than accessing the board directly
