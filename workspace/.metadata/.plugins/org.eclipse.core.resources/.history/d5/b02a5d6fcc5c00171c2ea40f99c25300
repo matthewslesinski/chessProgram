@@ -46,7 +46,7 @@ public class ImmutableArrayBoard extends Board {
 	 */
 	private final int[] board;
 	
-	private static final Supplier<MoveGenerator<ImmutableArrayBoard>> moveGeneratorConstructor = ImmutableArrayMoveGenerator::new;
+	private static final Supplier<MoveGenerator<ImmutableArrayBoard>> moveGenerator = ImmutableArrayMoveGenerator::new;
 		
 	
 	private ImmutableArrayBoard(int[] board) {
@@ -89,7 +89,7 @@ public class ImmutableArrayBoard extends Board {
 
 	@Override
 	public void calculateMoves() {
-		legalMoves = moveGeneratorConstructor.get().calculateMoves(this);
+		legalMoves = moveGenerator.calculateMoves(this);
 	}
 	
 	
