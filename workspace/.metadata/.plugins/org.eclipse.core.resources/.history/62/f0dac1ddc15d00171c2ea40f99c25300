@@ -1,0 +1,48 @@
+package moves;
+
+import boardFeatures.Square;
+import support.BadArgumentException;
+
+/**
+ * Acting like a list and backed by an array, this keeps a list of squares that you can add to, up to the maxSize,
+ * but can't remove from. Therefore, this is able to keep track of where the squares are placed, so it can quickly
+ * get neighbors as well as the index of a particular square.
+ * @author matthewslesinski
+ *
+ */
+public class FixedSizeList implements ImportantSquareList {
+	private final Square[] squares;
+	private final int[] indices = new int[Square.values().length];
+	int size = 0;
+	
+	public FixedSizeList(int maxSize) {
+		this.squares = new Square[maxSize];
+	}
+	
+	@Override
+	public void add(Square square) {
+		if (size >= squares.length) {
+			throw new BadArgumentException(square, FixedSizeList.class, "Can't add too many squares to this list");
+		}
+		squares[size] = square;
+		indices[square.getIndex()] = size++;
+	}
+	
+	@Override
+	public boolean contains(Square square) {
+		return squares[indices[square.getIndex()]] == square;
+	}
+	
+	@Override
+	public Square getNeighbor(Square square, int diff) {
+		if (!contains(square)) {
+			throw new BadArgumentException(square, FixedSizeList.class, "This square is not in this list");
+		}
+		int index = indices[square.getIndex()] + diff;
+		if (index < 0 || index >= size) {
+			return null;
+		}
+		return squares[index];
+	}
+	
+}

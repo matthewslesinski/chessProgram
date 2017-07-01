@@ -1,10 +1,6 @@
 package boardFeatures;
 
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
 import support.UtilityFunctions;
 
 
@@ -25,13 +21,11 @@ public enum Direction {
 	private final int rankDelta;
 	private final Class<? extends Line> containingLineType;
 	private final Movement movement;
-	private final List<Direction> outwardDirections; 
 	private Direction(int fileDelta, int rankDelta) {
 		this.fileDelta = fileDelta;
 		this.rankDelta = rankDelta;
 		containingLineType = getLineType();
 		movement = determineMovement();
-		outwardDirections = calculateOutwardDirections();
 	}
 	
 	/**
@@ -72,14 +66,6 @@ public enum Direction {
 	 */
 	public Movement getMovement() {
 		return this.movement;
-	}
-	
-	/**
-	 * Retrieves the list of the directions that face outward
-	 * @return The list of directions
-	 */
-	public List<Direction> getOutwardDirections() {
-		return outwardDirections;
 	}
 	
 	/**
@@ -127,13 +113,5 @@ public enum Direction {
 		default:
 			return Movement.NOWHERE;
 		}
-	}
-	
-	/**
-	 * Determines the list of directions that face outward
-	 * @return The list of the directions
-	 */
-	private List<Direction> calculateOutwardDirections() {
-		return Arrays.asList(values()).stream().filter(dir -> dir != NONE).collect(Collectors.toList());
 	}
 }
