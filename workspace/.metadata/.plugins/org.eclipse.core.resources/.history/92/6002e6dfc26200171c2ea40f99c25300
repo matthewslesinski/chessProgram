@@ -1,0 +1,107 @@
+package boardFeatures;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+
+public class SquareSet implements Set<Square>{
+	private static final int NUM_SQUARES = Square.values().length;
+	
+	private final List<Square> squaresList = new LinkedList<>();
+	private final boolean[] squaresArray = new boolean[NUM_SQUARES];
+	
+	public SquareSet() {
+		
+	}
+	
+	
+	@Override
+	public int size() {
+		return squaresList.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return squaresList.isEmpty();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		if (!(o instanceof Square)) {
+			return false;
+		}
+		return squaresArray[((Square) o).getIndex()];
+	}
+
+	@Override
+	public Iterator<Square> iterator() {
+		return squaresList.iterator();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return squaresList.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return squaresList.toArray(a);
+	}
+
+	@Override
+	public boolean add(Square e) {
+		squaresArray[e.getIndex()] = true;
+		return squaresList.add(e);
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		if (!(o instanceof Square)) {
+			return false;
+		}
+		squaresArray[((Square) o).getIndex()] = false;
+		return squaresList.remove(o);
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		for (Object e : c) {
+			if (!contains(e)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends Square> c) {
+		boolean toReturn = true;
+		for (Square s : c) {
+			if (!add(s)) {
+				toReturn = false;
+			}
+		}
+		return toReturn;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

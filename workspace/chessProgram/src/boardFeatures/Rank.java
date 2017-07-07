@@ -23,6 +23,7 @@ public enum Rank implements Line {
 	EIGHT("8");
 	
 	private String readableForm;
+	private static final Direction directionOfLine = Direction.RIGHT;
 	
 	private Rank(String readableForm) {
 		this.readableForm = readableForm;
@@ -68,6 +69,11 @@ public enum Rank implements Line {
 	@Override
 	public int getSpotInLine(Square square) {
 		return square.getFile().getIndex();
+	}
+	
+	@Override
+	public Direction getForwardDirection() {
+		return directionOfLine;
 	}
 	
 	/**

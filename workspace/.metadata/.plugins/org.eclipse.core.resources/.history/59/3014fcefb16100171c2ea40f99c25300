@@ -78,12 +78,6 @@ public interface Line {
 	}
 	
 	/**
-	 * Gets the direction this line goes in
-	 * @return the {@code Direction}
-	 */
-	public Direction getForwardDirection();
-	
-	/**
 	 * Returns a view to the squares ahead of the provided one in this line
 	 * @param square The square from which to look ahead
 	 * @return A {@code List} of {@code Square}, which is backed by the contained squares in this line

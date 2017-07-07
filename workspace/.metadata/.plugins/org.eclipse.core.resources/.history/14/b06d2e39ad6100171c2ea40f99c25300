@@ -5,7 +5,7 @@ import java.util.Set;
 
 import boardFeatures.Square;
 import moves.ProcessedBoard;
-import moves.BasicPreProcessing;
+import moves.IntensivePreProcessing;
 import moves.Move;
 import representation.MoveGenerator;
 
@@ -26,7 +26,7 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 	
 	@Override
 	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
-		preprocessing = new BasicPreProcessing<>(board);
+		preprocessing = new IntensivePreProcessing<>(board);
 		calculateChecks();
 		// TODO
 		return null;

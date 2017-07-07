@@ -108,7 +108,7 @@ public enum Piece {
 	
 	@Override
 	public String toString() {
-		return this.stringPicture;
+		return this.type.toString();
 	}
 	
 }

@@ -26,6 +26,7 @@ public enum UpRightDiagonal implements Line {
 	
 	private static final int CENTER_INDEX = 7;
 	private static final int MAX_LENGTH = 8;
+	private static final Direction directionOfLine = Direction.UP_RIGHT;
 	private final List<Square> containedSquares = getListOfContainedSquares(this.getIndex());
 
 	/**
@@ -83,6 +84,11 @@ public enum UpRightDiagonal implements Line {
 	@Override
 	public int getSpotInLine(Square square) {
 		return square.getRank().getIndex();
+	}
+	
+	@Override
+	public Direction getForwardDirection() {
+		return directionOfLine;
 	}
 	
 	/**

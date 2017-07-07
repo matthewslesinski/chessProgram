@@ -19,7 +19,7 @@ public enum PieceType {
 	
 	private final String readableForm;
 	private final static PieceType[] promotionPieces = {KNIGHT, BISHOP, ROOK, QUEEN};
-	private final static PieceType[] lineMovers = {BISHOP, ROOK, QUEEN};
+	private final static PieceType[] lineMoves = {BISHOP, ROOK, QUEEN};
 	
 	/**
 	 * Holds the utility methods calculating the legal moves for this piece
@@ -76,8 +76,8 @@ public enum PieceType {
 	 * Returns an array of the pieces that move long range
 	 * @return The array of {@code PieceType}s
 	 */
-	public static PieceType[] getLineMovers() {
-		return lineMovers;
+	public static PieceType[] getLineMoves() {
+		return lineMoves;
 	}
 	
 	
