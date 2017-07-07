@@ -283,16 +283,6 @@ public enum Square {
 		return file >= 0 && rank >= 0 && file <= 7 && file <= 7;
 	}
 	
-	/**
-	 * Calculates the manhattan distance between two squares
-	 * @param here The first square
-	 * @param there The second square
-	 * @return The manhattan distance between the two
-	 */
-	public static int getManhattanDistance(Square here, Square there) {
-		return Math.abs(here.getFile().getIndex() - there.getFile().getIndex()) + Math.abs(here.getRank().getIndex() - there.getRank().getIndex());
-	}
-	
 	@Override
 	public String toString() {
 		return file.getHumanReadableForm() + rank.getHumanReadableForm();

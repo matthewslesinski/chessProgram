@@ -6,28 +6,26 @@ import java.util.stream.Collectors;
 import support.BadArgumentException;
 import support.UtilityFunctions;
 
-public enum DownRightDiagonal implements Line {
+public enum UpRightDiagonal implements Line {
 	
-	A1,
-	A2_B1,
-	A3_C1,
-	A4_D1,
-	A5_E1,
-	A6_F1,
-	A7_G1,
-	A8_H1,
-	B8_H2,
-	C8_H3,
-	D8_H4,
-	E8_H5,
-	F8_H6,
-	G8_H7,
-	H8;
-	
+	A8,
+	A7_B8,
+	A6_C8,
+	A5_D8,
+	A4_E8,
+	A3_F8,
+	A2_G8,
+	A1_H8,
+	B1_H7,
+	C1_H6,
+	D1_H5,
+	E1_H4,
+	F1_H3,
+	G1_H2,
+	H1;
 	
 	private static final int CENTER_INDEX = 7;
 	private static final int MAX_LENGTH = 8;
-	private static final Direction directionOfLine = Direction.DOWN_RIGHT;
 	private final List<Square> containedSquares = getListOfContainedSquares(this.getIndex());
 
 	/**
@@ -50,9 +48,9 @@ public enum DownRightDiagonal implements Line {
 						// The start file is only either 0 or index minus the center diagonal index when the
 						// diagonal has a higher index than the center
 						File.getByIndex((byte) (offset + ((index / MAX_LENGTH) * (index - CENTER_INDEX)))),
-						// As you go rightward along the diagonal, the rank drops. The start rank is the center diagonal
+						// As you go rightward along the diagonal, the rank rises. The start rank is the center diagonal
 						// index minus the index, when the index is less than the center's, or 0
-						Rank.getByIndex((byte) (((index / MAX_LENGTH) - 1) * -1 * index - offset))))
+						Rank.getByIndex((byte) (((index / MAX_LENGTH) - 1) * -1 * (CENTER_INDEX - index) + offset))))
 				.collect(Collectors.toList());
 	}
 
@@ -79,7 +77,7 @@ public enum DownRightDiagonal implements Line {
 
 	@Override
 	public boolean containsSquare(Square square) {
-		return square.getDownRightDiagonal() == this;
+		return square.getUpRightDiagonal() == this;
 	}
 
 	@Override
@@ -87,29 +85,23 @@ public enum DownRightDiagonal implements Line {
 		return square.getRank().getIndex();
 	}
 	
-	@Override
-	public Direction getForwardDirection() {
-		return directionOfLine;
-	}
-
-	
 	/**
 	 * Gets the diagonal that has the given index
 	 * @param index The index to get
-	 * @return The {@code DownRightDiagonal} with number one greater than the index
+	 * @return The {@code UpRightDiagonal} with number one greater than the index
 	 * @throws BadArgumentException If the index is not an index for a file
 	 */
-	public static DownRightDiagonal getByIndex(int index) throws BadArgumentException {
-		return Line.getByIndex(index, DownRightDiagonal.class);
+	public static UpRightDiagonal getByIndex(int index) throws BadArgumentException {
+		return Line.getByIndex(index, UpRightDiagonal.class);
 	}
 	
 	/**
-	 * Returns the {@code DownRightDiagonal} containing a square
+	 * Returns the {@code UpRightDiagonal} containing a square
 	 * @param square the {@code Square} to check
-	 * @return the {@code DownRightDiagonal}
+	 * @return the {@code UpRightDiagonal}
 	 */
-	public static DownRightDiagonal getBySquare(Square square) {
-		int index = square.getFile().getIndex() + square.getRank().getIndex();
+	public static UpRightDiagonal getBySquare(Square square) {
+		int index = CENTER_INDEX + square.getFile().getIndex() - square.getRank().getIndex();
 		return getByIndex(index);
 	}
 	
