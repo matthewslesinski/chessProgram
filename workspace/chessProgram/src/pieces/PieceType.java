@@ -49,6 +49,23 @@ public enum PieceType {
 	}
 	
 	/**
+	 * Gets the piece type given the corresponding letter in algebraic notation.
+	 * @param letter: The letter used to represent the piece.
+	 * @return The piece type corresponding to the input letter.
+	 */
+	public static PieceType getByLetter(String letter) {
+		switch (letter) {
+		case "P": return PieceType.PAWN;
+		case "N": return PieceType.KNIGHT;
+		case "B": return PieceType.BISHOP;
+		case "R": return PieceType.ROOK;
+		case "Q": return PieceType.QUEEN;
+		case "K": return PieceType.KING;
+		default: throw new IllegalArgumentException(String.format("Input string \"%s\" does not correspond to a piece.", letter));
+		}
+	}
+	
+	/**
 	 * Detemrines if this piece can move far across the board in one turn.
 	 * @return true iff it can
 	 */

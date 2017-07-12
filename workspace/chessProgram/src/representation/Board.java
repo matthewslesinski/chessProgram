@@ -3,6 +3,7 @@ package representation;
 import java.util.Set;
 
 import boardFeatures.File;
+import boardFeatures.Rank;
 import boardFeatures.Square;
 import gamePlaying.State;
 import moves.Move;
@@ -71,6 +72,22 @@ public abstract class Board implements State {
 		return legalMoves.isEmpty();
 	}
 	
+	@Override
+	public String toString() {
+		StringBuilder toReturn = new StringBuilder();
+		toReturn.append("--------\n");
+		for (int rank = 8; rank >= 1; rank++) {
+			for (char file = 'a'; file <= 'h'; file++) {
+				toReturn.append("|");
+				toReturn.append(getPieceAtSquare(Square.getByFileAndRank(File.getByHumanReadableForm(file+""), Rank.getByHumanReadableForm(rank+""))));
+			}
+			toReturn.append("\n");
+		}
+		toReturn.append("|");
+		toReturn.append("--------\n");
+		
+		return toReturn.toString();
+	}
 	
 	
 }

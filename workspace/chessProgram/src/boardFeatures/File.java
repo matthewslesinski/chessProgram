@@ -28,7 +28,6 @@ public enum File implements Line{
 	
 	private File(String readableForm) {
 		this.readableForm = readableForm;
-		
 	}
 	
 	/**
@@ -92,7 +91,7 @@ public enum File implements Line{
 	
 	/**
 	 * Gets the file that has the given letter
-	 * @param readableForm The number
+	 * @param readableForm The letter
 	 * @return The file with the given letter
 	 * @throws BadArgumentException If the string is not a file
 	 */
