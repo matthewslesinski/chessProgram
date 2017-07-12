@@ -39,7 +39,7 @@ public class ImmutableArrayBoard extends Board {
 	/**
 	 * The array containing the pieces and other board information, and so the actual internal representation of this {@code Board}.
 	 * The first 8 indices contain ints representing the file with that index. Each of those ints is divided into 8 groups of four bits.
-	 * A piece an be encoded in 4 bits. So that's what's stored in each group of 4 bits: the piece stored at that square when indexing into
+	 * A piece can be encoded in 4 bits. So that's what's stored in each group of 4 bits: the piece stored at that square when indexing into
 	 * the file to get the rank. The last index of the array holds the extra information about board state, such as who's to move. This int
 	 * says what castling is potentially allowed, using the first four bits, now or in a deeper position from this one. It also uses second 4 bits
 	 * to say what file a pawn could take a pawn from through en passant, and it uses the first bit of the next quarter of the int to say whose move it is.
@@ -52,7 +52,7 @@ public class ImmutableArrayBoard extends Board {
 	private ImmutableArrayBoard(int[] board) {
 		this.board = board;
 	}
-		
+	
 	
 	@Override
 	public Piece getPieceAtSquare(Square square) {
@@ -92,8 +92,6 @@ public class ImmutableArrayBoard extends Board {
 		legalMoves = moveGeneratorConstructor.get().calculateMoves(this);
 	}
 	
-	
-	
 	public static class Builder extends BoardBuilder<ImmutableArrayBoard> {
 		
 		private int[] board = new int[ARRAY_SIZE];
@@ -123,6 +121,14 @@ public class ImmutableArrayBoard extends Board {
 		 */
 		public Builder(Piece[] pieces, Color whoToMove) {
 			super(pieces, whoToMove);
+		}
+		
+		/**
+		 * Produces an {@code ImmutableBoardBuilder} from a FEN string.
+		 * @param fen: a FEN string representing the board.
+		 */
+		public Builder(String fen) {
+			super(fen);
 		}
 		
 		@Override
