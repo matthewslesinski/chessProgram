@@ -6,10 +6,12 @@ import gamePlaying.Color;
 import moves.Move;
 import representation.Board;
 import support.BadArgumentException;
+import support.Constants;
 
 public enum Piece {
 
-	NONE(' '),
+	
+	NONE(Constants.RUNNING_FROM_ECLIPSE ? 0x3000 : ' '),
 	WHITE_PAWN(0x2659),
 	WHITE_KNIGHT(0x2658),
 	WHITE_BISHOP(0x2657),
@@ -35,7 +37,7 @@ public enum Piece {
 			this.type = PieceType.values()[(this.ordinal() - 1) % 6];
 			this.color = Color.getColor(this.ordinal() < 7);
 		}
-		stringPicture = ((char) picture) + "";
+		stringPicture = Character.toString((char) picture);
 	}
 	
 	/**
@@ -84,7 +86,7 @@ public enum Piece {
 		if (color == null || type == null) {
 			return NONE;
 		}
-		return values()[color.isWhite() ? 1 : 7 + type.ordinal()];
+		return values()[(color.isWhite() ? 1 : 7) + type.ordinal()];
 	}
 	
 	/**

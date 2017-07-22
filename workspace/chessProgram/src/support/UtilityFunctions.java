@@ -1,16 +1,10 @@
 package support;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import boardFeatures.DownRightDiagonal;
-import boardFeatures.Line;
-import boardFeatures.Rank;
-import boardFeatures.Square;
-import boardFeatures.UpRightDiagonal;
 
 /**
  * This class provides static utility functions
@@ -41,7 +35,7 @@ public class UtilityFunctions {
 	 * @return -1, 0, or 1
 	 */
 	public static int getSign(int value) {
-		return value / Math.abs(value);
+		return value == 0 ? 0 : value / Math.abs(value);
 	}
 	
 	/**
@@ -54,27 +48,6 @@ public class UtilityFunctions {
 		List<T> newList = new ArrayList<>(list);
 		Collections.reverse(newList);
 		return newList;
-	}
-	
-	/**
-	 * Determines which member field to retrieve when trying to get the {@code Line} containing the {@code square} that
-	 * is of type {@code type}
-	 * @param square The square in the line
-	 * @param type The type of line
-	 * @return The instance of the type of line
-	 */
-	public static Line getLineBySquareAndClass(Square square, Class<? extends Line> type) {
-		if (type.equals(File.class)) {
-			return square.getFile();
-		} else if (type.equals(Rank.class)) {
-			return square.getRank();
-		} else if (type.equals(UpRightDiagonal.class)) {
-			return square.getUpRightDiagonal();
-		} else if (type.equals(DownRightDiagonal.class)) {
-			return square.getDownRightDiagonal();
-		} else {
-			throw new BadArgumentException(square, type, "There should not be a fifth Line class");
-		}
 	}
 	
 }

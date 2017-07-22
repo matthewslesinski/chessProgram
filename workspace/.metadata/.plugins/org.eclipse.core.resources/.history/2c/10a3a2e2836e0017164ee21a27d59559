@@ -1,0 +1,19 @@
+package support;
+
+import representation.Board;
+import representation.BoardBuilder;
+
+public class FENStringParser {
+
+
+	private static final int FEN_CHUNKS = 6;
+	private static final int FEN_BOARD_ROWS = 8;
+	
+	
+	public static BoardBuilder<?> parse(String fenString, BoardBuilder<?> builder) {
+		
+		
+		
+		return builder;
+	}
+}

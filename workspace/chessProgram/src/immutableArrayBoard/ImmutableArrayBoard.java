@@ -36,12 +36,16 @@ public class ImmutableArrayBoard extends Board {
 	
 	private static final int NUMBER_OF_BITS_PER_PIECE = 4;
 	
+	private static final int ONES_IN_EN_PASSANT_BITS = 0b11110000;
+	
+	private static final int FOUR_ONES = 0b1111;
+	
 	/**
 	 * The array containing the pieces and other board information, and so the actual internal representation of this {@code Board}.
 	 * The first 8 indices contain ints representing the file with that index. Each of those ints is divided into 8 groups of four bits.
 	 * A piece can be encoded in 4 bits. So that's what's stored in each group of 4 bits: the piece stored at that square when indexing into
 	 * the file to get the rank. The last index of the array holds the extra information about board state, such as who's to move. This int
-	 * says what castling is potentially allowed, using the first four bits, now or in a deeper position from this one. It also uses second 4 bits
+	 * says what castling is potentially allowed, using the first four bits, now or in a deeper position from this one. It also uses the second 4 bits
 	 * to say what file a pawn could take a pawn from through en passant, and it uses the first bit of the next quarter of the int to say whose move it is.
 	 */
 	private final int[] board;
@@ -80,7 +84,7 @@ public class ImmutableArrayBoard extends Board {
 	
 	@Override
 	public Board performMove(Move move) {
-		BoardBuilder<ImmutableArrayBoard> builder = new Builder(this);
+		BoardBuilder<ImmutableArrayBoard> builder = Builder.fromBoard(this);
 		
 		// TODO handle rights
 		return builder.build();
@@ -96,13 +100,17 @@ public class ImmutableArrayBoard extends Board {
 		
 		private int[] board = new int[ARRAY_SIZE];
 		
+		private Builder() {}
+		
 		/**
 		 * Initializes the board based on another board
 		 * @param boardContainer The {@code ImmutableArrayBoard} to base this one off of
 		 * @return This builder
 		 */
-		public Builder(int[] board) {
-			this.board = board.clone();
+		public static Builder fromBoard(int[] board) {
+			Builder builder = new Builder();
+			builder.board = board.clone();
+			return builder;
 		}
 		
 		/**
@@ -110,25 +118,31 @@ public class ImmutableArrayBoard extends Board {
 		 * @param boardContainer The {@code ImmutableArrayBoard} to base this one off of
 		 * @return This builder
 		 */
-		public Builder(ImmutableArrayBoard boardContainer) {
-			this(boardContainer.board.clone());
+		public static Builder fromBoard(ImmutableArrayBoard boardContainer) {
+			return fromBoard(boardContainer.board);
 		}
 		
 		/**
 		 * Initializes the board based on an array of pieces. This does not set any rights except whose move.
 		 * @param pieces The array of pieces to put on the board
 		 * @param whoToMove Whose current move it is
+		 * @return This builder
 		 */
-		public Builder(Piece[] pieces, Color whoToMove) {
-			super(pieces, whoToMove);
+		public static Builder fromBoard(Piece[] pieces, Color whoToMove) {
+			Builder builder = new Builder();
+			BoardBuilder.fromBoard(pieces, whoToMove, builder);
+			return builder;
 		}
 		
 		/**
 		 * Produces an {@code ImmutableBoardBuilder} from a FEN string.
 		 * @param fen: a FEN string representing the board.
+		 * @return This builder
 		 */
-		public Builder(String fen) {
-			super(fen);
+		public static Builder fromFen(String fen) {
+			Builder builder = new Builder();
+			BoardBuilder.fromFen(fen, builder);
+			return builder;
 		}
 		
 		@Override
@@ -151,7 +165,9 @@ public class ImmutableArrayBoard extends Board {
 		
 		@Override
 		public Builder withEnPassant(File file) {
-			setRightsByBitMask(file != null ? (file.getIndex() | EN_PASSANT_PERMISSION_MASK) << EN_PASSANT_INDEX : ~0b11110000, file != null);
+			setRightsByBitMask(file != null ?
+					(file.getIndex() | EN_PASSANT_PERMISSION_MASK) << EN_PASSANT_INDEX : ONES_IN_EN_PASSANT_BITS,
+					file != null);
 			return this;
 		}
 		
@@ -162,11 +178,17 @@ public class ImmutableArrayBoard extends Board {
 		
 		/**
 		 * Sets the rights for the board to have a certain mask
+		 * The way this works is by: if {@code orBoolean} is true, we want to set all the bits that are 1 in mask
+		 * to 1 in the board, without touching the others, and if {@code orBoolean} is false, we want to set all the
+		 * bits that are 0 in mask to 0 in the board, without touching the others. Therefore, if it's true, we just OR
+		 * with the mask, but if it's false, we do the opposite, which is AND with the complement of the mask. In other
+		 * words, the mask should have every bit be 0 except for the ones that we want to set, and we will set those bits
+		 * to 1 if {@code orBoolean} is true, and to 0 if false.
 		 * @param mask The mask
 		 * @param orBoolean Whether the mask should be ORed, or the reverse of the mask should be ANDed
 		 */
 		private void setRightsByBitMask(int mask, boolean orBoolean) {
-			board[RIGHTS_INDEX] = orBoolean ? board[RIGHTS_INDEX] | mask : board[RIGHTS_INDEX] & ~mask;
+			board[RIGHTS_INDEX] = orBoolean ? board[RIGHTS_INDEX] | mask : (board[RIGHTS_INDEX] & ~mask);
 		}
 		
 		/**
@@ -187,7 +209,7 @@ public class ImmutableArrayBoard extends Board {
 	 * @return The bit representation, where 0 is nothing, 1-6 is a white piece, and 7-12 is a black piece
 	 */
 	private int getBitsAtSquare(Square square, int[] board) {
-		return (board[square.getFile().getIndex()] >>> (square.getRank().getIndex() * NUMBER_OF_BITS_PER_PIECE)) & 0b1111;
+		return (board[square.getFile().getIndex()] >>> (square.getRank().getIndex() * NUMBER_OF_BITS_PER_PIECE)) & FOUR_ONES;
 	}
 
 	

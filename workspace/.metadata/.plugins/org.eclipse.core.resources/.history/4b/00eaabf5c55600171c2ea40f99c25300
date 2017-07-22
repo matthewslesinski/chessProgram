@@ -1,5 +1,0 @@
-package representation;
-
-public abstract class MoveGenerator {
-
-}

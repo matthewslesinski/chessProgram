@@ -1,6 +1,5 @@
 package boardFeatures;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,24 +21,19 @@ public enum Rank implements Line {
 	SEVEN("7"),
 	EIGHT("8");
 	
+	
 	private String readableForm;
-	private static final Direction directionOfLine = Direction.RIGHT;
+	
+	/** The set of squares contained in this {@code Rank} */
+	private List<Square> containedSquares;
+	
+	/** The set of squares contained in this {@code Rank}, but reversed */
+	private List<Square> reverseContainedSquares;
+
 	
 	private Rank(String readableForm) {
 		this.readableForm = readableForm;
 	}
-	
-	/**
-	 * The set of squares contained in this {@code Rank}
-	 */
-	private final List<Square> containedSquares = Arrays.asList(File.values()).stream()
-			.map(file -> Square.getByFileAndRank(file, this))
-			.collect(Collectors.toList());
-	
-	/**
-	 * The set of squares contained in this {@code File}, but reversed
-	 */
-	private final List<Square> reverseContainedSquares = UtilityFunctions.reverseList(containedSquares);
 	
 	@Override
 	public int getIndex() {
@@ -49,6 +43,11 @@ public enum Rank implements Line {
 	@Override
 	public String getHumanReadableForm() {
 		return readableForm;
+	}
+	
+	@Override
+	public LineType getType() {
+		return type();
 	}
 	
 	@Override
@@ -65,16 +64,6 @@ public enum Rank implements Line {
 	public boolean containsSquare(Square square) {
 		return square.getRank() == this;
 	}
-
-	@Override
-	public int getSpotInLine(Square square) {
-		return square.getFile().getIndex();
-	}
-	
-	@Override
-	public Direction getForwardDirection() {
-		return directionOfLine;
-	}
 	
 	/**
 	 * Gets the {@code Rank} with the given ordinal/index
@@ -82,7 +71,7 @@ public enum Rank implements Line {
 	 * @return The {@code Rank}
 	 */
 	public static Rank getByIndex(int index) {
-		return Line.getByIndex(index, Rank.class);
+		return Line.getByIndex(index, type());
 	}
 	
 	/**
@@ -103,9 +92,28 @@ public enum Rank implements Line {
 		}
 	}
 	
+	/**
+	 * Retrieves the {@code enum} describing which type of line this is
+	 * @return The {@code LineType}
+	 */
+	public static LineType type() {
+		return LineType.RANK;
+	}
+	
 	@Override
 	public String toString() {
 		return getHumanReadableForm();
 	}
     
+	/**
+	 * Determines which squares are contained in the {@code Rank}s
+	 */
+	static void setContainedSquares() {
+		for (Rank rank : values()) {
+			rank.containedSquares = UtilityFunctions.getRange(0, 8).stream()
+					.map(index -> Square.getByFileAndRankIndices(index, rank.getIndex()))
+					.collect(Collectors.toList());
+			rank.reverseContainedSquares = UtilityFunctions.reverseList(rank.containedSquares);
+		}
+	}
 }
