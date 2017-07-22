@@ -1,13 +1,15 @@
 package representation;
 
+import java.util.Arrays;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import boardFeatures.File;
-import boardFeatures.Rank;
 import boardFeatures.Square;
 import gamePlaying.State;
 import moves.Move;
 import pieces.Piece;
+import support.BoardStringifier;
 
 /**
  * Instances of this class represent a board position at a given point in time. As opposed to {@code State},
@@ -58,6 +60,16 @@ public abstract class Board implements State {
 	 */
 	public abstract File enPassantCaptureFile();
 
+	/**
+	 * Returns a {@code Piece[]} that describes the arrangement of the pieces on this board
+	 * @return The {@code Piece[]}
+	 */
+	public Piece[] toPieceArray() {
+		return Arrays.asList(Square.values()).stream()
+				.map(square -> this.getPieceAtSquare(square))
+				.collect(Collectors.toList()).toArray(new Piece[Square.values().length]);
+	}
+	
 	
 	@Override
 	public Set<Move> getLegalMoves() {
@@ -74,19 +86,7 @@ public abstract class Board implements State {
 	
 	@Override
 	public String toString() {
-		StringBuilder toReturn = new StringBuilder();
-		toReturn.append("--------\n");
-		for (int rank = 8; rank >= 1; rank++) {
-			for (char file = 'a'; file <= 'h'; file++) {
-				toReturn.append("|");
-				toReturn.append(getPieceAtSquare(Square.getByFileAndRank(File.getByHumanReadableForm(file+""), Rank.getByHumanReadableForm(rank+""))));
-			}
-			toReturn.append("\n");
-		}
-		toReturn.append("|");
-		toReturn.append("--------\n");
-		
-		return toReturn.toString();
+		return new BoardStringifier<>(this).stringify();
 	}
 	
 	

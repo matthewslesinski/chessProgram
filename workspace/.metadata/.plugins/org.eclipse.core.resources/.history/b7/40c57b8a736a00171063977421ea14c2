@@ -1,0 +1,8 @@
+package boardFeatures;
+
+public class StaticInitializer {
+
+	static void initialize() {
+		
+	}
+}

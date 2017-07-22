@@ -1,0 +1,32 @@
+package boardFeatures;
+
+import java.util.function.Supplier;
+
+public enum LineType {
+
+	FILE(File.class),
+	RANK(Rank.class),
+	UP_RIGHT_DIAGONAL(UpRightDiagonal.class),
+	DOWN_RIGHT_DIAGONAL(DownRightDiagonal.class);
+	
+	private final Class<? extends Enum<? extends Line>> type;
+	private final Enum<? extends Line>[] valuesArray;
+	
+	private LineType(Class<? extends Enum<? extends Line>> type) {
+		this.type = type;
+		this.valuesArray = type.getEnumConstants();
+	}
+	
+	
+	public Class<? extends Enum<? extends Line>> getType() {
+		return type;
+	}
+	
+	public Enum<? extends Line>[] getEnumValues() {
+		return valuesArray;
+	}
+	
+	public Line getLineBySquare(Square square) {
+		return null;
+	}
+}

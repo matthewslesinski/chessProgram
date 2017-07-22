@@ -6,6 +6,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import boardFeatures.File;
+import boardFeatures.Line;
+import boardFeatures.LineType;
 import boardFeatures.Rank;
 import boardFeatures.Square;
 import immutableArrayBoard.ImmutableArrayBoard;
@@ -20,14 +22,16 @@ public class StartPosition {
 	static void tester() {
 		String startFen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
 
-		File aFile = File.A;
+		Board startPosition = ImmutableArrayBoard.Builder.fromFen(startFen).build();
+		System.out.println(startPosition);
 		
-//		List<Square> containedSquares = Arrays.asList(File.values()).stream()
-//				.map(file -> Square.getByFileAndRank(file, Rank.EIGHT))
-//				.collect(Collectors.toList());
-//		System.exit(1);
-//		Board startPosition = new ImmutableArrayBoard.Builder(startFen).build();
-//		System.out.println(startPosition);
+//		for (LineType type : LineType.values()) {
+//			for (Line line : (Line[]) type.getEnumValues()) {
+//				for (Square square : line.getContainedSquares()) {
+//					System.out.println(square);
+//				}
+//			}
+//		}
 	}
 	
 	public static void main(String[] args) {

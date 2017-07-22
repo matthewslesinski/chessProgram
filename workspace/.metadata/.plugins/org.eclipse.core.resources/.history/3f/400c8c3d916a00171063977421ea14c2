@@ -1,0 +1,20 @@
+package boardFeatures;
+
+public enum LineType {
+
+	FILE(File.class),
+	RANK(Rank.class),
+	UP_RIGHT_DIAGONAL(UpRightDiagonal.class),
+	DOWN_RIGHT_DIAGONAL(DownRightDiagonal.class);
+	
+	private final Class<? extends Enum<? extends Line>> type;
+	
+	private LineType(Class<? extends Enum<? extends Line>> type) {
+		this.type = type;
+	}
+	
+	
+	public Class<? extends Enum<? extends Line>> getType() {
+		return type;
+	}
+}

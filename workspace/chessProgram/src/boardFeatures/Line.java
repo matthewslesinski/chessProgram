@@ -26,6 +26,12 @@ public interface Line {
 	public String getHumanReadableForm();
 	
 	/**
+	 * Gets the type of line this is
+	 * @return The {@code LineType}
+	 */
+	public LineType getType();
+	
+	/**
 	 * Gets the length of this line
 	 * @return The length
 	 */
@@ -40,6 +46,14 @@ public interface Line {
 	 */
 	public default boolean indexInBounds(int index) {
 		return index >= 0 && index < getLength();
+	}
+	
+	/**
+	 * Retrieves the square at the beginning of the line
+	 * @return The {@code Square}
+	 */
+	public default Square getStartSquare() {
+		return getContainedSquares().get(0);
 	}
 
 	/**
@@ -66,7 +80,9 @@ public interface Line {
 	 * @param square The square to check
 	 * @return its index in the line
 	 */
-	public int getSpotInLine(Square square);
+	public default int getSpotInLine(Square square) {
+		return Square.getManhattanDistance(square, getStartSquare()) / getForwardDirection().getSuccessiveManhattanDistanceDelta();
+	}
 	
 	/**
 	 * Determines how far down the reversed order of the line this square is
@@ -81,7 +97,9 @@ public interface Line {
 	 * Gets the direction this line goes in
 	 * @return the {@code Direction}
 	 */
-	public Direction getForwardDirection();
+	public default Direction getForwardDirection() {
+		return getType().getForwardDirection();
+	}
 	
 	/**
 	 * Returns a view to the squares ahead of the provided one in this line
@@ -106,7 +124,7 @@ public interface Line {
 	 * @param index The index to get
 	 * @return The {@code Square at that index}
 	 */
-	public default Square getSquare(byte index) {
+	public default Square getSquare(int index) {
 		return indexInBounds(index) ? getContainedSquares().get(index) : null;
 	}
 	
@@ -119,7 +137,7 @@ public interface Line {
 		if (!containsSquare(square)) {
 			throw new BadArgumentException(square, Square.class, "The square is not in the line");
 		}
-		return getSquare((byte) (getSpotInLine(square) + 1));
+		return getSquare(getSpotInLine(square) + 1);
 	}
 	
 	/**
@@ -131,7 +149,7 @@ public interface Line {
 		if (!containsSquare(square)) {
 			throw new BadArgumentException(square, Square.class, "The square is not in the line");
 		}
-		return getSquare((byte) (getSpotInLine(square) - 1));
+		return getSquare(getSpotInLine(square) - 1);
 	}
 	
 	/**
@@ -141,9 +159,10 @@ public interface Line {
 	 * @return The {@code Line} with the given index
 	 * @throws BadArgumentException If the index is not an index for a {@code Line}
 	 */
-	public static <T extends Enum<? extends Line>> T getByIndex(int index, Class<T> type) throws BadArgumentException {
+	@SuppressWarnings("unchecked")
+	public static <T extends Enum<? extends Line>> T getByIndex(int index, LineType type) throws BadArgumentException {
 		try {
-			return type.getEnumConstants()[index];
+			return (T) type.getEnumValues()[index];
 		} catch (ArrayIndexOutOfBoundsException e) {
 			Line.indexOutOfRange(e, index, Integer.class);
 			// We should never get here since indexOutOfRange throws an exception

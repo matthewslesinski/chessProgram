@@ -1,0 +1,18 @@
+package support;
+
+import representation.Board;
+
+public class BoardStringifier<B extends Board> {
+
+	private final B board;
+	
+	public BoardStringifier(B board) {
+		this.board = board;
+	}
+	
+	
+	public String stringify() {
+		return "";
+	}
+	
+}

@@ -1,0 +1,14 @@
+package boardFeatures;
+
+public class StaticInitializer {
+
+	/**
+	 * Initializes values through this initialization process, to avoid circular dependencies
+	 */
+	static void initialize() {
+		File.setContainedSquares();
+		Rank.setContainedSquares();
+		UpRightDiagonal.setContainedSquares();
+		DownRightDiagonal.setContainedSquares();
+	}
+}

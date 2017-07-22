@@ -2,8 +2,6 @@ package boardFeatures;
 
 import java.util.List;
 
-import support.UtilityFunctions;
-
 public enum Movement {
 	BACKWARDS,
 	NOWHERE,
@@ -24,12 +22,12 @@ public enum Movement {
 	 * @param lineType The type of line 
 	 * @return
 	 */
-	public List<Square> getSquaresToMoveThrough(Square square, Class<? extends Line> lineType) {
+	public List<Square> getSquaresToMoveThrough(Square square, LineType lineType) {
 		switch (increment) {
 		case -1:
-			return UtilityFunctions.getLineBySquareAndClass(square, lineType).getSquaresBehind(square);
+			return ((Line) lineType.getLineBySquare(square)).getSquaresBehind(square);
 		case 1:
-			return UtilityFunctions.getLineBySquareAndClass(square, lineType).getSquaresInFront(square);
+			return ((Line) lineType.getLineBySquare(square)).getSquaresInFront(square);
 		default:
 			return null;
 		}

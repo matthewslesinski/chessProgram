@@ -23,15 +23,14 @@ public enum Direction {
 	private static final int CENTER_INDEX = 4;
 	private final int fileDelta;
 	private final int rankDelta;
-	private final Class<? extends Line> containingLineType;
+	private final LineType containingLineType;
 	private final Movement movement;
-	private final List<Direction> outwardDirections; 
+	private static final List<Direction> outwardDirections = calculateOutwardDirections(); 
 	private Direction(int fileDelta, int rankDelta) {
 		this.fileDelta = fileDelta;
 		this.rankDelta = rankDelta;
 		containingLineType = getLineType();
 		movement = determineMovement();
-		outwardDirections = calculateOutwardDirections();
 	}
 	
 	/**
@@ -59,10 +58,19 @@ public enum Direction {
 	}
 	
 	/**
-	 * Retrieves the class of the {@code Line} that contains movement in this {@code Direction}
-	 * @return The {@code Class}
+	 * Calculates what the manhattan distance between two consecutive squares in this direction is (in other words
+	 * it returns 1 if the direction is vertical/horizontal, 2 if diagonal, and 0 if {@code NONE})
+	 * @return The distance
 	 */
-	public Class<? extends Line> getContainingLineType() {
+	public int getSuccessiveManhattanDistanceDelta() {
+		return Math.abs(fileDelta) + Math.abs(rankDelta);
+	}
+	
+	/**
+	 * Retrieves the class of the {@code Line} that contains movement in this {@code Direction}
+	 * @return The {@code LineType}
+	 */
+	public LineType getContainingLineType() {
 		return containingLineType;
 	}
 	
@@ -78,7 +86,7 @@ public enum Direction {
 	 * Retrieves the list of the directions that face outward
 	 * @return The list of directions
 	 */
-	public List<Direction> getOutwardDirections() {
+	public static List<Direction> getOutwardDirections() {
 		return outwardDirections;
 	}
 	
@@ -97,18 +105,18 @@ public enum Direction {
 	
 	/**
 	 * Gets the type of line this direction goes along
-	 * @return The {@code Line} subclass
+	 * @return The {@code LineType} enum
 	 */
-	private Class<? extends Line> getLineType() {
+	private LineType getLineType() {
 		switch (Math.abs(CENTER_INDEX - this.ordinal())) {
 		case 1:
-			return File.class;
+			return LineType.FILE;
 		case 2:
-			return DownRightDiagonal.class;
+			return LineType.DOWN_RIGHT_DIAGONAL;
 		case 3:
-			return Rank.class;
+			return LineType.RANK;
 		case 4:
-			return UpRightDiagonal.class;
+			return LineType.UP_RIGHT_DIAGONAL;
 		default:
 			return null;
 		}
@@ -120,9 +128,9 @@ public enum Direction {
 	 */
 	private Movement determineMovement() {
 		switch (UtilityFunctions.getSign(CENTER_INDEX - this.ordinal())) {
-		case 1:
-			return Movement.FORWARDS;
 		case -1:
+			return Movement.FORWARDS;
+		case 1:
 			return Movement.BACKWARDS;
 		default:
 			return Movement.NOWHERE;
@@ -133,7 +141,7 @@ public enum Direction {
 	 * Determines the list of directions that face outward
 	 * @return The list of the directions
 	 */
-	private List<Direction> calculateOutwardDirections() {
+	private static List<Direction> calculateOutwardDirections() {
 		return Arrays.asList(values()).stream().filter(dir -> dir != NONE).collect(Collectors.toList());
 	}
 }

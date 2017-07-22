@@ -1,0 +1,14 @@
+package support;
+
+import representation.Board;
+
+public class BoardToStringConverter<B extends Board> {
+
+	private final B board;
+	
+	public BoardToStringConverter(B board) {
+		this.board = board;
+	}
+	
+	
+}

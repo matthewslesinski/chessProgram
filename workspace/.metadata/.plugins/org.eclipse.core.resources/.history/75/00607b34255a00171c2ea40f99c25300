@@ -1,9 +1,0 @@
-package moves;
-
-public interface Capture {
-
-	@Override
-	public default boolean isCapture() {
-		return false;
-	}
-}

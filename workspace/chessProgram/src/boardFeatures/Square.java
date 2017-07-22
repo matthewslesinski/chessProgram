@@ -75,13 +75,18 @@ public enum Square {
 	H7,
 	H8;
 	
+	// Calculate the rest of the initialization that needs to be done after all {@code Square}s have been initialized
+	static {
+		StaticInitializer.initialize();
+	}
+	
 	private final File file;
 	private final Rank rank;
 	private final UpRightDiagonal upRightDiagonal;
 	private final DownRightDiagonal downRightDiagonal;
-	private final List<Square>[] surroundingLines;
+	private List<Square>[] surroundingLines;
 	
-	private final List<Square> knightJumps = new LinkedList<>();
+	private List<Square> knightJumps = new LinkedList<>();
 	
 	private Square() {
 		int file = this.ordinal() / 8;
@@ -98,11 +103,18 @@ public enum Square {
 		this.file = fileValue;
 		this.rank = rankValue;
 		this.upRightDiagonal = UpRightDiagonal.getBySquare(this);
-		this.downRightDiagonal = DownRightDiagonal.getBySquare(this);
-		this.surroundingLines = determineSurroundingLines();
-		
-		calculateKnightMoves();
-		
+		this.downRightDiagonal = DownRightDiagonal.getBySquare(this);		
+	}
+	
+	/**
+	 * Performs the rest of the necessary initialization for squares, which should happen after all the {@code Line}s
+	 * have been initialized
+	 */
+	static void postInitialization() {
+		for (Square square: values()) {
+			square.surroundingLines = square.determineSurroundingLines();
+			square.calculateKnightMoves();
+		}
 	}
 	
 	/**
@@ -111,9 +123,9 @@ public enum Square {
 	 */
 	@SuppressWarnings("unchecked")
 	private List<Square>[] determineSurroundingLines() {
-		return (List<Square>[]) Arrays.asList(Direction.values()).stream()
+		return (List<Square>[]) Direction.getOutwardDirections().stream()
 			.map(dir ->	dir.getMovement().getSquaresToMoveThrough(this, dir.getContainingLineType()))
-			.collect(Collectors.toList()).toArray();
+			.collect(Collectors.toList()).toArray(new List[Direction.getOutwardDirections().size()]);
 	}
 	
 	/**
@@ -180,6 +192,14 @@ public enum Square {
 	 */
 	public DownRightDiagonal getDownRightDiagonal() {
 		return this.downRightDiagonal;
+	}
+	
+	/**
+	 * Determines if this is a dark or list square
+	 * @return true iff it's a dark square
+	 */
+	public boolean isDarkSquare() {
+		return (file.getIndex() + rank.getIndex()) % 2 == 0;
 	}
 	
 	/**
@@ -264,13 +284,31 @@ public enum Square {
 	}
 	
 	/**
+	 * Returns the square at the given index, from 0 to 63
+	 * @param index The index of the square
+	 * @return
+	 */
+	public static Square getByIndex(int index) {
+		return Square.values()[index];
+	}
+	
+	/**
+	 * Returns the square at the intersection of the file and rank with the given indices
+	 * @param fileIndex The index of the file
+	 * @param rankIndex The index of the rank
+	 * @return The square at the intersection
+	 */
+	public static Square getByFileAndRankIndices(int fileIndex, int rankIndex) {
+		return getByIndex(fileIndex * 8 + rankIndex);
+	}
+	/**
 	 * Gets the square by the intersection of which {@code File} and {@code Rank} it lies on
 	 * @param file The file of the square
 	 * @param rank The rank of the square
 	 * @return The {@code Square} at the intersection
 	 */
 	public static Square getByFileAndRank(File file, Rank rank) {
-		return Square.values()[file.getIndex() * 8 + rank.getIndex()];
+		return getByFileAndRankIndices(file.getIndex(), rank.getIndex());
 	}
 	
 	/**
@@ -280,7 +318,7 @@ public enum Square {
 	 * @return Whether the intersection square for the file and rank is on the board
 	 */
 	public static boolean areRealSquareIndices(int file, int rank) {
-		return file >= 0 && rank >= 0 && file <= 7 && file <= 7;
+		return file >= 0 && rank >= 0 && file <= 7 && rank <= 7;
 	}
 	
 	/**

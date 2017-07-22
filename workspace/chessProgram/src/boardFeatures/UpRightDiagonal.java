@@ -24,36 +24,15 @@ public enum UpRightDiagonal implements Line {
 	G1_H2,
 	H1;
 	
+	
 	private static final int CENTER_INDEX = 7;
 	private static final int MAX_LENGTH = 8;
-	private static final Direction directionOfLine = Direction.UP_RIGHT;
-	private final List<Square> containedSquares = getListOfContainedSquares(this.getIndex());
+	
+	/** The set of squares contained in this {@code UpRightDiagonal} */	
+	private List<Square> containedSquares;
 
-	/**
-	 * The set of squares contained in this {@code File}, but reversed
-	 */
-	private final List<Square> reverseContainedSquares = UtilityFunctions.reverseList(containedSquares);
-	
-	
-	/**
-	 * Gets the list of squares that are in this diagonal
-	 * @param index The index identifying the diagonal
-	 * @return The list of {@code Square}
-	 */
-	private static List<Square> getListOfContainedSquares(int index) {
-		// The length is 8 minus how far the index is from the center, which is at index 7
-		int length = MAX_LENGTH - Math.abs(index - CENTER_INDEX);
-		return UtilityFunctions.getRange(0, length).stream()
-				.map(offset -> Square.getByFileAndRank(
-						// As you go rightward along the diagonal, the file of the square rises proportionally
-						// The start file is only either 0 or index minus the center diagonal index when the
-						// diagonal has a higher index than the center
-						File.getByIndex((byte) (offset + ((index / MAX_LENGTH) * (index - CENTER_INDEX)))),
-						// As you go rightward along the diagonal, the rank rises. The start rank is the center diagonal
-						// index minus the index, when the index is less than the center's, or 0
-						Rank.getByIndex((byte) (((index / MAX_LENGTH) - 1) * -1 * (CENTER_INDEX - index) + offset))))
-				.collect(Collectors.toList());
-	}
+	/** The set of squares contained in this {@code UpRightDiagonal}, but reversed */
+	private List<Square> reverseContainedSquares;
 
 	@Override
 	public int getIndex() {
@@ -64,6 +43,11 @@ public enum UpRightDiagonal implements Line {
 	public String getHumanReadableForm() {
 		return this.getSquare((byte) 0).toString() + "-" +
 				this.getSquare((byte) (this.getLength() - 1)).toString();
+	}
+	
+	@Override
+	public LineType getType() {
+		return type();
 	}
 
 	@Override
@@ -80,16 +64,6 @@ public enum UpRightDiagonal implements Line {
 	public boolean containsSquare(Square square) {
 		return square.getUpRightDiagonal() == this;
 	}
-
-	@Override
-	public int getSpotInLine(Square square) {
-		return square.getRank().getIndex();
-	}
-	
-	@Override
-	public Direction getForwardDirection() {
-		return directionOfLine;
-	}
 	
 	/**
 	 * Gets the diagonal that has the given index
@@ -98,7 +72,7 @@ public enum UpRightDiagonal implements Line {
 	 * @throws BadArgumentException If the index is not an index for a file
 	 */
 	public static UpRightDiagonal getByIndex(int index) throws BadArgumentException {
-		return Line.getByIndex(index, UpRightDiagonal.class);
+		return Line.getByIndex(index, type());
 	}
 	
 	/**
@@ -111,9 +85,47 @@ public enum UpRightDiagonal implements Line {
 		return getByIndex(index);
 	}
 	
+	/**
+	 * Gets the list of squares that are in this diagonal
+	 * @param index The index identifying the diagonal
+	 * @return The list of {@code Square}
+	 */
+	private static List<Square> getListOfContainedSquares(int index) {
+		// The length is 8 minus how far the index is from the center, which is at index 7
+		int length = MAX_LENGTH - Math.abs(index - CENTER_INDEX);
+		return UtilityFunctions.getRange(0, length).stream()
+				.map(offset -> Square.getByFileAndRank(
+						// As you go rightward along the diagonal, the file of the square rises proportionally
+						// The start file is only either 0 or index minus the center diagonal index when the
+						// diagonal has a higher index than the center
+						File.getByIndex(offset + ((index / MAX_LENGTH) * (index - CENTER_INDEX))),
+						// As you go rightward along the diagonal, the rank rises. The start rank is the center diagonal
+						// index minus the index, when the index is less than the center's, or 0
+						Rank.getByIndex((index / MAX_LENGTH - 1) * -1 * (CENTER_INDEX - index) + offset)))
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Retrieves the {@code enum} describing which type of line this is
+	 * @return The {@code LineType}
+	 */
+	public static LineType type() {
+		return LineType.UP_RIGHT_DIAGONAL;
+	}
+	
 	@Override
 	public String toString() {
 		return getHumanReadableForm();
 	}
 
+	/**
+	 * Determines which squares are contained in the {@code UpRightDiagonal}s
+	 */
+	static void setContainedSquares() {
+		for (UpRightDiagonal diagonal : values()) {
+			diagonal.containedSquares = getListOfContainedSquares(diagonal.getIndex());
+			diagonal.reverseContainedSquares = UtilityFunctions.reverseList(diagonal.containedSquares);
+		}
+	}
+	
 }

@@ -1,10 +1,9 @@
 package boardFeatures;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import support.BadArgumentException;
+import support.Constants;
 import support.UtilityFunctions;
 
 /**
@@ -13,36 +12,29 @@ import support.UtilityFunctions;
  */
 public enum File implements Line{
 
-	A("a"),
-	B("b"),
-	C("c"),
-	D("d"),
-	E("e"),
-	F("f"),
-	G("g"),
-	H("h");
+	A("a", "\uff41"),
+	B("b", "\uff42"),
+	C("c", "\uff43"),
+	D("d", "\uff44"),
+	E("e", "\uff45"),
+	F("f", "\uff46"),
+	G("g", "\uff47"),
+	H("h", "\uff48");
 	
-	private String readableForm;
-	private static final Direction directionOfLine = Direction.UP;
+	private final String readableForm;
+	private final String eclipseSpecificLengthenedForm;
+	
+	/** The set of squares contained in this {@code File} */
+	private List<Square> containedSquares;
+	
+	/** The set of squares contained in this {@code File}, but reversed */
+	private List<Square> reverseContainedSquares;
 
-	
-	private File(String readableForm) {
+	private File(String readableForm, String eclipseSpecificLengthenedForm) {
 		this.readableForm = readableForm;
+		this.eclipseSpecificLengthenedForm = eclipseSpecificLengthenedForm;
 	}
-	
-	/**
-	 * The set of squares contained in this {@code File}
-	 */
-	private final List<Square> containedSquares = Arrays.asList(Rank.values()).stream()
-			.map(rank -> Square.getByFileAndRank(this, rank))
-			.collect(Collectors.toList());
-	
-	/**
-	 * The set of squares contained in this {@code File}, but reversed
-	 */
-	private final List<Square> reverseContainedSquares = UtilityFunctions.reverseList(containedSquares);
-	
-
+			
 	
 	@Override
 	public int getIndex() {
@@ -52,6 +44,11 @@ public enum File implements Line{
 	@Override
 	public String getHumanReadableForm() {
 		return readableForm;
+	}
+	
+	@Override
+	public LineType getType() {
+		return type();
 	}
 	
 	@Override
@@ -68,16 +65,6 @@ public enum File implements Line{
 	public boolean containsSquare(Square square) {
 		return square.getFile() == this;
 	}
-
-	@Override
-	public int getSpotInLine(Square square) {
-		return square.getRank().getIndex();
-	}
-	
-	@Override
-	public Direction getForwardDirection() {
-		return directionOfLine;
-	}
 	
 	/**
 	 * Gets the file that has the given index
@@ -86,7 +73,7 @@ public enum File implements Line{
 	 * @throws BadArgumentException If the index is not an index for a file
 	 */
 	public static File getByIndex(int index) throws BadArgumentException {
-		return Line.getByIndex(index, File.class);
+		return Line.getByIndex(index, type());
 	}
 	
 	/**
@@ -106,9 +93,28 @@ public enum File implements Line{
 		}
 	}
 	
+	/**
+	 * Retrieves the {@code enum} describing which type of line this is
+	 * @return The {@code LineType}
+	 */
+	public static LineType type() {
+		return LineType.FILE;
+	}
+	
 	@Override
 	public String toString() {
-		return getHumanReadableForm();
+		return Constants.RUNNING_FROM_ECLIPSE ? eclipseSpecificLengthenedForm : getHumanReadableForm();
 	}
     
+	/**
+	 * Determines which squares are contained in the {@code File}s
+	 */
+	static void setContainedSquares() {
+		for (File file : values()) {
+			file.containedSquares = UtilityFunctions.getRange(0, 8).stream()
+					.map(index -> Square.getByFileAndRankIndices(file.getIndex(), index))
+					.collect(Collectors.toList());
+			file.reverseContainedSquares = UtilityFunctions.reverseList(file.containedSquares);
+		}
+	}
 }

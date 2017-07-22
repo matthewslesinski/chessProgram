@@ -1,0 +1,5 @@
+1500439097922	Rename local variable 'board'
+1500689273005	Rename type 'FENStringOutputter'
+1500691583152	Rename local variable 'boardArrangement'
+1500692972020	Rename type 'BoardToStringConverter'
+1500757168941	Rename field 'SPACE'
