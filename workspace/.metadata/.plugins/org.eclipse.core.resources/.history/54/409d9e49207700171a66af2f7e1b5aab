@@ -44,7 +44,7 @@ public enum PieceType {
 		this.readableForm = readableForm;
 		utilityInstance = constructor.apply(this);
 		List<Direction> possibleLongDistanceDirections = (utilityInstance instanceof LineMover) ? ((LineMover) utilityInstance).getMovementDirections() : Collections.emptyList();
-		this.longDistanceDirections = possibleLongDistanceDirections.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(possibleLongDistanceDirections);
+		this.longDistanceDirections = EnumSet.copyOf(possibleLongDistanceDirections);
 	}
 	
 	
