@@ -1,0 +1,250 @@
+package moves;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+
+import boardFeatures.Direction;
+import boardFeatures.DownRightDiagonal;
+import boardFeatures.File;
+import boardFeatures.Line;
+import boardFeatures.LineType;
+import boardFeatures.Rank;
+import boardFeatures.Square;
+import boardFeatures.UpRightDiagonal;
+import dataStructures.FixedSizeList;
+import dataStructures.FixedOrderingSet;
+import gamePlaying.Color;
+import pieces.Piece;
+import pieces.PieceType;
+import representation.Board;
+import representation.CastlingRights;
+import support.BadArgumentException;
+import support.UtilityFunctions;
+
+/**
+ * Used to preprocess a board before calculating the moves, so that calculating them is easier. The main benefits of this class
+ * are that it can provide the basic info about the board, such as which piece is on a square, the player to move, castling abilities,
+ * and en passant abilities, but it can also list all the squares a piece of particular type and color is on, as well as efficiently
+ * retrieving information about which king move is safe, whether the king is in check, and if pieces are pinned
+ * @author matthewslesinski
+ *
+ */
+public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
+	private static final int NUMBER_OF_CASTLING_RIGHTS = CastlingRights.values().length;
+	private static final int NUM_SQUARES = Square.values().length;
+	
+	/** The color to move */
+	private final Color toMove;
+	
+	/** Array of the booleans for each castling right, for if it's allowed without accounting for specifics of the position */
+	private final boolean[] castlingRights = new boolean[CastlingRights.values().length];
+	
+	/** The file to capture onto with en passant, or null if not allowed */
+	private final File enPassantFile;
+	
+	/** Stores the pieces on the board in the most intuitive arrangement. Each index of the array will be the piece at the square with that index as its index */
+	private final Piece[] pieces = new Piece[Square.values().length];
+	@SuppressWarnings("unchecked")
+	
+	/**
+	 * Stores the pieces on the board in another intuitive arrangement. Each index of the array
+	 * will be the list with the squares that the piece with that ordinal (minus 1 because Piece.NONE is not included) is on
+	 */
+	private final List<Square>[] piecesToSquares = new List[Piece.values().length - 1];
+	
+	/** The four following arrays of lists contain the squares with pieces on them for each of the instances of a line type */
+	private final FixedOrderingSet[][] preProcessedLines = {
+		new FixedOrderingSet[File.values().length],	
+		new FixedOrderingSet[Rank.values().length],
+		new FixedOrderingSet[UpRightDiagonal.values().length],														
+		new FixedOrderingSet[DownRightDiagonal.values().length]
+	};
+	
+	private final Square kingSquare;
+	
+	private final boolean[] safeSquaresAroundKing = new boolean[NUM_SQUARES];
+	
+	
+	/**
+	 * Initiates the preprocessing
+	 * @param board The board to decompress
+	 */
+	public BasicPreProcessing(B board) {
+		toMove = board.whoseMove();
+		for (int i = 0; i < NUMBER_OF_CASTLING_RIGHTS; i++) {
+			castlingRights[i] = board.canCastle(CastlingRights.values()[i]);
+		}
+		enPassantFile = board.enPassantCaptureFile();
+		
+		initializeLists(piecesToSquares, index -> new ArrayList<Square>(10));
+		parseBoard(board);
+		initializeLines();
+		kingSquare = getPieceSquares(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		
+	}
+	
+	private FixedOrderingSet<Square>[] retrievePreProcessingForType(LineType type) {
+		return UtilityFunctions.getValueFromArray(preProcessedLines, type);
+	}
+	
+	/**
+	 * Parses a board into a state where it is easy to see which piece is on which square and also which squares have particular pieces
+	 * @param board The board to parse
+	 */
+	private void parseBoard(B board) {
+		for (Square square : Square.values()) {
+			Piece piece = board.getPieceAtSquare(square);
+			if (piece != Piece.NONE ) {
+				pieces[square.getIndex()] = piece;
+				piecesToSquares[piece.ordinal() - 1].add(square);
+			}
+		}
+	}
+	
+	/**
+	 * Initializes all list in the appropriate array, using the index of the array that each list will be in
+	 * @param arr The array to put the lists in
+	 * @param constructor How to initialize each list
+	 */
+	private <T> void initializeLists(T[] arr, Function<Integer, T> constructor) {
+		int length = arr.length;
+		for (int i = 0; i < length; i++) {
+			arr[i] = constructor.apply(i);
+		}
+	}
+	
+	/**
+	 * Retrieves the list of squares that a particular piece is on
+	 * @param piece The piece to get squares for
+	 * @return The list of squares containing that piece
+	 */
+	private List<Square> getPieceSquares(Piece piece) {
+		return piecesToSquares[piece.ordinal() - 1];
+	}
+	
+	/**
+	 * Initializes the preprocessing for a line and adds all the pieces in that line to the preprocessing list
+	 * @param line The line
+	 * @param arr The array to put the preprocessing in for storage
+	 */
+	private void preProcessLine(Line line, FixedOrderingSet[] arr) {
+		FixedOrderingSet<Square> list = new FixedSizeList(line.getLength(), line.getForwardDirection());
+		line.getContainedSquares().forEach(square -> {
+			Piece piece = square.getValueOfSquareInArray(pieces);
+			if (piece != Piece.NONE) {
+				list.add(square);
+			}
+		});
+		arr[line.getIndex()] = list;
+	}
+	
+	/**
+	 * Performs the preprocessing
+	 */
+	private void initializeLines() {
+		for (PieceType lineMover: PieceType.getLineMovers()) {
+			Piece relevantPiece = Piece.getByColorAndType(toMove.getOtherColor(), lineMover);
+			List<Square> relevantSquares = getPieceSquares(relevantPiece);
+			relevantSquares.forEach(square -> {
+				for (LineType type : LineType.values()) {
+					preProcessLine((Line) type.getLineBySquare(square), retrievePreProcessingForType(type));
+				}		
+			});
+		}
+	}
+	
+	@Override
+	public Color whoseMove() {
+		return toMove;
+	}
+	
+	@Override
+	public boolean canCastle(CastlingRights right) {
+		return castlingRights[right.getIndex()];
+	}
+	
+	@Override
+	public File getEnPassantFile() {
+		return enPassantFile;
+	}
+	
+	@Override
+	public List<Square> getListOfSquaresForPiece(Piece piece) {
+		if (piece == Piece.NONE) {
+			throw new BadArgumentException(piece, Piece.class, "An absent piece cannot be associated with a square");
+		}
+		return piecesToSquares[piece.ordinal() - 1];
+	}
+	
+	@Override
+	public Piece getPieceAtSquare(Square square) {
+		return square.getValueOfSquareInArray(pieces);
+	}
+	
+	/**
+	 * Retrieves the piece that is n pieces away from the current square in a direction
+	 * @param square The current square
+	 * @param dir The direction to look
+	 * @param n How many pieces away
+	 * @return The square containing the piece or null
+	 */
+	public Square getNPiecesAway(Square square, Direction dir, int n) {
+		if (n < 0) {
+			throw new BadArgumentException(n, Integer.class, "Steps away can't be negative");
+		}
+		int sign = dir.getMovement().getIncrement();
+		int numberOfSteps = n * sign;
+		FixedOrderingSet<Square> listOfSquares = retrievePreProcessingForType(dir.getContainingLineType())[((Line) dir.getContainingLineType().getLineBySquare(square)).getIndex()];
+		
+		return listOfSquares.retrieveOffsetFromElement(square, numberOfSteps);
+	}
+
+	/**
+	 * Gets the square with a piece on it that is next along the direction
+	 * @param square The current square
+	 * @param dir The direction to travel
+	 * @return The {@code Square}, or null if none
+	 */
+	public Square getNextSquareWithPiece(Square square, Direction dir) {
+		return getNPiecesAway(square, dir, 1);
+	}
+	
+	
+	@Override
+	public void calculateKingSafety(List<Square> possibleSquares) {
+		possibleSquares.forEach(square -> safeSquaresAroundKing[square.getIndex()] = true);
+		// TODO
+		
+		
+		
+		possibleSquares.forEach(square -> {
+			
+		});
+	}
+	
+	@Override
+	public List<Square> whoIsAttackingTheKing() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<Square> getSafeKingDestinations() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Direction isPiecePinned(Square square) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean isEnPassantPinned(File movingPawnFile) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+}

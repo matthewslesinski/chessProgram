@@ -1,0 +1,63 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+public class Ring<E extends Enum<E>> extends EnumSequence<E> implements Circleable<E> {
+	
+	private final Supplier<Set<E>> setConstructor = () -> EnumSet.noneOf(this.type);;
+	
+	public Ring(List<E> elements) {
+		super(elements);
+	}
+
+	@Override
+	public Iterator<E> getIterator(E target, Predicate<E> shouldTraverse) {
+		return new BreadthFirstTraversal<E>(constructNeighborFunction(target, shouldTraverse), setConstructor);
+	}
+	
+	@Override
+	protected E getIndex(int index) {
+		return super.getIndex(index % size());
+	}
+	
+	private Function<E, Collection<E>> constructNeighborFunction(E target, Predicate<E> shouldTraverse) {
+		final Set<E> goingDown = setConstructor.get();
+		final Set<E> goingUp = setConstructor.get();
+		return current -> getNeighbors(target, shouldTraverse, goingDown, goingUp, current);
+	}
+	
+	private Collection<E> getNeighbors(E target, Predicate<E> shouldTraverse, Set<E> goingDown, Set<E> goingUp, E current) {
+		if (current == null) {
+			return getStartElement(target, shouldTraverse, goingDown, goingUp);
+		}
+		List<E> toReturn  = new LinkedList<E>();
+		E candidate;
+		if (goingDown.contains(current)) {
+			candidate = this.lower(current);
+			if (shouldTraverse.test(candidate)) {
+				toReturn.add(candidate);
+			}
+		}
+		if (goingUp.contains(current)) {
+			candidate = this.higher(current);
+			if (shouldTraverse.test(candidate)) {
+				toReturn.add(candidate);
+			}
+		}
+		return toReturn;
+	}
+		
+	private List<E> getStartElement(E target, Predicate<E> shouldTraverse, Set<E> goingDown, Set<E> goingUp) {
+		// TODO
+		return null;
+	}
+	
+}

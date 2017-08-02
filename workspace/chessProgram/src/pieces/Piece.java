@@ -1,5 +1,6 @@
 package pieces;
 
+import java.util.Arrays;
 import java.util.Set;
 import boardFeatures.Square;
 import gamePlaying.Color;
@@ -25,6 +26,7 @@ public enum Piece {
 	BLACK_QUEEN(0x265B),
 	BLACK_KING(0x265A);
 	
+	private final static Piece[] realPieces = Arrays.copyOfRange(values(), 1, values().length);
 	private final PieceType type;
 	private final Color color;
 	private final String stringPicture;
@@ -77,6 +79,14 @@ public enum Piece {
 	}
 	
 	/**
+	 * An array of all the pieces besides 'NONE'
+	 * @return The array of pieces
+	 */
+	public static Piece[] realPieces() {
+		return realPieces;
+	}
+	
+	/**
 	 * Gets the piece that has a color and a type
 	 * @param color The {@code Color} of the {@code Piece}
 	 * @param type The {@code PieceType} of the {@code Piece}
@@ -93,9 +103,10 @@ public enum Piece {
 	 * Gets the legal moves of this piece in any situation.
 	 * @param square The {@code Square} mapping to this piece in the {@code Board}
 	 * @param board The {@code Board} to get the moves from
+	 * @param toMove The {@code Color} whose move it is
 	 * @return The {@code Set} of the legal {@code Move}s
 	 */
-	public Set<Move> getLegalMoves(Square square, Board board) {
+	public Set<Move> getLegalMoves(Square square, Board board, Color toMove) {
 		if (!board.isPieceAtSquare(this, square)) {
 			throw new BadArgumentException(square, Square.class, "Can't get legal moves for a different piece than what is on the provided square");
 		}
@@ -105,7 +116,7 @@ public enum Piece {
 		if (this == NONE) {
 			throw new BadArgumentException(this, Piece.class, "Can't calculate legal moves for an empty square");
 		}
-		return type.getUtilityInstance().getLegalMoves(square, board);
+		return type.getUtilityInstance().getLegalMoves(square, board, toMove);
 	}
 	
 	@Override

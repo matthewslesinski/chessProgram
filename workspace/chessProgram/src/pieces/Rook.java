@@ -1,25 +1,37 @@
 package pieces;
 
-import java.util.Set;
+import java.util.List;
 
-import boardFeatures.Square;
-import moves.Move;
-import representation.Board;
+import boardFeatures.Direction;
+import support.Constants;
 
 /**
  * Provides the utility method(s) for calculating a rook's legal moves
  * @author matthewslesinski
  *
  */
-public class Rook extends PieceUtility{
+public class Rook extends LineMover {
 
-	Rook(PieceType piece) {
-		super(piece);
-	}
+	private static final PieceType TYPE = PieceType.ROOK;
+	private static final int ATTACK_DISTANCE = 8;
 	
-	@Override
-	public Set<Move> getLegalMoves(Square square, Board board) {
-		// TODO Auto-generated method stub
-		return null;
+	Rook(PieceType piece) {
+		super();
 	}
+
+	@Override
+	protected PieceType determinePieceType() {
+		return TYPE;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return ATTACK_DISTANCE;
+	}
+
+	@Override
+	List<Direction> getMovementDirections() {
+		return Constants.ROOK_DIRECTIONS;
+	}
+
 }

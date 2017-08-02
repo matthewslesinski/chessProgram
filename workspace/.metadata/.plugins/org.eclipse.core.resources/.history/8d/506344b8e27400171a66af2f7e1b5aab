@@ -1,0 +1,60 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Line;
+import boardFeatures.LineType;
+import boardFeatures.Square;
+import support.UtilityFunctions;
+
+public class ElementSet implements Cluster<Square> {
+	
+	private final Set<Square> squares;
+	private final Map<LineType, Map<Line, Set<Square>>> lineIndexedSquares;
+	private final Square center;
+	private int radius;
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public ElementSet(Collection<Square> elementsWithoutCenter, Square center) {
+		Collection<Square> elements = UtilityFunctions.concat(elementsWithoutCenter, Collections.singleton(center));
+		this.squares = EnumSet.copyOf(elements);
+		this.lineIndexedSquares = new EnumMap<>(LineType.class);
+		for (Square square : squares) {
+			radius = Math.max(radius, Square.getManhattanDistance(square, center));
+			for (LineType lineType : LineType.values()) {
+				Map<Line, Set<Square>> innerMap = lineIndexedSquares.getOrDefault(lineType, new EnumMap(lineType.getType()));
+				lineIndexedSquares.putIfAbsent(lineType, innerMap);
+				Line lineInstance = (Line) lineType.getLineBySquare(square);
+				Set<Square> squaresInALine = innerMap.getOrDefault(lineInstance, EnumSet.noneOf(Square.class));
+				innerMap.putIfAbsent(lineInstance, squaresInALine);
+				squaresInALine.add(square);
+			}
+		}
+		this.center = center;
+	}
+	
+	@Override
+	public Square getCenter() {
+		return center;
+	}
+
+	@Override
+	public Set<Square> getWrappedSet() {
+		return this.squares;
+	}
+	
+	@Override
+	public Set<Square> getAllOnLine(Line line) {
+		return lineIndexedSquares.get(line.getType()).getOrDefault(line, Collections.emptySet());
+	}
+	
+	@Override
+	public int getRadius() {
+		return radius;
+	}
+}

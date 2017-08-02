@@ -1,0 +1,12 @@
+package dataStructures;
+
+import java.util.Set;
+
+public interface WrappedSet<E> extends Set<E> {
+
+	/**
+	 * Retrieves the {@code Set} this wraps
+	 * @return The {@code Set}
+	 */
+	public Set<E> getWrappedSet();
+}

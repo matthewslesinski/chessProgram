@@ -1,0 +1,10 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.function.Function;
+
+public interface Circleable<E> {
+
+	public Iterable<E> traverseClosestSquares(Function<E, Collection<E>> getNeighbors);
+	
+}

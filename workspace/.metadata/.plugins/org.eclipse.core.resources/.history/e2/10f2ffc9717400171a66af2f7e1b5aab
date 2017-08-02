@@ -1,0 +1,14 @@
+package dataStructures;
+
+import java.util.Set;
+
+
+public interface Cluster<E> extends Set<E>{
+
+	/**
+	 * Gets the center square in this cluster
+	 * @return The {@code Square}
+	 */
+	public E getCenter();
+	
+}

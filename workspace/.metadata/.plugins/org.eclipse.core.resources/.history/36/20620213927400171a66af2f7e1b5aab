@@ -1,0 +1,118 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Predicate;
+
+import boardFeatures.Direction;
+import boardFeatures.Square;
+import support.BadArgumentException;
+
+public class Cross<E extends Enum<E>> implements AttackStructure<E> {
+
+	public static class OfSquares extends Cross<Square> {
+		
+	}
+	
+	private final Map<Direction, List<E>> DIRECTION_MAP;
+	
+	public Cross() {
+		this.DIRECTION_MAP = new EnumMap<Direction, List<E>>(Direction.class);
+	}
+	
+	public Cross<E> addDirection(Direction dir, List<E> elements) {
+		if (DIRECTION_MAP.containsKey(dir)) {
+			throw new BadArgumentException(dir, this.getClass(), "The given direction was already added");
+		}
+		DIRECTION_MAP.put(dir, elements);
+		return this;
+	}
+	
+	@Override
+	public Iterator<E> getIteratorFromPerspective(Cluster<E> target, Predicate<E> shouldTraverse) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Iterator<E> iterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object[] toArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean add(E e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends E> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+
+}

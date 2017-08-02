@@ -1,0 +1,10 @@
+package dataStructures;
+
+import java.util.List;
+
+import boardFeatures.Square;
+
+public interface EvenlySpacedCircle extends Iterable<Square>{
+
+	List<Square> getNearestSquares(Square remote);
+}

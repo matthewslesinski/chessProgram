@@ -1,0 +1,17 @@
+package dataStructures;
+
+import java.util.NavigableSet;
+
+import boardFeatures.Square;
+
+public interface ImportantSquareList<E> extends NavigableSet<E> {
+
+	
+	/**
+	 * Gets the square in this list that is a certain number of other squares removed from the current one
+	 * @param square The current square
+	 * @param diff The number of squares removed the other one is
+	 * @return The square a certain number of other squares removed
+	 */
+	public Square getNeighbor(Square square, int diff);
+}

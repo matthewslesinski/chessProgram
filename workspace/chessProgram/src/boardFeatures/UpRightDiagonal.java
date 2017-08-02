@@ -65,6 +65,11 @@ public enum UpRightDiagonal implements Line {
 		return square.getUpRightDiagonal() == this;
 	}
 	
+	@Override
+	public int getManhattanDistanceToSquare(Square square) {
+		return Math.abs(square.getUpRightDiagonal().getIndex() - this.getIndex());
+	}
+	
 	/**
 	 * Gets the diagonal that has the given index
 	 * @param index The index to get

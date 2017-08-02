@@ -1,8 +1,10 @@
 package pieces;
 
+import java.util.List;
 import java.util.Set;
 
 import boardFeatures.Square;
+import gamePlaying.Color;
 import moves.Move;
 import representation.Board;
 
@@ -15,11 +17,27 @@ public class King extends PieceUtility {
 
 	
 	King(PieceType piece) {
-		super(piece);
+		super();
 	}
 	
 	@Override
-	public Set<Move> getLegalMoves(Square square, Board board) {
+	public Set<Move> getLegalMoves(Square square, Board board, Color color) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected PieceType determinePieceType() {
+		return PieceType.KING;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return 2;
+	}
+
+	@Override
+	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color color) {
 		// TODO Auto-generated method stub
 		return null;
 	}

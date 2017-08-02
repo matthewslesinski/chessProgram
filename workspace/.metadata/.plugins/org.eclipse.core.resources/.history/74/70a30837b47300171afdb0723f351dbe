@@ -1,0 +1,24 @@
+package pieces;
+
+import java.util.List;
+
+import boardFeatures.Direction;
+import boardFeatures.Square;
+import representation.Board;
+
+public abstract class LineMover extends PieceUtility {
+
+	
+	protected LineMover() {
+		super();
+	}
+	
+	protected abstract List<Direction> getMovementDirections();
+	
+	
+	@Override
+	protected List<Square> getSquaresToMoveTo(Square square, Board board) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

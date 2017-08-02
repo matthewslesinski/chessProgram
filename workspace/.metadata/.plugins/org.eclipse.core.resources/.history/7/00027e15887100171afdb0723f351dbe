@@ -1,0 +1,23 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.function.Function;
+
+public interface Circleable<E> {
+
+	public default Iterable<E> traverseClosestElements(E target, Function<E, Collection<E>> getNeighbors) {
+		return new Iterable<E>() {
+
+			@Override
+			public Iterator<E> iterator() {
+				return getIterator(getNeighbors);
+			}
+			
+		};
+	}
+	
+	public Iterator<E> getIterator(Function<E, Collection<E>> getNeighbors);
+	
+	
+}

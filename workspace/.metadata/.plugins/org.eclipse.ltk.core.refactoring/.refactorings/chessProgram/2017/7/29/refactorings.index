@@ -3,3 +3,9 @@
 1500691583152	Rename local variable 'boardArrangement'
 1500692972020	Rename type 'BoardToStringConverter'
 1500757168941	Rename field 'SPACE'
+1500760337377	Move compilation unit
+1500760363476	Move compilation unit
+1500764459285	Delete element
+1500764694273	Rename type 'BreadthFirstSearch'
+1500765237574	Rename type 'BreadthFirstSearcher'
+1500765324410	Rename type 'BreadthFirstPath'

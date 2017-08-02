@@ -129,6 +129,13 @@ public interface Line {
 	}
 	
 	/**
+	 * Gets the minimum manhattan distance from this line to some square
+	 * @param square The square to measure towards
+	 * @return The distance
+	 */
+	public int getManhattanDistanceToSquare(Square square);
+	
+	/**
 	 * Gets the next {@code Square} in the line
 	 * @param square The current {@code Square}
 	 * @return The next one or null if it's out of bounds

@@ -1,0 +1,18 @@
+package dataStructures;
+
+import java.util.Collection;
+
+import support.BadArgumentException;
+
+public interface UnmodifiableWrappedCollection<E> extends IrreversibleWrappedCollection<E> {
+	
+	@Override
+	public default boolean add(E e) {
+		throw new BadArgumentException(this, ElementSet.class, REMOVAL_MESSAGE);
+	}
+
+	@Override
+	public default boolean addAll(Collection<? extends E> c) {
+		throw new BadArgumentException(this, ElementSet.class, REMOVAL_MESSAGE);
+	}
+}

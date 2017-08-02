@@ -1,0 +1,27 @@
+package dataStructures;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+
+public class Ring<E extends Enum<E>> extends EnumSequence<E> {
+	
+	private final Set<E> addedElements;
+	private final Predicate<E> isPossibleValue;
+	
+	
+	public Ring(Class<E> type, int maxSize, List<E> elements) {
+		isPossibleValue = element -> addedElements.contains(element);
+		super(type, maxSize, null, isPossibleValue);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+}
