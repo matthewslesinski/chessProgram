@@ -1,0 +1,17 @@
+package dataStructures;
+
+import java.util.NavigableSet;
+
+import boardFeatures.Square;
+
+public interface FixedOrderingSet<E> extends NavigableSet<E> {
+
+	
+	/**
+	 * Gets the element in this set that is a certain number of indices removed from the given one
+	 * @param square The current square
+	 * @param diff The number of squares removed the other one is
+	 * @return The square a certain number of other squares removed
+	 */
+	public Square retrieveOffsetFromElement(E element, int offset);
+}

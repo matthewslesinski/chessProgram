@@ -1,0 +1,17 @@
+package dataStructures;
+
+import java.util.Set;
+
+import boardFeatures.Line;
+
+public interface Cluster<E> extends UnmodifiableWrappedSet<E>{
+
+	/**
+	 * Gets the center square in this cluster
+	 * @return The {@code Square}
+	 */
+	public E getCenter();
+	
+	public Set<E> getAllOnLine(Line line);
+	
+}

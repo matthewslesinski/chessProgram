@@ -1,0 +1,26 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+
+import boardFeatures.SixteenthSector;
+import boardFeatures.Square;
+import support.BadArgumentException;
+
+public class EvenlySpacedCircleImpl implements EvenlySpacedCircle {
+
+	
+	private Map<SixteenthSector, Square> relations = new EnumMap<SixteenthSector, Square>(SixteenthSector.class);
+	
+	public EvenlySpacedCircleImpl(Square center, Collection<Square> ring) {
+		for (Square squareToAdd : ring) {
+			SixteenthSector sector = SixteenthSector.getRelation(center, squareToAdd);
+			if (relations.containsKey(sector)) {
+				throw new BadArgumentException(squareToAdd, Square.class, "The whole point of an EvenlySpacedCircle is to have one square in each sector");
+			}
+			relations.put(sector, squareToAdd);
+		}
+	}
+	
+}

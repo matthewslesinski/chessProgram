@@ -1,0 +1,104 @@
+package support;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+
+/**
+ * This class provides static utility functions
+ * @author matthewslesinski
+ *
+ */
+public class UtilityFunctions {
+
+	
+	/**
+	 * Returns an array-backed list containing the integers between
+	 * {@code start} (inclusive) and {@code end} (exclusive)
+	 * @param start The start of the range
+	 * @param end The first number after the end of the range
+	 * @return The list of all the integers between
+	 */
+	public static List<Integer> getRange(int start, int end) {
+		Integer[] arrayOfInts = new Integer[end - start];
+		for (int i = start; i < end; i++) {
+			arrayOfInts[i - start] = i;
+		}
+		return Arrays.asList(arrayOfInts);
+	}
+	
+	/**
+	 * Returns a positive, zero, or negative number to represent the sign of the given number
+	 * @param value The number
+	 * @return -1, 0, or 1
+	 */
+	public static int getSign(int value) {
+		return value == 0 ? 0 : value / Math.abs(value);
+	}
+	
+	/**
+	 * Returns a new list (backed by an {@code ArrayList}) that contains a reverse-order shallow
+	 * copy of the given list
+	 * @param list The list to reverse
+	 * @return The reverse order list
+	 */
+	public static <T> List<T> reverseList(List<T> list) {
+		List<T> newList = new ArrayList<>(list);
+		Collections.reverse(newList);
+		return newList;
+	}
+	
+	/**
+	 * Returns the element in the array at the index this enum value's ordinal corresponds to
+	 * @param array The array to access. This should be of size equal or larger than the values array for the enum's class
+	 * @param enumValue The enum to use to access the array
+	 * @return The element in the array
+	 */
+	public static <T> T getValueFromArray(T[] array, Enum<?> enumValue) {
+		return array[enumValue.ordinal()];
+	}
+	
+	public static <T, U, V> Function<U, V> bind(BiFunction<T, U, V> originalFunction, final T defaultArgument) {
+		return otherArgument -> originalFunction.apply(defaultArgument, otherArgument);
+	}
+	
+	public static <T> void sortTwoElements(List<T> list, Comparator<? super T> comparator) {
+		if (list.size() != 2) {
+			throw new BadArgumentException(list, List.class, "Expected list of size 2");
+		}
+		if (comparator.compare(list.get(0), list.get(1)) > 1) {
+			Collections.reverse(list);
+		}
+	}
+	
+	/**
+	 * Concatenates two lists, where the values from each are interspersed evenly
+	 * @param list1 One of the lists
+	 * @param list2 The other of the lists
+	 * @return The combined list
+	 */
+	public static <T> List<T> concat(Collection<? extends T> list1, Collection<? extends T> list2) {
+		List<T> result = new LinkedList<T>();
+		Iterator<? extends T> iterator1 = list1.iterator();
+		Iterator<? extends T> iterator2 = list2.iterator();
+		while (iterator1.hasNext() || iterator2.hasNext()) {
+			if (iterator1.hasNext()) {
+				result.add(iterator1.next());
+			}
+			if (iterator2.hasNext()) {
+				result.add(iterator2.next());
+			}
+		}
+		return result;
+	}
+	
+	
+}

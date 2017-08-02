@@ -66,6 +66,11 @@ public enum File implements Line{
 		return square.getFile() == this;
 	}
 	
+	@Override
+	public int getManhattanDistanceToSquare(Square square) {
+		return Math.abs(square.getFile().getIndex() - this.getIndex());
+	}
+	
 	/**
 	 * Gets the file that has the given index
 	 * @param index The index to get

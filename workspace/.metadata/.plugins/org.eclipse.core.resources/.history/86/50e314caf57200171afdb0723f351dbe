@@ -1,0 +1,27 @@
+package dataStructures;
+
+import java.util.Iterator;
+import java.util.Set;
+import java.util.function.Predicate;
+
+/**
+ * Describes some convex shape
+ * @author matthewslesinski
+ *
+ * @param <E>
+ */
+public interface ConvexShape<E> extends Set<E> {
+
+	public default Iterable<E> traverseClosestElements(E target, Predicate<E> shouldTraverse) {
+		return new Iterable<E>() {
+
+			@Override
+			public Iterator<E> iterator() {
+				return getIteratorFromPerspective(target, shouldTraverse);
+			}
+			
+		};
+	}
+	
+	public Iterator<E> getIteratorFromPerspective(E target, Predicate<E> shouldTraverse);
+}

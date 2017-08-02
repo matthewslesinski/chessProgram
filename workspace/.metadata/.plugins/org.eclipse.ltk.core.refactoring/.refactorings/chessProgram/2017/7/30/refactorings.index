@@ -1,0 +1,33 @@
+1500824491563	Rename type 'EnumList'
+1500861962051	Rename type 'ImportantSquareList'
+1500862055967	Rename method 'getNeighbor'
+1500945021858	Infer generic type arguments
+1500945035395	Infer generic type arguments
+1500945043456	Infer generic type arguments
+1500945050349	Infer generic type arguments
+1500945057441	Infer generic type arguments
+1500945322648	Delete element
+1501016948194	Rename type 'BreadthFirstSequence'
+1501020827662	Rename type 'FixedPerspective'
+1501029079083	Delete element
+1501076718614	Rename method 'getIterator'
+1501164894810	Rename method 'calculateQuartileBase'
+1501171314891	Rename field 'nearestDiagonal'
+1501171343183	Rename field 'nearestSector'
+1501173154605	Rename type 'EvenlySpacedCircle'
+1501173165915	Move compilation unit
+1501178218273	Rename type 'Circleable'
+1501279700186	Rename method 'traverseClosestElements'
+1501336875956	Move compilation unit
+1501337077764	Delete element
+1501337270918	Rename type 'ConvexShape'
+1501341427989	Rename type 'WrappedSet'
+1501342970995	Delete element
+1501343008582	Delete element
+1501343060727	Rename type 'UnmodifiabledWrappedCollection'
+1501348572320	Rename method 'retrieveArrayIndex'
+1501355062471	Rename field 'squares'
+1501355508642	Rename local variable 'square'
+1501355521755	Rename local variable 'squares'
+1501355572584	Rename type 'SquareSet'
+1501355616784	Rename local variable 'squaresInALine'

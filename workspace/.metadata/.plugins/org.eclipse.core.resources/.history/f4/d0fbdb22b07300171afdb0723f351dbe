@@ -1,0 +1,9 @@
+package pieces;
+
+public abstract class LineMover extends PieceUtility {
+
+	
+	protected LineMover() {
+		super();
+	}
+}

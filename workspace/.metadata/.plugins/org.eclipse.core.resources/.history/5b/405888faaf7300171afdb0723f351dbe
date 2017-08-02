@@ -1,0 +1,69 @@
+package pieces;
+
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import boardFeatures.Square;
+import moves.Move;
+import representation.Board;
+
+/**
+ * The classes that extend this abstract class hold the utility method(s) for calculating
+ * the legal moves for a type of piece on a square in a position.
+ * @author matthewslesinski
+ *
+ */
+public abstract class PieceUtility {
+	
+	/**
+	 * The type of piece this is
+	 */
+	public final PieceType pieceType;
+	
+	public final int MAX_ATTACK_DISTANCE;
+	
+	/**
+	 * Constructor for pieces in general. Establishes what piece this is for
+	 * @param color
+	 */
+	protected PieceUtility() {
+		this.pieceType = determinePieceType();
+		this.MAX_ATTACK_DISTANCE = determineMaxAttackDistance();
+	}
+	
+	/**
+	 * Gets the {@code Set} of moves for this piece
+	 * @param square The current square containing this piece
+	 * @param board The current board requesting the legal moves for this piece
+	 * @return The {@code Set} of {@code Move} at a {@code Square} on the {@code Board}
+	 */
+	public Set<Move> getLegalMoves(Square square, Board board) {
+		return getSquaresToMoveTo().stream().map(moveSquare -> convertSquareToMove(moveSquare, board)).collect(Collectors.toCollection(this::setConstructor));
+	}
+	
+	protected Set<Move> setConstructor() {
+		// TODO
+		return null;
+	}
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return The {@code PieceType} describing this piece
+	 */
+	protected abstract PieceType determinePieceType();
+	
+	/**
+	 * Determines the furthest manhattan distance removed an attacked square can be from this piece
+	 * @return The distance
+	 */
+	protected abstract int determineMaxAttackDistance();
+	
+	protected static Move convertSquareToMove(Square square, Board board) {
+		// TODO
+		return null;
+	}
+	
+	protected abstract List<Square> getSquaresToMoveTo();
+	
+}

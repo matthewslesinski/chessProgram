@@ -1,0 +1,75 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.NavigableSet;
+
+import support.BadArgumentException;
+
+public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappedCollection<E> {
+
+	
+	/**
+	 * Gets the element in this set that is a certain number of indices removed from the given one
+	 * @param element The given element
+	 * @param offset The number of indices removed the other one is. The sign of the number determines the direction.
+	 * @return The element a certain number of indices away
+	 */
+	public E retrieveOffsetFromElement(E element, int offset);
+
+	@Override
+	public default int size() {
+		return IrreversibleWrappedCollection.super.size();
+	}
+
+	@Override
+	public default boolean isEmpty() {
+		return IrreversibleWrappedCollection.super.isEmpty();
+	}
+
+	@Override
+	public default boolean contains(Object o) {
+		return IrreversibleWrappedCollection.super.contains(o);
+	}
+
+	@Override
+	public default Iterator<E> iterator() {
+		return IrreversibleWrappedCollection.super.iterator();
+	}
+
+	@Override
+	public default Object[] toArray() {
+		return IrreversibleWrappedCollection.super.toArray();
+	}
+
+	@Override
+	public default <T> T[] toArray(T[] a) {
+		return IrreversibleWrappedCollection.super.toArray(a);
+	}
+	
+	@Override
+	public default boolean containsAll(Collection<?> c) {
+		return IrreversibleWrappedCollection.super.containsAll(c);
+	}
+	
+	@Override
+	public default boolean remove(Object o) {
+		return IrreversibleWrappedCollection.super.remove(o);
+	}
+	
+	@Override
+	public default boolean retainAll(Collection<?> c) {
+		return IrreversibleWrappedCollection.super.retainAll(c);
+	}
+
+	@Override
+	public default boolean removeAll(Collection<?> c) {
+		return IrreversibleWrappedCollection.super.removeAll(c);
+	}
+
+	@Override
+	public default void clear() {
+		IrreversibleWrappedCollection.super.clear();
+	}
+	
+}

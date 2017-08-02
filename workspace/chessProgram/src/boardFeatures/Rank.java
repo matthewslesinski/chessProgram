@@ -65,6 +65,11 @@ public enum Rank implements Line {
 		return square.getRank() == this;
 	}
 	
+	@Override
+	public int getManhattanDistanceToSquare(Square square) {
+		return Math.abs(square.getRank().getIndex() - this.getIndex());
+	}
+	
 	/**
 	 * Gets the {@code Rank} with the given ordinal/index
 	 * @param index The index to get

@@ -25,13 +25,13 @@ public class StartPosition {
 		Board startPosition = ImmutableArrayBoard.Builder.fromFen(startFen).build();
 		System.out.println(startPosition);
 		
-//		for (LineType type : LineType.values()) {
-//			for (Line line : (Line[]) type.getEnumValues()) {
-//				for (Square square : line.getContainedSquares()) {
-//					System.out.println(square);
-//				}
-//			}
-//		}
+		for (LineType type : LineType.values()) {
+			for (Line line : (Line[]) type.getEnumValues()) {
+				for (Square square : line.getContainedSquares()) {
+					System.out.println(square);
+				}
+			}
+		}
 	}
 	
 	public static void main(String[] args) {

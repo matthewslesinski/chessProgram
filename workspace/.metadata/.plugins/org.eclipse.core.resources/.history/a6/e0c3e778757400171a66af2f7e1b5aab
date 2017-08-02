@@ -1,0 +1,24 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.Set;
+
+import support.BadArgumentException;
+
+public interface UnmodifiableWrappedSet<E> extends Set<E>, UnmodifiableWrappedCollection<E> {
+
+	public final static String REMOVAL_MESSAGE = "Modification after creation is not allowed";
+	
+	/**
+	 * Retrieves the {@code Set} this wraps
+	 * @return The {@code Set}
+	 */
+	public Set<E> getWrappedSet();
+	
+	@Override
+	public default Collection<E> getWrappedCollection() {
+		return this.getWrappedSet();
+	}
+	
+}

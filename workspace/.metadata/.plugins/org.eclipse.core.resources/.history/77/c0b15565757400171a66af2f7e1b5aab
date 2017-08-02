@@ -1,0 +1,12 @@
+package dataStructures;
+
+import java.util.Collection;
+
+public interface UnmodifiableWrappedCollection<E> extends Collection<E> {
+
+	/**
+	 * Gets the collection that this wraps
+	 * @return The collection
+	 */
+	public Collection<E> getWrappedCollection();
+}

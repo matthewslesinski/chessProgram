@@ -1,0 +1,69 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+
+import boardFeatures.Square;
+import pieces.Piece;
+import support.UtilityFunctions;
+
+public class SquareSet implements Cluster<Square> {
+	
+	private final Set<Square> squares;
+	private final Map<Piece, Map<Square, BiFunction<Predicate<Square>, Square, Square>>> potentialThreats = new EnumMap<>(Piece.class);
+	private final Square center;
+	
+	public SquareSet(Collection<Square> elementsWithoutCenter, Square center) {
+		Collection<Square> elements = UtilityFunctions.concat(elementsWithoutCenter, Collections.singleton(center));
+		this.squares = EnumSet.copyOf(elements);
+		for (Piece piece : Piece.realPieces()) {
+			Map<Square, BiFunction<Predicate<Square>, Square, Square>> innerMap = new EnumMap<>(Square.class);
+			potentialThreats.put(piece, innerMap);
+			for (Square remoteSquare : Square.values()) {
+				innerMap.put(remoteSquare, remoteSquare.pieceThreats(piece, this.squares));
+			}
+			
+		}
+		this.center = center;
+	}
+	
+	public Iterator<Square> getRelevantSquares(Square perspective, Piece occupant, Predicate<Square> shouldTraverse) {
+		Function<Square, Square> getNextFunction = UtilityFunctions.bind(potentialThreats.get(occupant).get(perspective), shouldTraverse);
+		Iterator<Square> iterator = new Iterator<Square>() {
+			Square curr = getNextFunction.apply(null);
+			@Override
+			public boolean hasNext() {
+				return curr != null;
+			}
+
+			@Override
+			public Square next() {
+				Square toReturn = curr;
+				curr = getNextFunction.apply(curr);
+				return toReturn;
+			}
+			
+		};
+		return iterator;
+	}
+
+	
+	
+	@Override
+	public Square getCenter() {
+		return center;
+	}
+
+	@Override
+	public Set<Square> getWrappedSet() {
+		return this.squares;
+	}
+}

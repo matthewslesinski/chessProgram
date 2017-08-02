@@ -1,6 +1,12 @@
 package pieces;
 
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
+
+import boardFeatures.Direction;
 
 
 /**
@@ -25,6 +31,7 @@ public enum PieceType {
 	 * Holds the utility methods calculating the legal moves for this piece
 	 */
 	private final PieceUtility utilityInstance;
+	private final Set<Direction> longDistanceDirections;
 	
 	/**
 	 * Describes a particular type of piece.
@@ -36,6 +43,8 @@ public enum PieceType {
 	private PieceType(String readableForm, Function<PieceType, PieceUtility> constructor) {
 		this.readableForm = readableForm;
 		utilityInstance = constructor.apply(this);
+		List<Direction> possibleLongDistanceDirections = (utilityInstance instanceof LineMover) ? ((LineMover) utilityInstance).getMovementDirections() : Collections.emptyList();
+		this.longDistanceDirections = EnumSet.copyOf(possibleLongDistanceDirections);
 	}
 	
 	
@@ -97,6 +106,14 @@ public enum PieceType {
 		return lineMovers;
 	}
 	
+	/**
+	 * Determines if this piece type can move far in a particular direction
+	 * @param dir The direction
+	 * @return true iff it can
+	 */
+	public boolean movesFarInDirection(Direction dir) {
+		return longDistanceDirections.contains(dir);
+	}
 	
 	/**
 	 * Gets the utility class instance for this type

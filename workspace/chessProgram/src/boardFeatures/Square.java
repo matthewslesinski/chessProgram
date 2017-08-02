@@ -1,10 +1,18 @@
 package boardFeatures;
 
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import dataStructures.EvenlySpacedCircle;
+import dataStructures.EvenlySpacedCircleImpl;
+import dataStructures.Ring;
+import pieces.Knight;
+import pieces.Piece;
 import support.BadArgumentException;
 import support.UtilityFunctions;
 
@@ -86,13 +94,16 @@ public enum Square {
 	private final DownRightDiagonal downRightDiagonal;
 	private List<Square>[] surroundingLines;
 	
-	private List<Square> knightJumps = new LinkedList<>();
+	private Map<Piece, Set<Square>> attackSquares;
+	
+	private Ring<Square> knightJumps;
 	
 	private Square() {
 		int file = this.ordinal() / 8;
 		int rank = this.ordinal() % 8;
 		File fileValue = null;
 		Rank rankValue = null;
+		this.attackSquares = new EnumMap<Piece, Set<Square>>(Piece.class);
 		try {
 			fileValue = File.getByIndex(file);
 			rankValue = Rank.getByIndex(rank);
@@ -132,26 +143,13 @@ public enum Square {
 	 * Stores in {@code knightJumps} the list of squares a knight can jump to from this one
 	 */
 	private void calculateKnightMoves() {
-		List<List<Integer>> setOfDifferences = Arrays.asList(
-			Arrays.asList(2, 1),
-			Arrays.asList(2, -1),
-			Arrays.asList(1, -2),
-			Arrays.asList(-1, -2),
-			Arrays.asList(-2, -1),
-			Arrays.asList(-2, 1),
-			Arrays.asList(-1, 2),
-			Arrays.asList(1, 2)
-		);
-		
-		setOfDifferences.forEach(list -> {
-			byte fileOffset = (byte) (int) list.get(0);
-			byte rankOffset = (byte) (int) list.get(1);
-			Square jump = getSquareByOffset(fileOffset, rankOffset);
-			if (jump != null) {
-				knightJumps.add(jump);
-			}
-		});
-		
+		List<Square> possibleJumps = Knight.KNIGHT_MOVE_OFFSETS.stream().map(list -> {
+			int fileOffset = list.get(0);
+			int rankOffset = list.get(1);
+			return getSquareByOffset(fileOffset, rankOffset);
+		}).filter(square -> square != null).collect(Collectors.toList());
+		EvenlySpacedCircle circle = new EvenlySpacedCircleImpl(this, possibleJumps);
+		this.knightJumps = new Ring.OfSquares(circle);
 	}
 	
 	/**
@@ -243,7 +241,7 @@ public enum Square {
 	 * Provides access to the list of squares a knight's jump away from this one
 	 * @return The squares
 	 */
-	public List<Square> getKnightJumps() {
+	public Ring<Square> getKnightJumps() {
 		return knightJumps;
 	}
 	
@@ -280,13 +278,26 @@ public enum Square {
 	 * @return The element
 	 */
 	public <T> T getValueOfSquareInArray(T[] array) {
-		return array[this.getFile().getIndex() * 8 + this.getRank().getIndex()];
+		return UtilityFunctions.getValueFromArray(array, this);
+	}
+	
+	/**
+	 * Retrieves a function that, given a boolean function to determine if squares are blocked, will map each square in a set of relevant
+	 * squares to the next square to consider, given a piece who is making the move. This is specifically with the purpose of building an
+	 * iterator over the relevant squares to consider when determining if a piece is threatening a set of squares
+	 * @param occupant The piece that is making the threats
+	 * @param relevantSquares The set of squares to create the mapping over
+	 * @return A function that describes the mapping
+	 */
+	public BiFunction<Predicate<Square>, Square, Square> pieceThreats(Piece occupant, Set<Square> relevantSquares) {
+		// TODO
+		return null;
 	}
 	
 	/**
 	 * Returns the square at the given index, from 0 to 63
 	 * @param index The index of the square
-	 * @return
+	 * @return The Square
 	 */
 	public static Square getByIndex(int index) {
 		return Square.values()[index];

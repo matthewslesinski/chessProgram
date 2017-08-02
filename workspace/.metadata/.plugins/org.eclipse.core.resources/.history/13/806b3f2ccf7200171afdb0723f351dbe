@@ -1,0 +1,82 @@
+package dataStructures;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+
+import boardFeatures.Square;
+import support.BadArgumentException;
+
+public class EvenlySpacedCircle {
+
+	// This enum is defined specifically to allow the usage of EnumMap
+	private enum Sector {
+		UP,
+		UP_UP_RIGHT,
+		UP_RIGHT,
+		UP_RIGHT_RIGHT,
+		RIGHT,
+		RIGHT_RIGHT_DOWN,
+		RIGHT_DOWN,
+		RIGHT_DOWN_DOWN,
+		DOWN,
+		DOWN_DOWN_LEFT,
+		DOWN_LEFT,
+		DOWN_LEFT_LEFT,
+		LEFT,
+		LEFT_LEFT_UP,
+		LEFT_UP,
+		LEFT_UP_UP;
+		
+		static {
+			for (Sector sector : values()) {
+				sector.nearestDiagonal = sector.isBetweenLines ? values()[sector.ordinal() + ((sector.ordinal() % 4) * -1 + 2)] : null;
+			}
+		}
+		
+		final boolean isBetweenLines;
+		Sector nearestDiagonal;
+		private Sector() {
+			this.isBetweenLines = this.ordinal() % 2 == 1;
+		}
+		
+		private static boolean fallsInLatterHalf(int fileDifference, int rankDifference) {
+			switch (Integer.compare(fileDifference, 0)) {
+			case -1:
+				return true;
+			case 0:
+				return rankDifference > 0;
+			case 1:
+				return false;
+			default:
+				// wtf
+				throw new BadArgumentException(fileDifference, int.class, "How did we get here?!");
+			}
+		}
+		
+		private static Sector getByIncrements(int fileDifference, int rankDifference) {
+			if (fileDifference == 0 && rankDifference == 0) {
+				throw new BadArgumentException(Arrays.asList(fileDifference, rankDifference), int.class, "Expected a non zero increment");
+			}
+			int ordinal = 0;
+			
+			
+			
+			
+			return values()[ordinal];
+		}
+		
+		private static Sector getRelation(Square center, Square remote) {
+			int fileDifference = remote.getFile().getIndex() - center.getFile().getIndex();
+			int rankDifference = remote.getRank().getIndex() - center.getRank().getIndex();			
+			return getByIncrements(fileDifference, rankDifference);
+		}
+	}
+	
+	private Map<Sector, Square> relations = new EnumMap<Sector, Square>(Sector.class);
+	
+	public EvenlySpacedCircle(Square center, Collection<Square> ring) {
+		
+	}
+}

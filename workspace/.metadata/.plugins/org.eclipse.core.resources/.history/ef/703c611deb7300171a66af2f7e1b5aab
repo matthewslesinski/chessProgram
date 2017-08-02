@@ -1,0 +1,106 @@
+package boardFeatures;
+
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+public class SquareSet implements Set<Square> {
+
+	private final Set<Square> squares;
+	private final Map<LineType, Map<? extends Enum<? extends Line>, Set<Square>>> lineIndexedSquares;
+	
+	@SuppressWarnings("unchecked")
+	public SquareSet(Collection<Square> squares) {
+		this.squares = EnumSet.copyOf(squares);
+		this.lineIndexedSquares = new EnumMap<>(LineType.class);
+		for (Square square : squares) {
+			for (LineType lineType : LineType.values()) {
+				Map<? extends Enum<? extends Line>, Set<Square>> innerMap = lineIndexedSquares.getOrDefault(lineType, (Map<? extends Enum<? extends Line>, Set<Square>>) new EnumMap((Class<? extends Enum<? extends Line>>) lineType.getType()));
+			}
+		}
+	}
+	
+	@Override
+	public int size() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public boolean isEmpty() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public Iterator<Square> iterator() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Object[] toArray() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public boolean add(Square e) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends Square> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public void clear() {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	
+	
+}

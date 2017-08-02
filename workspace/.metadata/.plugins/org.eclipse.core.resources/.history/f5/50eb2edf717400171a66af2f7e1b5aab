@@ -1,0 +1,110 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Line;
+import boardFeatures.LineType;
+import boardFeatures.Square;
+import support.BadArgumentException;
+import support.UtilityFunctions;
+
+public class SquareSet implements Cluster<Square> {
+
+	private final Set<Square> squares;
+	private final Map<LineType, Map<Line, Set<Square>>> lineIndexedSquares;
+	private final Square center;
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public SquareSet(Collection<Square> squaresWithoutCenter, Square center) {
+		Collection<Square> squares = UtilityFunctions.concat(squaresWithoutCenter, Collections.singleton(center));
+		this.squares = EnumSet.copyOf(squares);
+		this.lineIndexedSquares = new EnumMap<>(LineType.class);
+		for (Square square : squares) {
+			for (LineType lineType : LineType.values()) {
+				Map<Line, Set<Square>> innerMap = lineIndexedSquares.getOrDefault(lineType, new EnumMap(lineType.getType()));
+				lineIndexedSquares.putIfAbsent(lineType, innerMap);
+				Line lineInstance = (Line) lineType.getLineBySquare(square);
+				Set<Square> squaresInALine = innerMap.getOrDefault(lineInstance, EnumSet.noneOf(Square.class));
+				innerMap.putIfAbsent(lineInstance, squaresInALine);
+				squaresInALine.add(square);
+			}
+		}
+		this.center = center;
+	}
+	
+	@Override
+	public Square getCenter() {
+		return center;
+	}
+	
+	@Override
+	public int size() {
+		return squares.size();
+	}
+
+	@Override
+	public boolean isEmpty() {
+		return squares.isEmpty();
+	}
+
+	@Override
+	public boolean contains(Object o) {
+		return squares.contains(o);
+	}
+
+	@Override
+	public Iterator<Square> iterator() {
+		return squares.iterator();
+	}
+
+	@Override
+	public Object[] toArray() {
+		return squares.toArray();
+	}
+
+	@Override
+	public <T> T[] toArray(T[] a) {
+		return squares.toArray(a);
+	}
+
+	@Override
+	public boolean add(Square e) {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+
+	@Override
+	public boolean remove(Object o) {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+
+	@Override
+	public boolean containsAll(Collection<?> c) {
+		return squares.containsAll(c);
+	}
+
+	@Override
+	public boolean addAll(Collection<? extends Square> c) {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+
+	@Override
+	public boolean retainAll(Collection<?> c) {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+
+	@Override
+	public boolean removeAll(Collection<?> c) {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+
+	@Override
+	public void clear() {
+		throw new BadArgumentException(this, SquareSet.class, "Modification after creation not allowed");
+	}
+}

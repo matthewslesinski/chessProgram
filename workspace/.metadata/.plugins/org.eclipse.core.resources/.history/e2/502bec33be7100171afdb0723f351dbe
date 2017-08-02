@@ -1,0 +1,137 @@
+package dataStructures;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.function.Supplier;
+
+import boardFeatures.Square;
+import support.BadArgumentException;
+import support.UtilityFunctions;
+
+public class Ring<E extends Enum<E>> extends EnumSequence<E> implements Circleable<E> {
+	
+	public static class OfSquares extends Ring<Square> {
+
+		public OfSquares(List<Square> elements) {
+			super(elements, OfSquares::friendFinder);
+		}
+		
+		private static List<Square> friendFinder(Square target, Object obj) {
+			return null;
+		}
+	}
+	
+	private static final int LARGEST_EXPECTED_CLOSE_ELEMENTS = 2;
+	private static final int SMALLEST_EXPECTED_CLOSE_ELEMENTS = 1;
+	
+	private final Supplier<Set<E>> setConstructor = () -> EnumSet.noneOf(this.type);
+	private final BiFunction<E, Ring<E>, List<E>> friendFinder;
+	
+	public Ring(List<E> elements, BiFunction<E, Ring<E>, List<E>> friendFinder) {
+		super(elements);
+		this.friendFinder = friendFinder;
+	}
+
+	@Override
+	public Iterator<E> getIterator(E target, Predicate<E> shouldTraverse) {
+		return new BreadthFirstTraversal<E>(constructNeighborFunction(target, shouldTraverse), setConstructor);
+	}
+	
+	@Override
+	protected E getIndex(int index) {
+		return super.getIndex(index % size());
+	}
+	
+	private Function<E, Collection<E>> constructNeighborFunction(E target, Predicate<E> shouldTraverse) {
+		final Set<E> goingDown = setConstructor.get();
+		final Set<E> goingUp = setConstructor.get();
+		return current -> getNeighbors(target, shouldTraverse, goingDown, goingUp, current);
+	}
+	
+	private Collection<E> getNeighbors(E target, Predicate<E> shouldTraverse, Set<E> goingDown, Set<E> goingUp, E current) {
+		if (current == null) {
+			return getStartElement(target, shouldTraverse, goingDown, goingUp);
+		}
+		List<E> toReturn  = new LinkedList<E>();
+		E candidate;
+		if (goingDown.contains(current)) {
+			candidate = this.lower(current);
+			if (shouldTraverse.test(candidate)) {
+				toReturn.add(candidate);
+				goingDown.add(candidate);
+			}
+		}
+		if (goingUp.contains(current)) {
+			candidate = this.higher(current);
+			if (shouldTraverse.test(candidate)) {
+				toReturn.add(candidate);
+				goingDown.add(candidate);
+			}
+		}
+		return toReturn;
+	}
+	
+	private List<E> getStartElement(E target, Predicate<E> shouldTraverse, Set<E> goingDown, Set<E> goingUp) {
+		List<E> closestElements = getClosestElements(target);
+		switch (closestElements.size()) {
+		case SMALLEST_EXPECTED_CLOSE_ELEMENTS:
+			E loneElement = closestElements.get(0);
+			if (shouldTraverse.test(loneElement)) {
+				goingDown.add(loneElement);
+				goingUp.add(loneElement);
+				return closestElements;
+			} else {
+				return Collections.emptyList();
+			}
+		case LARGEST_EXPECTED_CLOSE_ELEMENTS:
+			UtilityFunctions.sortTwoElements(closestElements, this.comparator());
+			E firstElement = closestElements.get(0);
+			E secondElement = closestElements.get(1);
+			goingDown.add(firstElement);
+			goingUp.add(secondElement);
+			return closestElements;
+		default:
+			throw new BadArgumentException(closestElements, List.class, "Unexpected number of close elements");
+		}
+		
+		
+	}
+	
+	private List<E> getClosestElements(E target) {
+		return friendFinder.apply(target, this);
+	}
+	
+	private boolean isFirstLower(E first, E second) {
+		int arg1Index = retrieveArrayIndex(first);
+		int arg2Index = retrieveArrayIndex(second);
+		return (arg2Index - arg1Index) % size() == 1;
+	}
+	
+	@Override
+	public Comparator<? super E> comparator() {
+		return (E arg1, E arg2) -> {
+			if (arg1 == arg2) {
+				return 0;
+			}
+			if (isFirstLower(arg1, arg2)) {
+				return -1;
+			}
+			if (isFirstLower(arg2, arg1)) {
+				return 1;
+			}
+			throw new BadArgumentException(Arrays.asList(arg1, arg2), arg1.getClass(), "The arguments, " + arg1 + " and " + arg2 + ", "
+					+ "are not adjacent in this ring");
+		};
+	}
+	
+}

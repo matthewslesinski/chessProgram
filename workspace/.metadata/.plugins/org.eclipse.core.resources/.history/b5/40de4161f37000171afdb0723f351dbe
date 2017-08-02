@@ -1,0 +1,28 @@
+package dataStructures;
+
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Predicate;
+
+public class Ring<E extends Enum<E>> extends EnumSequence<E> {
+	
+	
+	
+	public Ring(List<E> elements) {
+		super(elements);
+	}
+	
+	private boolean elementHasBeenAdded(E element) {
+		return addedElements.contains(element);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+}

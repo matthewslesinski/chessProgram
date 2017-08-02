@@ -8,15 +8,19 @@ import boardFeatures.Direction;
 import boardFeatures.DownRightDiagonal;
 import boardFeatures.File;
 import boardFeatures.Line;
+import boardFeatures.LineType;
 import boardFeatures.Rank;
 import boardFeatures.Square;
 import boardFeatures.UpRightDiagonal;
+import dataStructures.EnumSequence;
+import dataStructures.FixedOrderingSet;
 import gamePlaying.Color;
 import pieces.Piece;
 import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
 import support.BadArgumentException;
+import support.UtilityFunctions;
 
 /**
  * Used to preprocess a board before calculating the moves, so that calculating them is easier. The main benefits of this class
@@ -50,10 +54,12 @@ public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	private final List<Square>[] piecesToSquares = new List[Piece.values().length - 1];
 	
 	/** The four following arrays of lists contain the squares with pieces on them for each of the instances of a line type */
-	private final ImportantSquareList[] fileSquares = new ImportantSquareList[File.values().length];
-	private final ImportantSquareList[] rankSquares = new ImportantSquareList[Rank.values().length];
-	private final ImportantSquareList[] upRightSquares = new ImportantSquareList[UpRightDiagonal.values().length];
-	private final ImportantSquareList[] downRightSquares = new ImportantSquareList[DownRightDiagonal.values().length];
+	private final FixedOrderingSet[][] preProcessedLines = {
+		new FixedOrderingSet[File.values().length],	
+		new FixedOrderingSet[Rank.values().length],
+		new FixedOrderingSet[UpRightDiagonal.values().length],														
+		new FixedOrderingSet[DownRightDiagonal.values().length]
+	};
 	
 	private final Square kingSquare;
 	
@@ -76,6 +82,11 @@ public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		initializeLines();
 		kingSquare = getPieceSquares(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	private FixedOrderingSet<Square>[] retrievePreProcessingForType(LineType type) {
+		return UtilityFunctions.getValueFromArray(preProcessedLines, type);
 	}
 	
 	/**
@@ -118,8 +129,9 @@ public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 * @param line The line
 	 * @param arr The array to put the preprocessing in for storage
 	 */
-	private void preProcessLine(Line line, ImportantSquareList[] arr) {
-		ImportantSquareList list = new FixedSizeList(line.getLength(), line.getForwardDirection());
+	private void preProcessLine(Line line, FixedOrderingSet<Square>[] arr) {
+		FixedOrderingSet<Square> list = new EnumSequence<Square>(Square.class, line.getLength(),
+										square -> square.getNeighbor(line.getForwardDirection().getOppositeDirection()), line::containsSquare);
 		line.getContainedSquares().forEach(square -> {
 			Piece piece = square.getValueOfSquareInArray(pieces);
 			if (piece != Piece.NONE) {
@@ -137,10 +149,9 @@ public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
 			Piece relevantPiece = Piece.getByColorAndType(toMove.getOtherColor(), lineMover);
 			List<Square> relevantSquares = getPieceSquares(relevantPiece);
 			relevantSquares.forEach(square -> {
-				preProcessLine(square.getFile(), fileSquares);
-				preProcessLine(square.getRank(), rankSquares);
-				preProcessLine(square.getUpRightDiagonal(), upRightSquares);
-				preProcessLine(square.getDownRightDiagonal(), downRightSquares);				
+				for (LineType type : LineType.values()) {
+					preProcessLine((Line) type.getLineBySquare(square), retrievePreProcessingForType(type));
+				}		
 			});
 		}
 	}
@@ -186,36 +197,11 @@ public class BasicPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		}
 		int sign = dir.getMovement().getIncrement();
 		int numberOfSteps = n * sign;
-		int indexOfContainingLine;
-		ImportantSquareList[] listArray = null;
-		switch (dir) {
-		case DOWN:
-		case UP:
-			indexOfContainingLine = square.getFile().getIndex();
-			listArray = fileSquares;
-			break;
-		case DOWN_LEFT:
-		case UP_RIGHT:
-			indexOfContainingLine = square.getUpRightDiagonal().getIndex();
-			listArray = upRightSquares;
-			break;
-		case DOWN_RIGHT:
-		case UP_LEFT:
-			indexOfContainingLine = square.getDownRightDiagonal().getIndex();
-			listArray = downRightSquares;
-			break;
-		case LEFT:
-		case RIGHT:
-			indexOfContainingLine = square.getRank().getIndex();
-			listArray = rankSquares;
-			break;
-		default:
-			throw new BadArgumentException(dir, Direction.class, "Can't get n pieces away if we don't have a direction to go by");
-		}
+		LineType lineType = dir.getContainingLineType();
+		int indexOfPreProcessing = ((Line) lineType.getLineBySquare(square)).getIndex();
+		FixedOrderingSet<Square> listOfSquares = retrievePreProcessingForType(lineType)[indexOfPreProcessing];
 		
-		ImportantSquareList listOfSquares = listArray[indexOfContainingLine];
-		
-		return listOfSquares.getNeighbor(square, numberOfSteps);
+		return listOfSquares.retrieveOffsetFromElement(square, numberOfSteps);
 	}
 
 	/**

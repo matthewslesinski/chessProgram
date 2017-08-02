@@ -1,0 +1,10 @@
+package dataStructures;
+
+import java.util.Collection;
+
+import boardFeatures.Square;
+
+public interface EvenlySpacedCircle extends Collection<Square>{
+
+	Collection<Square> getNearestSquares(Square remote);
+}

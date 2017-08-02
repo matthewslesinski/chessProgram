@@ -1,0 +1,45 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Supplier;
+
+import boardFeatures.Square;
+import support.UtilityFunctions;
+
+public class Ring<E extends Enum<E>> extends EnumSequence<E> implements Circleable<E> {
+	
+	public static class OfSquares extends Ring<Square> {
+
+		public OfSquares(List<Square> elements) {
+			super(elements);
+			// TODO Auto-generated constructor stub
+		}
+		
+	}
+	
+	private final Supplier<Set<E>> setConstructor;
+	
+	public Ring(List<E> elements, Supplier<Set<E>> setConstructor) {
+		super(elements);
+		this.setConstructor = setConstructor;
+	}
+
+	@Override
+	public Iterator<E> getIterator(E target) {
+		return new BreadthFirstTraversal<E>(UtilityFunctions.bind(this::getNeighbors, target), setConstructor);
+	}
+	
+	private Collection<E> getNeighbors(E target, E current) {
+		return null;
+	}
+	
+	
+	
+	
+	
+	
+	
+}

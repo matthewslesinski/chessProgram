@@ -1,0 +1,94 @@
+package dataStructures;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+
+import boardFeatures.Square;
+import support.BadArgumentException;
+
+public class EvenlySpacedCircle {
+
+	// This enum is defined specifically to allow the usage of EnumMap
+	private enum Sector {
+		UP, // 0, 1
+		UP_UP_RIGHT, // 1, 2
+		UP_RIGHT, // 1, 1
+		UP_RIGHT_RIGHT, // 2, 1
+		RIGHT, // 1, 0
+		RIGHT_RIGHT_DOWN, // 2, -1
+		RIGHT_DOWN, // 1, -1
+		RIGHT_DOWN_DOWN, // 1, -2
+		DOWN, // 0, -1
+		DOWN_DOWN_LEFT, // -1, -2
+		DOWN_LEFT, // -1, -1
+		DOWN_LEFT_LEFT, // -2, -1
+		LEFT, // -1, 0
+		LEFT_LEFT_UP, // -2, 1
+		LEFT_UP, // -1, 1
+		LEFT_UP_UP; // -1, 2
+		
+		static {
+			for (Sector sector : values()) {
+				// there's not a clear nearestDiagonal if this isn't between lines. If it is, if this is further in it's quartile, subtract 1,
+				// otherwise add 1
+				sector.nearestDiagonal = sector.isBetweenLines ? values()[sector.ordinal() + ((sector.ordinal() % 4) * -1 + 2)] : null;
+			}
+		}
+		
+		final boolean isBetweenLines;
+		Sector nearestDiagonal;
+		private Sector() {
+			// It's between lines if its ordinal is odd
+			this.isBetweenLines = this.ordinal() % 2 == 1;
+		}
+		
+		private Sector getNearestDiagonal() {
+			return this.nearestDiagonal;
+		}
+		
+		private static Sector getByIncrements(int fileDifference, int rankDifference) {
+			if (fileDifference == 0 && rankDifference == 0) {
+				throw new BadArgumentException(Arrays.asList(fileDifference, rankDifference), int.class, "Expected a non zero increment");
+			}
+			int ordinal = 0;
+			// If the file moves to the left or direction is straight down
+			if (fileDifference < 0 || (fileDifference == 0 && rankDifference < 0)) {
+				ordinal = 8;
+				// reflect to other half
+				fileDifference *= -1;
+				rankDifference *= -1;
+			}
+			// If the rank moves downwards or the file moves straight right
+			if (rankDifference <= 0) {
+				ordinal += 4;
+				// swap, and get rid of negatives
+				int tmp = fileDifference;
+				fileDifference = -1 * rankDifference;
+				rankDifference = tmp;
+			}
+			// If the rank changes less than the file
+			if (rankDifference <= fileDifference) {
+				ordinal += 2;
+				fileDifference -= rankDifference;
+			}
+			if (fileDifference > 0) {
+				ordinal += 1;
+			}
+			return values()[ordinal];
+		}
+		
+		private static Sector getRelation(Square center, Square remote) {
+			int fileDifference = remote.getFile().getIndex() - center.getFile().getIndex();
+			int rankDifference = remote.getRank().getIndex() - center.getRank().getIndex();			
+			return getByIncrements(fileDifference, rankDifference);
+		}
+	}
+	
+	private Map<Sector, Square> relations = new EnumMap<Sector, Square>(Sector.class);
+	
+	public EvenlySpacedCircle(Square center, Collection<Square> ring) {
+		
+	}
+}

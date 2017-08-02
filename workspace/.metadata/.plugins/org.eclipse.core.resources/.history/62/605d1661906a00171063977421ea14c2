@@ -1,5 +1,0 @@
-package boardFeatures;
-
-public enum LineType {
-
-}

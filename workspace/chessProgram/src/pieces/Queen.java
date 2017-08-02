@@ -1,26 +1,37 @@
 package pieces;
 
-import java.util.Set;
+import java.util.List;
 
-import boardFeatures.Square;
-import moves.Move;
-import representation.Board;
+import boardFeatures.Direction;
+import support.Constants;
 
 /**
  * Provides the utility method(s) for calculating a queen's legal moves
  * @author matthewslesinski
  *
  */
-public class Queen extends PieceUtility {
+public class Queen extends LineMover {
 
+	private static final PieceType TYPE = PieceType.QUEEN;
+	private static final int ATTACK_DISTANCE = 14;
 	
 	Queen(PieceType piece) {
-		super(piece);
+		super();
 	}
 	
+
 	@Override
-	public Set<Move> getLegalMoves(Square square, Board board) {
-		// TODO Auto-generated method stub
-		return null;
+	protected PieceType determinePieceType() {
+		return TYPE;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return ATTACK_DISTANCE;
+	}
+
+	@Override
+	List<Direction> getMovementDirections() {
+		return Constants.QUEEN_DIRECTIONS;
 	}
 }
