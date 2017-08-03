@@ -1,5 +1,7 @@
 package pieces;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -38,6 +40,12 @@ public class Pawn extends PieceUtility {
 	@Override
 	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color color) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare) {
+		// TODO
 		return null;
 	}
 }

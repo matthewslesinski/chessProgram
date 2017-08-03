@@ -34,7 +34,7 @@ public abstract class PieceUtility {
 		this.MAX_ATTACK_DISTANCE = determineMaxAttackDistance();
 	}
 	
-	public abstract Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare);
+	public abstract Collection<Square> getPossibleSquaresToThreaten(Color color, Square square);
 	
 	/**
 	 * Gets the {@code Set} of moves for this piece

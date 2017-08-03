@@ -68,7 +68,7 @@ public enum Piece {
 	}
 	
 	public Collection<Square> getPossibleThreatsFromSquare(Square square) {
-		return type.getUtilityInstance().getPossibleSquaresToThreaten(color, square);
+		
 	}
 	
 	/**

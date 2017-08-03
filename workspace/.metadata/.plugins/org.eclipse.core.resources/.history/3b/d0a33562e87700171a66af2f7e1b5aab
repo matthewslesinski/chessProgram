@@ -61,12 +61,6 @@ public class Knight extends PieceUtility{
 			return fromSquare.getSquareByOffset(fileOffset, rankOffset);
 		}).filter(square -> square != null).collect(Collectors.toList());
 		EvenlySpacedCircle circle = new EvenlySpacedCircleImpl(fromSquare, possibleJumps);
-		return new Ring.OfSquares(circle);
-	}
-
-	@Override
-	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color toMove) {
-		// TODO Auto-generated method stub
-		return null;
+		return = new Ring.OfSquares(circle);
 	}
 }
