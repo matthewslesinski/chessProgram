@@ -63,10 +63,4 @@ public class Knight extends PieceUtility{
 		EvenlySpacedCircle circle = new EvenlySpacedCircleImpl(fromSquare, possibleJumps);
 		return new Ring.OfSquares(circle);
 	}
-
-	@Override
-	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color toMove) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -101,8 +101,7 @@ public enum Square {
 	private Ring<Square> knightJumps;
 	private Set<Square> bishopMoves;
 	private Set<Square> rookMoves;
-	private Set<Square> kingAttacks;
-	private Set<Square> kingSlides;
+	private Set<Square> kingMoves;
 	
 	private Square() {
 		int file = this.ordinal() / 8;
@@ -223,7 +222,7 @@ public enum Square {
 	 * @param rankOffset How many ranks over
 	 * @return The {@code Square}
 	 */
-	public Square getSquareByOffset(int fileOffset, int rankOffset) {
+	private Square getSquareByOffset(int fileOffset, int rankOffset) {
 		int fileIndex = this.file.getIndex() + fileOffset;
 		int rankIndex = this.rank.getIndex() + rankOffset;
 		if (!areRealSquareIndices(fileIndex, rankIndex)) {

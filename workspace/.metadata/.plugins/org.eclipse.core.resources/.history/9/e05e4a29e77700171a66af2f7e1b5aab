@@ -1,6 +1,5 @@
 package pieces;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -33,8 +32,6 @@ public abstract class PieceUtility {
 		this.pieceType = determinePieceType();
 		this.MAX_ATTACK_DISTANCE = determineMaxAttackDistance();
 	}
-	
-	public abstract Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare);
 	
 	/**
 	 * Gets the {@code Set} of moves for this piece

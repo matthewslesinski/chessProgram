@@ -49,8 +49,7 @@ public class King extends PieceUtility {
 	@Override
 	public Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare) {
 		return Arrays.asList(Direction.values()).stream()
-				.map(direction -> fromSquare.getNeighbor(direction)).filter(square -> square != null)
-				.collect(Collectors.toList());
+				.map(direction -> fromSquare.getNeighbor(direction)).collect(Collectors.toList());
 	}
 
 }

@@ -223,7 +223,7 @@ public enum Square {
 	 * @param rankOffset How many ranks over
 	 * @return The {@code Square}
 	 */
-	public Square getSquareByOffset(int fileOffset, int rankOffset) {
+	private Square getSquareByOffset(int fileOffset, int rankOffset) {
 		int fileIndex = this.file.getIndex() + fileOffset;
 		int rankIndex = this.rank.getIndex() + rankOffset;
 		if (!areRealSquareIndices(fileIndex, rankIndex)) {

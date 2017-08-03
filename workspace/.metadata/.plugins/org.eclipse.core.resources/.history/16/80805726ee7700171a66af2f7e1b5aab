@@ -15,10 +15,8 @@ public class SquareSet implements Cluster<Square> {
 	/** The set of squares in this cluster */
 	private final Set<Square> squares;
 	
-	/** The center of this cluster */
 	private final Square center;
 	
-	/** Stores the squares on each line of each type */
 	private final Map<LineType, Map<Line, Set<Square>>> lineToSquares = new EnumMap<>(LineType.class);
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })
@@ -46,11 +44,6 @@ public class SquareSet implements Cluster<Square> {
 		return center;
 	}
 	
-	/**
-	 * Retrieves the set of squares in this cluster that are on a line
-	 * @param line The line to retrieve squares on
-	 * @return The set of squares
-	 */
 	public Set<Square> getSquaresOnLine(Line line) {
 		return lineToSquares.get(line.getType()).getOrDefault(line, EnumSet.noneOf(Square.class));
 	}
