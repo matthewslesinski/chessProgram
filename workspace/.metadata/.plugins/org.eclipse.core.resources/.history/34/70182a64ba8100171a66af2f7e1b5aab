@@ -1,0 +1,23 @@
+package gamePlaying;
+
+import java.util.function.Function;
+
+public class UserInput {
+
+	
+	private final InputType type;
+	private final Function<Game<?>, String> action;
+	
+	public UserInput(String input) {
+		this.type = InputType.getInputType(input);
+		this.action = type.getAction(input);
+	}
+	
+	public String performAction(Game<?> game) {
+		return action.apply(game);
+	}
+	
+	public String performAction() {
+		return action.apply(Game.getCurrentGame());
+	}
+}

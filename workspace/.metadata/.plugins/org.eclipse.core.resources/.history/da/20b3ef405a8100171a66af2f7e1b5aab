@@ -1,0 +1,20 @@
+package gamePlaying;
+
+public class UserActions {
+	
+	public static String exit(String[] args, Game<?> game) {
+		System.exit(0);
+		return null;
+	}
+	
+	public static String redo(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String undo(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+}

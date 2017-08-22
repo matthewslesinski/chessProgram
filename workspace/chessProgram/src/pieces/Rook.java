@@ -13,20 +13,14 @@ import support.Constants;
 public class Rook extends LineMover {
 
 	private static final PieceType TYPE = PieceType.ROOK;
-	private static final int ATTACK_DISTANCE = 8;
 	
-	Rook(PieceType piece) {
+	Rook() {
 		super();
 	}
 
 	@Override
 	protected PieceType determinePieceType() {
 		return TYPE;
-	}
-
-	@Override
-	protected int determineMaxAttackDistance() {
-		return ATTACK_DISTANCE;
 	}
 
 	@Override

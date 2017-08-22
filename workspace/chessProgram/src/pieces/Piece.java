@@ -1,12 +1,14 @@
 package pieces;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Set;
+import java.util.List;
+
+import boardFeatures.Direction;
 import boardFeatures.Square;
+import dataStructures.SquareSet;
 import gamePlaying.Color;
 import moves.Move;
-import representation.Board;
+import moves.ProcessedBoard;
 import support.BadArgumentException;
 import support.Constants;
 
@@ -31,14 +33,17 @@ public enum Piece {
 	private final PieceType type;
 	private final Color color;
 	private final String stringPicture;
+	private final PieceUtility utilityInstance;
 	
 	private Piece(int picture) {
 		if (this.ordinal() == 0) {
 			this.type = null;
 			this.color = null;
+			this.utilityInstance = null;
 		} else {
 			this.type = PieceType.values()[(this.ordinal() - 1) % 6];
 			this.color = Color.getColor(this.ordinal() < 7);
+			this.utilityInstance = this.type.getUtilityInstanceConstructor().apply(this.color);
 		}
 		stringPicture = Character.toString((char) picture);
 	}
@@ -67,8 +72,48 @@ public enum Piece {
 		return this.ordinal();
 	}
 	
-	public Collection<Square> getPossibleThreatsFromSquare(Square square) {
-		return type.getUtilityInstance().getPossibleSquaresToThreaten(color, square);
+	/**
+	 * Gets the utility class for this piece
+	 * @return The utility instance
+	 */
+	public PieceUtility getUtilityInstance() {
+		return utilityInstance;
+	}
+	
+	/**
+	 * Gets the {@code Square}s this {@code Piece} can threaten from some {@code Square}
+	 * @param square The {@code Square} from which this can threaten
+	 * @return The {@code SquareSet} containing the threats
+	 */
+	public SquareSet getPossibleThreatsFromSquare(Square square) {
+		return new SquareSet(getUtilityInstance().calculatePossibleSquaresToThreaten(square), square);
+	}
+	
+	/**
+	 * Gets the {@code Square}s this {@code Piece} can move to from some {@code Square}
+	 * @param square The {@code Square} from which this can move
+	 * @return The {@code SquareSet} containing the destinations. Note, this may return a {@code SquareSet}, {@code PawnMoveSet}, or {@code KingMoveSet}
+	 */
+	public SquareSet getPossibleMovesFromSquare(Square square) {
+		return getUtilityInstance().calculatePossibleSquaresToMoveTo(square);
+	}
+	
+	/**
+	 * Determines if this piece type can move in a particular direction
+	 * @param dir The direction
+	 * @return true iff it can
+	 */
+	public boolean movesInDirection(Direction dir) {
+		return getUtilityInstance().movesInDirection(dir);
+	}
+	
+	/**
+	 * Determines if this piece type can threaten in a particular direction
+	 * @param dir The direction
+	 * @return true iff it can
+	 */
+	public boolean threatensInDirection(Direction dir) {
+		return getUtilityInstance().movesInDirection(dir);
 	}
 	
 	/**
@@ -104,6 +149,7 @@ public enum Piece {
 		return values()[(color.isWhite() ? 1 : 7) + type.ordinal()];
 	}
 	
+	
 	/**
 	 * Gets the legal moves of this piece in any situation.
 	 * @param square The {@code Square} mapping to this piece in the {@code Board}
@@ -111,8 +157,8 @@ public enum Piece {
 	 * @param toMove The {@code Color} whose move it is
 	 * @return The {@code Set} of the legal {@code Move}s
 	 */
-	public Set<Move> getLegalMoves(Square square, Board board, Color toMove) {
-		if (!board.isPieceAtSquare(this, square)) {
+	public List<Move> getLegalMoves(Square square, ProcessedBoard<?> board) {
+		if (board.getPieceAtSquare(square) != this) {
 			throw new BadArgumentException(square, Square.class, "Can't get legal moves for a different piece than what is on the provided square");
 		}
 		if (board.whoseMove() != this.color) {
@@ -121,7 +167,7 @@ public enum Piece {
 		if (this == NONE) {
 			throw new BadArgumentException(this, Piece.class, "Can't calculate legal moves for an empty square");
 		}
-		return type.getUtilityInstance().getLegalMoves(square, board, toMove);
+		return getUtilityInstance().getLegalMoves(square, board);
 	}
 	
 	@Override

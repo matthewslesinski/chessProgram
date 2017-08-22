@@ -1,12 +1,14 @@
 package moves;
 
 import java.util.List;
+import java.util.Set;
 
 import boardFeatures.Direction;
 import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
 import pieces.Piece;
+import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
 
@@ -50,27 +52,63 @@ public interface ProcessedBoard<B extends Board> {
 	public Piece getPieceAtSquare(Square square);
 	
 	/**
-	 * Figures out if the king is in check and what squares around it it can move to safely
+	 * Gets the square that the king of the color to move is on
+	 * @return The {@code Square}
+	 */
+	public default Square getKingSquare() {
+		return getListOfSquaresForPiece(Piece.getByColorAndType(whoseMove(), PieceType.KING)).get(0);
+	}
+	
+	/**
+	 * Determines if there is no piece at the square
+	 * @param square The square to check
+	 * @return If there's no piece there
+	 */
+	public default boolean isEmptySquare(Square square) {
+		Piece piece = getPieceAtSquare(square);
+		return piece == null || piece == Piece.NONE;
+	}
+	
+	/**
+	 * Determines if the square does not hold a piece of the same color as the player to move
+	 * @param square The square to check
+	 * @return true iff there is no piece at that square or the piece that is there is the other color
+	 */
+	public default boolean isNotSameColor(Square square) {
+		Piece piece = getPieceAtSquare(square);
+		return piece == null || piece == Piece.NONE || piece.getColor() != whoseMove();
+	}
+	
+	/**
+	 * Figures out if the king is in check, squares around it it can move to safely, and what pins are present
 	 * @param The possible squares that the king could move to if they're safe
 	 */
-	public void calculateKingSafety(List<Square> possibleSquares);
+	public void calculateKingSafety();
 	
 	/**
 	 * Retrieves the list of squares with pieces that are giving check
 	 * @return The list of squares
 	 */
-	public List<Square> whoIsAttackingTheKing();
+	public Set<Square> whoIsAttackingTheKing();
 	
 	/**
 	 * Returns the list of the squares around the king that are safe to move to
 	 * @return The list of safe squares
 	 */
-	public List<Square> getSafeKingDestinations();
+	public Set<Square> getSafeKingDestinations();
 	
 	/**
-	 * Determines if a piece on a square is pinned to the king. If so, the direction to the pinning piece will be returned, otherwise null
+	 * Determines if there is a piece in the way that would block movement from one square to another
+	 * @param start The start square for the movement
+	 * @param end The end square for the movement
+	 * @return Iff there's a piece in the way
+	 */
+	public boolean isMovementBlocked(Square start, Square end);
+	
+	/**
+	 * Determines if a piece on a square is pinned to the king. If so, the direction to the pinning piece will be returned, otherwise NONE
 	 * @param square The square of the possibly pinned piece
-	 * @return The directino to the pinning piece
+	 * @return The direction to the pinning piece
 	 */
 	public Direction isPiecePinned(Square square);
 	

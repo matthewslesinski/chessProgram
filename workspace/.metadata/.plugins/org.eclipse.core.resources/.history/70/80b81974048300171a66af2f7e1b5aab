@@ -1,0 +1,30 @@
+package boardFeatures;
+
+import java.util.LinkedList;
+import java.util.List;
+
+/**
+ * Used to control the initialization order of the various classes in this package, since there are various circular dependencies
+ * @author matthewslesinski
+ *
+ */
+public class StaticInitializer {
+
+	private static final List<Runnable> TO_CALL_ACTIONS = new LinkedList<>();
+	
+	/**
+	 * Initializes values through this initialization process, to avoid circular dependencies
+	 */
+	static void initialize() {
+		File.setContainedSquares();
+		Rank.setContainedSquares();
+		UpRightDiagonal.setContainedSquares();
+		DownRightDiagonal.setContainedSquares();
+		LineType.postInitialization();
+		Square.postInitialization();
+	}
+	
+	public static void addAction(Runnable action) {
+		TO_CALL_ACTIONS.add(action);
+	}
+}

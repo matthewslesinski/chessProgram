@@ -5,9 +5,11 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 /**
+ * A structure that represents a set of threats. It can return an iterator, and iterable of that iterator,
+ * over the threats that are relevant
  * @author matthewslesinski
  *
- * @param <E>
+ * @param <E> The type of the elements in this structure
  */
 public interface AttackStructure<E> extends Set<E> {
 

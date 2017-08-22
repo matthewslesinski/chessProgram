@@ -1,0 +1,73 @@
+package gamePlaying;
+
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import immutableArrayBoard.ImmutableArrayBoard;
+import representation.Board;
+import representation.BoardBuilder;
+import support.Constants;
+
+public class Game {
+
+	private static Game CURRENT_GAME;
+	
+	private final List<Board> positions = new LinkedList<>();
+	private final Player player1;
+	private final Player player2;
+	private final Map<Color, Player> colorMapping = new EnumMap<>(Color.class);
+	
+	public Game() {
+		this(Constants.PLAYER_1_TYPE, Constants.PLAYER_1_NAME, Constants.PLAYER_2_TYPE, Constants.PLAYER_2_NAME, Constants.BOARD_BUILDER_CONSTRUCTOR);
+	}
+	
+	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor) {
+		this(player1Type, name1, player2Type, name2, constructor, Constants.STANDARD_START_POSITION);
+	}
+	
+	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor, String startPosition) {
+		this.player1 = player1Type.createNew(name1);
+		this.player2 = player2Type.createNew(name2);
+		colorMapping.put(Color.WHITE, player1);
+		colorMapping.put(Color.BLACK, player2);
+		positions.add(constructor.apply(startPosition).build());
+		CURRENT_GAME = this;
+	}
+	
+	public Board getCurrentPosition() {
+		return positions.get(positions.size() - 1);
+	}
+	
+	public Player getCurrentPlayer() {
+		return colorMapping.get(getCurrentPosition().whoseMove());
+	}
+	
+	public void takeTurn() {
+		Board currentPosition = getCurrentPosition();
+		Player player = getCurrentPlayer();
+		UserInput nextAction = player.getNextInput(currentPosition);
+		nextAction.performAction(this);
+	}
+	
+	public void play() {
+		for (;;) {
+			takeTurn();
+		}
+	}
+	
+	public static Game getCurrentGame() {
+		return CURRENT_GAME;
+	}
+	
+	public static void startPlaying() {
+		Game<ImmutableArrayBoard> game = new Game(PlayerType.HUMAN, "Matthew", PlayerType.HUMAN, "Luke", ImmutableArrayBoard.Builder::fromFen);
+		game.play();
+	}
+	
+	public static void main(String[] args) {
+		startPlaying();
+	}
+}

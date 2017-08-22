@@ -1,18 +1,24 @@
 package moves;
 
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.EnumMap;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.IntFunction;
+
+import boardFeatures.Square;
+import convenienceDataStructures.UnmodifiableWrappedSet;
+import pieces.PieceType;
 
 /**
  * Represents a {@code Set} of {@code Move} by compressing each move into an int
  * @author matthewslesinski
  *
  */
-public class MoveSet<M extends Move> implements Set<M> {
+public class MoveSet implements UnmodifiableWrappedSet<Move> {
 
 	/**
 	 * Stores the compressed moves
@@ -22,18 +28,21 @@ public class MoveSet<M extends Move> implements Set<M> {
 	/**
 	 * Used to create moves from the ints stored in this class
 	 */
-	// TODO Find some way to not need to store this constructor
-	protected final IntFunction<M> constructor;
+	protected final IntFunction<Move> constructor;
 	
 	/**
 	 * Initializes this {@code MoveSet} with all of its moves
 	 * @param moves The moves to include in this {@code MoveSet}
 	 * @param constructor The constructor for recreating {@code Move}s from the compressed versions
 	 */
-	public MoveSet(List<M> moves, IntFunction<M> constructor) {
+	public MoveSet(Collection<Move> moves, IntFunction<Move> constructor) {
 		this.constructor = constructor;
 		moveStore = new int[moves.size()];
-		this.addAll(moves);
+		int index = 0;
+		Iterator<Move> iterator = moves.iterator();
+		while (iterator.hasNext()) {
+			moveStore[index++] = iterator.next().compress();
+		}
 	}
 	
 	@Override
@@ -42,76 +51,77 @@ public class MoveSet<M extends Move> implements Set<M> {
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return size() == 0;
-	}
-
-	@Override
 	public boolean contains(Object o) {
-		// TODO Auto-generated method stub
+		for (Move move : this) {
+			if (o.equals(move)) {
+				return true;
+			}
+		}
 		return false;
 	}
 
 	@Override
-	public Iterator<M> iterator() {
-		// TODO Auto-generated method stub
-		return null;
+	public Iterator<Move> iterator() {
+		return new Iterator<Move>() {
+
+			private int index = 0;
+			@Override
+			public boolean hasNext() {
+				return index < moveStore.length;
+			}
+
+			@Override
+			public Move next() {
+				return constructor.apply(moveStore[index++]);
+			}
+			
+		};
 	}
 
-	@Override
-	public Object[] toArray() {
-		return Arrays.stream(moveStore).mapToObj(constructor).toArray();
-	}
-
-	@Override
-	public <T> T[] toArray(T[] a) {
-		return Arrays.stream(moveStore).mapToObj(constructor).toArray(length -> a);
-	}
-
-	@Override
-	public boolean add(Move e) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean remove(Object o) {
-		// TODO Auto-generated method stub
-		return false;
-	}
 
 	@Override
 	public boolean containsAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
-	}
-
-	@Override
-	public boolean addAll(Collection<? extends M> c) {
-		boolean toReturn = false;
-		for (Move m : c) {
-			toReturn = toReturn || add(m);
+		for (Object o : c) {
+			if (!(o instanceof Move)) {
+				return false;
+			}
+			Move move = (Move) o;
+			if (!contains(move)) {
+				return false;
+			}
 		}
-		return toReturn;
+		return true;
 	}
 
 	@Override
-	public boolean retainAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+	public Set<Move> getWrappedSet() {
+		return this;
 	}
-
+	
+	/**
+	 * Maps each relevant piece/square combination to the list of moves involving that piece moving to that square.
+	 * This is important for figuring out how much information to include in the strings of moves that get printed.
+	 * @param moves The {@code Set} of {@code Move}s that can be made
+	 * @return
+	 */
+	public static Map<PieceType, Map<Square, List<Move>>> mapEndSquaresToMovesForPieces(Set<Move> moves) {
+		Map<PieceType, Map<Square, List<Move>>> map = new EnumMap<>(PieceType.class);
+		moves.forEach(move -> {
+			PieceType piece = move.getMovingPiece();
+			Map<Square, List<Move>> squareMapping = map.getOrDefault(piece, new EnumMap<>(Square.class));
+			map.putIfAbsent(piece, squareMapping);
+			Square endSquare = move.getEndSquare();
+			List<Move> movesWithRelevantDestination = squareMapping.getOrDefault(endSquare, new LinkedList<>());
+			squareMapping.putIfAbsent(endSquare, movesWithRelevantDestination);
+			movesWithRelevantDestination.add(move);
+		});
+		return map;
+	}
+	
 	@Override
-	public boolean removeAll(Collection<?> c) {
-		// TODO Auto-generated method stub
-		return false;
+	public String toString() {
+		Map<PieceType, Map<Square, List<Move>>> endSquareMap = mapEndSquaresToMovesForPieces(this);
+		return toStringImpl(move -> move.getMoveAsString(endSquareMap));
 	}
-
-	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-		
-	}
-
 
 }

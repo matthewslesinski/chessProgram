@@ -1,13 +1,22 @@
 package boardFeatures;
 
+import support.Constants;
+
+/**
+ * Represents the two left/right sides of the chessboard, the kingside and the queenside.
+ * @author matthewslesinski
+ *
+ */
 public enum Side {
 
 	KINGSIDE,
 	QUEENSIDE;
 	
+	/** A boolean representation distinguisher for these enums */
 	private final boolean isKingside = this.ordinal() == 0 ? true : false;
 	
-	private final File castlingRookFile = isKingside ? File.H : File.A;
+	/** The {@code File} that is on the edge of this side, and the rook from this side starts on */
+	private final File castlingRookFile = isKingside ? Constants.KINGSIDE_ROOK_START_FILE : Constants.QUEENSIDE_ROOK_START_FILE;
 	
 	/**
 	 * Returns whether this side is the kingside or queenside
@@ -43,5 +52,14 @@ public enum Side {
 	 */
 	public static Side getByBoolean(boolean isKingside) {
 		return isKingside ? KINGSIDE : QUEENSIDE;
+	}
+	
+	/**
+	 * Gets the {@code Side} containing this square
+	 * @param square The square on the side
+	 * @return The {@code Side}
+	 */
+	public static Side getByRelation(Square square) {
+		return getByBoolean(square.getFile().getIndex() > 3);
 	}
 }

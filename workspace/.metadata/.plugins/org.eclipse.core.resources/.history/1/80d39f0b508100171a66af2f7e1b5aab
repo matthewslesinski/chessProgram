@@ -1,0 +1,26 @@
+package gamePlaying;
+
+public enum InputType {
+
+	MOVE(null),
+	POKE("poke"),
+	PRINT_MOVES("print moves"),
+	PRINT_BOARD("print board"),
+	GET_FEN("get fen"),
+	UNDO("undo"),
+	REMOVE("remove"),
+	QUIT("quit"),
+	
+	private final String expectedInput;
+	
+	
+	private static final Map<String InputType> INTERNAL_MAPPING = new HashMap<>();
+
+	
+	private InputType(String expectedInput) {
+		this.expectedInput = expectedInput;
+	}
+	
+	
+	
+}

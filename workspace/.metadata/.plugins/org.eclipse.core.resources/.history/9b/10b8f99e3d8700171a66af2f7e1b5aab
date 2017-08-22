@@ -1,0 +1,95 @@
+package representation;
+
+import boardFeatures.Side;
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.Move;
+import pieces.Piece;
+import pieces.PieceType;
+
+/**
+ * Instances of this class are intended to hold the logic for performing the legal moves for the appropriate type of {@code Board}.
+ * @author matthewslesinski
+ *
+ * @param <B> The type of Board that this performs moves for
+ */
+public abstract class MoveMaker<B extends Board> {
+
+	/**
+	 * Retrieves a new builder to build the new board with
+	 * @param board The board to seed the builder with
+	 * @return The builder
+	 */
+	protected abstract BoardBuilder<B> getNewBuilderFromBoard(B board);
+	
+	/**
+	 * Performs a move in a given position.
+	 * @param move The move to perform
+	 * @param board The board to perform the move on
+	 * @return The resulting board. If the move is illegal, null should be returned
+	 */
+	public B performMove(Move move, B board) {
+		if (!board.getLegalMoves().contains(move)) {
+			return null;
+		}
+		BoardBuilder<B> builder = getNewBuilderFromBoard(board);
+		builder.withEnPassant(null);
+		Color movingColor = move.getMovingColor();
+		switch (move.getMovingPiece()) {
+		case PAWN:
+			if (move.isEnPassant()) {
+				switchSquares(builder, PieceType.PAWN, move.getStartSquare(), move.getEnPassantDestinationSquare(), movingColor);
+				builder.withPieceAtSquare(Piece.NONE, move.getEnPassantCaptureSquare());
+			} else if (move.isPromotion()) {
+				switchSquares(builder, move.getPromotionPiece(), move.getStartSquare(), move.getEndSquare(), movingColor);
+			} else {
+				if (Math.abs(move.getStartSquare().getRank().getIndex() - move.getEndSquare().getRank().getIndex()) == 2) {
+					builder.withEnPassant(move.getStartSquare().getFile());
+				}
+				switchSquares(builder, move);
+			}
+			break;
+		case KING:
+			if (move.isCastle()) {
+				CastlingRights relevantRight = CastlingRights.getByColorAndSide(movingColor, Side.getByRelation(move.getEndSquare()));
+				switchSquares(builder, PieceType.ROOK, relevantRight.getRookSquare(), relevantRight.getTargetRookSquare(), movingColor);
+			}
+		case ROOK:
+			CastlingRights.getAffectedRightsByColorAndSquare(movingColor, move.getStartSquare())
+				.forEach(right -> builder.withCastlingRight(right, false));
+		default:
+			switchSquares(builder, move);
+			break;
+		}
+		if (move.isCapture() && move.getCapturedPiece() == PieceType.ROOK) {
+			CastlingRights.getAffectedRightsByColorAndSquare(movingColor.getOtherColor(), move.getEndSquare())
+				.forEach(right -> builder.withCastlingRight(right, false));
+		}
+		return builder.withLastMove(move).withColorToMove(movingColor.getOtherColor()).build();
+	}	
+	
+	/**
+	 * Does the basic logic of the move, by switching the square the moving piece starts on with the destination square
+	 * @param builder The builder to record the move in
+	 * @param move The move being made
+	 * @return The builder
+	 */
+	protected BoardBuilder<B> switchSquares(BoardBuilder<B> builder, Move move) {
+		return switchSquares(builder, move.getMovingPiece(), move.getStartSquare(), move.getEndSquare(), move.getMovingColor());
+	}
+	
+	/**
+	 * Gets rid of the piece at the start square and puts the moving piece at the end square in the builder
+	 * @param builder The builder
+	 * @param movingPiece The moving piece
+	 * @param start The square it starts on
+	 * @param end The square to put the moving piece on
+	 * @param whoseMove The color of the player making the move
+	 * @return The builder
+	 */
+	protected BoardBuilder<B> switchSquares(BoardBuilder<B> builder, PieceType movingPiece, Square start, Square end, Color whoseMove) {
+		return builder
+				.withPieceAtSquare(Piece.getByColorAndType(whoseMove, movingPiece), end)
+				.withPieceAtSquare(Piece.NONE, start);
+	}
+}

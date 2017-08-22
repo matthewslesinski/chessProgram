@@ -4,7 +4,12 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Set;
 
-
+/**
+ * Wraps a {@code Set} that shouldn't be modified
+ * @author matthewslesinski
+ *
+ * @param <E> The type of the elements
+ */
 public interface UnmodifiableWrappedSet<E> extends Set<E>, UnmodifiableWrappedCollection<E> {
 
 	

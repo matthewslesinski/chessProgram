@@ -10,7 +10,7 @@ import support.UtilityFunctions;
  * Represents a vertical column of squares on the board, of which there are 8
  * @author matthewslesinski
  */
-public enum File implements Line{
+public enum File implements Line {
 
 	A("a", "\uff41"),
 	B("b", "\uff42"),
@@ -21,7 +21,10 @@ public enum File implements Line{
 	G("g", "\uff47"),
 	H("h", "\uff48");
 	
+	/** The letter of this {@code File} */
 	private final String readableForm;
+	
+	/** A widened unicode version of the readableForm */
 	private final String eclipseSpecificLengthenedForm;
 	
 	/** The set of squares contained in this {@code File} */
@@ -84,10 +87,13 @@ public enum File implements Line{
 	/**
 	 * Gets the file that has the given letter
 	 * @param readableForm The letter
-	 * @return The file with the given letter
+	 * @return The file with the given letter or null if the input is null
 	 * @throws BadArgumentException If the string is not a file
 	 */
 	public static File getByHumanReadableForm(String readableForm) throws BadArgumentException {
+		if (readableForm == null) {
+			return null;
+		}
 		int numericalValue = -1;
 		try {
 			numericalValue = readableForm.charAt(0) - 96;

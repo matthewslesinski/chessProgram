@@ -3,6 +3,7 @@ package representation;
 import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import moves.Move;
 import pieces.Piece;
 import support.FENStringParser;
 
@@ -60,7 +61,14 @@ public abstract class BoardBuilder<B extends Board> {
 	 * @return This builder
 	 */
 	public abstract BoardBuilder<B> withEnPassant(File file);
-	
+
+	/**
+	 * Sets the move made to reach this board to the given move
+	 * @param move The last move
+	 * @return This builder
+	 */
+	public abstract BoardBuilder<B> withLastMove(Move move);
+
 	/**
 	 * Builds the board from this builder
 	 * @return The {@code ImmutableArrayBoard} instance

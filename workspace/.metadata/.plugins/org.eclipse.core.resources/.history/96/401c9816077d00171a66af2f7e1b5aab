@@ -1,0 +1,84 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Direction;
+import boardFeatures.Line;
+import boardFeatures.LineType;
+import boardFeatures.Square;
+
+public class SquareSet implements Cluster<Square> {
+
+	/** The set of squares in this cluster */
+	private final Set<Square> squares;
+	
+	/** The center of this cluster */
+	private final Square center;
+	
+	/** Stores the squares on each line of each type */
+	private final Map<LineType, Map<Line, Set<Square>>> lineToSquares = new EnumMap<>(LineType.class);
+	private final Map<Direction, List<Square>> outwardLines = new EnumMap<>(Direction.class);
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public SquareSet(Collection<Square> elementsWithoutCenter, Square center) {
+		this.center = center;
+		this.squares = EnumSet.copyOf(elementsWithoutCenter);
+		for (Square square : elementsWithoutCenter) {
+			Direction directionFromCenter = center.getDirectionToSquare(square);
+			List<Square> squaresInDirection = outwardLines.getOrDefault(directionFromCenter, new LinkedList<>());
+			outwardLines.putIfAbsent(directionFromCenter, squaresInDirection);
+			addSquareToListInOrder(square, squaresInDirection);
+			for (LineType type : LineType.values()) {
+				Line line = type.getLineBySquare(square);
+				lineToSquares.putIfAbsent(type, new EnumMap((Class<? extends Enum<? extends Line>>) line.getClass()));
+				Map<Line, Set<Square>> innerMap = lineToSquares.get(type);
+				innerMap.putIfAbsent(line, EnumSet.noneOf(Square.class));
+				innerMap.get(line).add(square);
+			}
+		}
+	}
+	
+	@Override
+	public Set<Square> getWrappedSet() {
+		return squares;
+	}
+
+	@Override
+	public Square getCenter() {
+		return center;
+	}
+	
+	/**
+	 * Retrieves the set of squares in this cluster that are on a line
+	 * @param line The line to retrieve squares on
+	 * @return The set of squares
+	 */
+	public Set<Square> getSquaresOnLine(Line line) {
+		return lineToSquares.get(line.getType()).getOrDefault(line, EnumSet.noneOf(Square.class));
+	}
+	
+	public List<Square> getSquaresInDirectionFromCenter(Direction dir) {
+		return outwardLines.getOrDefault(dir, Collections.emptyList());
+	}
+	
+	/**
+	 * Adds the square to the list
+	 * @param toAdd
+	 * @param list
+	 */
+	private void addSquareToListInOrder(Square toAdd, List<Square> list) {
+		int index = list.size() - 1;
+		while (index >= 0 && center.whichIsCloser(list.get(index), toAdd) == toAdd) {
+			index -= 1;
+		}
+		list.add(index, toAdd);
+	}
+
+}

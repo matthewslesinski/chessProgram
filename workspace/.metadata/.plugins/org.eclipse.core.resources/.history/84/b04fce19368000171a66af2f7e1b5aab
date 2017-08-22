@@ -1,0 +1,50 @@
+package representation;
+
+import moves.Move;
+
+/**
+ * Instances of this class are intended to hold the logic for performing the legal moves for the appropriate type of {@code Board}.
+ * @author matthewslesinski
+ *
+ * @param <B> The type of Board that this performs moves for
+ */
+public abstract class MoveMaker<B extends Board> {
+
+	protected abstract BoardBuilder<B> getNewBuilderFromBoard(B board);
+	
+	/**
+	 * Performs a move in a given position.
+	 * @param move The move to perform
+	 * @param board The board to perform the move on
+	 * @return The resulting board. If the move is illegal, null should be returned
+	 */
+	public B performMove(Move move, B board) {
+		if (!board.getLegalMoves().contains(move)) {
+			return null;
+		}
+		BoardBuilder<B> builder = getNewBuilderFromBoard(board);
+		switch (move.getMovingPiece()) {
+		case PAWN:
+			
+			break;
+		case KING:
+			if (move.isCastle()) {
+				
+			}
+			break;
+		case ROOK:
+			
+			break;
+
+		default:
+			break;
+		}
+		// TODO handle rights
+		return builder.build();
+	}	
+	
+	protected BoardBuilder<B> switchSquares(BoardBuilder<B> builder, Move move) {
+		
+	}
+	
+}

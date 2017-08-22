@@ -1,0 +1,172 @@
+package immutableArrayBoard;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import boardFeatures.Direction;
+import boardFeatures.Line;
+import boardFeatures.Square;
+import dataStructures.SquareSet;
+import gamePlaying.Color;
+import moves.ProcessedBoard;
+import moves.SolidPreProcessing;
+import pieces.Piece;
+import pieces.PieceType;
+import moves.BasicMove;
+import moves.Move;
+import moves.MoveSet;
+import moves.MoveType;
+import representation.MoveGenerator;
+import support.BadArgumentException;
+import support.UtilityFunctions;
+
+/**
+ * Calculates the moves for a given position. This is a mutable object, and 
+ * @author matthewslesinski
+ *
+ */
+public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
+	
+	
+	private ProcessedBoard<ImmutableArrayBoard> preprocessing;
+	private Set<Square> safeKingSquares;
+	private Set<Square> checks;
+	private List<Move> moves;
+	private boolean isInCheck;
+	private Color toMove;
+	private Square kingSquare;
+	
+	
+	
+	@Override
+	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
+		preprocessing = new SolidPreProcessing<>(board);
+		preprocessing.calculateKingSafety();
+		safeKingSquares = preprocessing.getSafeKingDestinations();
+		checks = preprocessing.whoIsAttackingTheKing();
+		isInCheck = !checks.isEmpty();
+		toMove = preprocessing.whoseMove();
+		kingSquare = preprocessing.getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		realizeMoves();
+		return new MoveSet(moves, BasicMove::new);
+	}
+	
+	private void realizeMoves() {
+		addSafeKingMoves();
+		switch (checks.size()) {
+		case 0:
+			
+			break;
+		case 1:
+			
+			break;
+		default:
+			
+		}
+	}
+	
+	
+	private Map<Square, SquareSet> getPossibleMovesForPieceTypes(PieceType... pieceTypes) {
+		List<Square> pieceSquares = UtilityFunctions.concat(Arrays.stream(pieceTypes)
+				.map(UtilityFunctions.bind(Piece::getByColorAndType, toMove)).map(preprocessing::getListOfSquaresForPiece)
+				.collect(Collectors.toList()));
+		return pieceSquares.stream().collect(Collectors.toMap(square -> square, 
+				(Square square) -> square.getPossibleMovesByPiece(preprocessing.getPieceAtSquare(square)),
+				(squareSet1, squareSet2) -> squareSet1, () -> new EnumMap<>(Square.class)));
+	}
+	
+	private void addSafeKingMoves() {
+		kingSquare.getPossibleThreatsByPiece(Piece.getByColorAndType(toMove, PieceType.KING)).stream()
+		.filter(square -> safeKingSquares.contains(square)).forEach(endSquare -> addBasicMove(kingSquare, endSquare));
+	}
+	
+	private void addCastling() {
+		// TODO
+	}
+	
+	private boolean validatePawnMove(Square start, Square end) {
+		MoveType type = inferType(start, end);
+		switch (type) {
+		case NORMAL:
+		case PROMOTION:
+			return start.getFile() == end.getFile();
+		case EN_PASSANT:
+			return start.getRank() == toMove.getEnPassantRank() && preprocessing.getEnPassantFile() == end.getFile() && !preprocessing.isEnPassantPinned(start.getFile());
+		case CAPTURE:
+		case PROMOTION_WITH_CAPTURE:
+			return start.getFile() != end.getFile();
+
+		default:
+			throw new BadArgumentException(type, MoveType.class, "How can a pawn castle?");
+		}
+	}
+	
+	private boolean isSpecialMoveAllowed(Square start, Square end) {
+		PieceType mover = preprocessing.getPieceAtSquare(start).getType();
+		return mover != PieceType.PAWN || validatePawnMove(start, end);
+	}
+	
+	private boolean isMoveLegal(Square start, Square end) {
+		
+	}
+	
+	private MoveType inferType(Square start, Square end) {
+		PieceType mover = preprocessing.getPieceAtSquare(start).getType();
+		boolean capture = !preprocessing.isEmptySquare(end);
+		if (!mover.isPromotionPiece()) {
+			if (mover == PieceType.PAWN) {
+				if (end.getRank() == toMove.getQueeningRank()) {
+					return capture ? MoveType.PROMOTION_WITH_CAPTURE : MoveType.PROMOTION;
+				} else if (start.getRank() == end.getRank()) {
+					return MoveType.EN_PASSANT;
+				}
+			} else if (Math.abs(start.getFile().getIndex() - end.getFile().getIndex()) > 1) {
+				return MoveType.CASTLE;
+			}
+		}
+		
+		return capture ? MoveType.CAPTURE : MoveType.NORMAL;
+	}
+	
+	private void addCheckBeaters(Square check) {
+		getPossibleMovesForPieceTypes(PieceType.getExpendablePieces()).entrySet().stream().forEach(entry -> {
+			Square start = entry.getKey();
+			// There is no conceivable way that a pinned piece can stop a check
+			if (preprocessing.isPiecePinned(start) != Direction.NONE) {
+				return;
+			}
+			SquareSet possibleMoves = entry.getValue();
+			Direction attackOnKing = check.getDirectionToSquare(kingSquare);
+			Set<Square> squaresOnCheckLine;
+			if (attackOnKing == Direction.NONE) {
+				squaresOnCheckLine = possibleMoves.contains(check) ? Collections.singleton(check) : Collections.emptySet();
+			} else {
+				Line checkLine = attackOnKing.getContainingLineType().getLineBySquare(check);
+				squaresOnCheckLine = possibleMoves.getSquaresOnLine(checkLine);
+			}
+			squaresOnCheckLine.stream()
+				.filter(square -> square.isBetweenSquares(check, kingSquare) && !preprocessing.isMovementBlocked(start, square) && // TODO isMoveLegal(start, square))
+				.forEach(endSquare -> addBasicMove(start, endSquare));
+		});
+	}
+	
+	
+	
+	
+	private void addBasicMove(Square startSquare, Square endSquare) {
+		MoveType type = inferType(startSquare, endSquare);
+		moves.add(buildBasicMove(startSquare, endSquare));
+	}
+	
+	private Move buildBasicMove(Square start, Square end) {
+		
+	}
+	
+
+}

@@ -24,8 +24,10 @@ public enum UpRightDiagonal implements Line {
 	G1_H2,
 	H1;
 	
-	
+	/** The ordinal of the long diagonal of this type */
 	private static final int CENTER_INDEX = 7;
+	
+	/** The length of the longest diagonal of this type */
 	private static final int MAX_LENGTH = 8;
 	
 	/** The set of squares contained in this {@code UpRightDiagonal} */	

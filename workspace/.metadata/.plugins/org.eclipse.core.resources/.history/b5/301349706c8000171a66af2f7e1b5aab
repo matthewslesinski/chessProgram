@@ -1,0 +1,83 @@
+package support;
+
+public class MoveParser {
+
+	private static final String REGEX;
+	
+	private static final String PIECE_MOVE_SECTION = "pieceMove";
+	private static final String PIECE_TYPE = "pieceType";
+	private static final String START_FILE = "startFile";
+	private static final String START_RANK = "startRank";
+	private static final String CAPTURE_SYMBOL_NAME = "capture";
+	private static final String DESTINATION_FILE = "destFile";
+	private static final String DESTINATION_RANK = "destRank";
+	private static final String PAWN_MOVE_SECTION = "pawnMove";
+	private static final String PAWN_CAPTURE = "pawnCapture";
+	private static final String PAWN_START_FILE = "pawnStartFile";
+	private static final String PAWN_DESTINATION_FILE = "pawnDestFile";
+	private static final String PUSHED_STATE = "pushedState";
+	private static final String PAWN_DESTINATION_RANK = "pawnDestRank";
+	private static final String PROMOTION_DESTINATION_RANK = "promotionDestRank";
+	private static final String PROMOTION_PIECE = "promotionPiece";
+	private static final String CASTLE = "castle";
+	private static final String QUEENSIDE_CASTLE = "queenside";
+	private static final String OPENING_NAMED_SECTION = "(?<";
+	private static final String CLOSING_ARROW = ">";
+	private static final String OR = "|";
+	private static final String CLOSING_PARENS = ")";
+	private static final String OPTIONAL = "?";
+	private static final String ALL_FILES = "[a-h]";
+	private static final String ALL_RANKS = "[1-8]";
+	private static final String CAPTURE_SYMBOL = "x";
+	private static final String CASTLE_O = "[0Oo]";
+	private static final String CASTLE_DASH = "-";
+	static {
+		REGEX = buildRegex();
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	private static String buildRegex() {
+		StringBuilder sb = new StringBuilder();
+		sb.append("^\\s*")
+		.append(OPENING_NAMED_SECTION).append(PIECE_MOVE_SECTION).append(CLOSING_ARROW)
+			.append(OPENING_NAMED_SECTION).append(PIECE_TYPE).append(CLOSING_ARROW).append("[KQRBN]").append(CLOSING_PARENS)
+			.append(OPENING_NAMED_SECTION).append(START_FILE).append(CLOSING_ARROW).append(ALL_FILES).append(CLOSING_PARENS).append(OPTIONAL)
+			.append(OPENING_NAMED_SECTION).append(START_RANK).append(CLOSING_ARROW).append(ALL_RANKS).append(CLOSING_PARENS).append(OPTIONAL)
+			.append(OPENING_NAMED_SECTION).append(CAPTURE_SYMBOL_NAME).append(CLOSING_ARROW).append(CAPTURE_SYMBOL).append(CLOSING_PARENS).append(OPTIONAL)
+			.append(OPENING_NAMED_SECTION).append(DESTINATION_FILE).append(CLOSING_ARROW).append(ALL_FILES).append(CLOSING_PARENS)
+			.append(OPENING_NAMED_SECTION).append(DESTINATION_RANK).append(CLOSING_ARROW).append(ALL_RANKS).append(CLOSING_PARENS).append(CLOSING_PARENS)
+		.append(OR)
+		.append(OPENING_NAMED_SECTION).append(PAWN_MOVE_SECTION).append(CLOSING_ARROW)
+			.append(OPENING_NAMED_SECTION).append(PAWN_CAPTURE).append(CLOSING_ARROW)
+				.append(OPENING_NAMED_SECTION).append(PAWN_START_FILE).append(CLOSING_ARROW).append(ALL_FILES).append(CLOSING_PARENS).append(CAPTURE_SYMBOL).append(CLOSING_PARENS).append(OPTIONAL)
+			.append(OPENING_NAMED_SECTION).append(PAWN_DESTINATION_FILE).append(CLOSING_ARROW).append(ALL_FILES).append(CLOSING_PARENS)
+			.append(OPENING_NAMED_SECTION).append(PUSHED_STATE).append(CLOSING_ARROW)
+				.append(OPENING_NAMED_SECTION).append(PAWN_DESTINATION_RANK).append(CLOSING_ARROW).append("[2-7]").append(CLOSING_PARENS)
+				.append(OR)
+				.append(OPENING_NAMED_SECTION).append(PROMOTION_DESTINATION_RANK).append(CLOSING_ARROW).append("[18]").append(CLOSING_PARENS)
+				.append("=")
+				.append(OPENING_NAMED_SECTION).append(PROMOTION_PIECE).append(CLOSING_ARROW).append("[QRBN]").append(CLOSING_PARENS).append(CLOSING_PARENS).append(CLOSING_PARENS)
+		.append(OR)
+		.append(OPENING_NAMED_SECTION).append(CASTLE).append(CLOSING_ARROW).append(CASTLE_O).append(CASTLE_DASH).append(CASTLE_O)
+			.append(OPENING_NAMED_SECTION).append(QUEENSIDE_CASTLE).append(CLOSING_ARROW).append(CASTLE_DASH).append(CASTLE_O).append(CLOSING_PARENS).append(OPTIONAL).append(CLOSING_PARENS)
+		.append("\\s*$");
+		return sb.toString();
+	}
+	
+	public static void main(String[] args) {
+		System.out.println(REGEX);
+	}
+}

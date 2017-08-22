@@ -1,0 +1,75 @@
+package pieces;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import boardFeatures.Direction;
+import boardFeatures.Side;
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.Move;
+import representation.Board;
+import representation.CastlingRights;
+import support.UtilityFunctions;
+
+/**
+ * Provides the utility method(s) for calculating a king's legal moves
+ * @author matthewslesinski
+ *
+ */
+public class King extends PieceUtility {
+
+	private final Color color;
+	
+	King(Color color) {
+		super();
+		this.color = color;
+	}
+	
+	@Override
+	public Set<Move> getLegalMoves(Square square, Board board, Color color) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected PieceType determinePieceType() {
+		return PieceType.KING;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return 2;
+	}
+	
+	private Collection<Square> calculatePossibleCastleSquares(Color color, Square fromSquare) {
+		if (fromSquare != color.getKingCastleSquare()) {
+			return Collections.emptySet();
+		}
+		return Arrays.asList(CastlingRights.getByColorAndSide(color, Side.KINGSIDE).getTargetKingSquare(),
+							 CastlingRights.getByColorAndSide(color, Side.QUEENSIDE).getTargetKingSquare());
+	}
+	
+	@Override
+	public Collection<Square> calculatePossibleSquaresToMoveTo(Color color, Square fromSquare) {
+		return UtilityFunctions.concat(super.calculatePossibleSquaresToMoveTo(color, fromSquare), calculatePossibleCastleSquares(color, fromSquare));
+	}
+
+	@Override
+	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color color) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Square> calculatePossibleSquaresToThreaten(Color color, Square fromSquare) {
+		return Arrays.asList(Direction.values()).stream()
+				.map(direction -> fromSquare.getNeighbor(direction)).filter(square -> square != null)
+				.collect(Collectors.toList());
+	}
+
+}

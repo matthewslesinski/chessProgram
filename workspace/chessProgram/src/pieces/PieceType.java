@@ -1,12 +1,8 @@
 package pieces;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.List;
-import java.util.Set;
 import java.util.function.Function;
 
-import boardFeatures.Direction;
+import gamePlaying.Color;
 
 
 /**
@@ -16,35 +12,37 @@ import boardFeatures.Direction;
  */
 public enum PieceType {
 
-	PAWN("pawn", Pawn::new),
-	KNIGHT("knight", Knight::new),
-	BISHOP("bishop", Bishop::new),
-	ROOK("rook", Rook::new),
-	QUEEN("queen", Queen::new),
-	KING("king", King::new);
+	PAWN("pawn", "", Pawn::new),
+	KNIGHT("knight", "N", color -> new Knight()),
+	BISHOP("bishop", "B", color -> new Bishop()),
+	ROOK("rook", "R", color -> new Rook()),
+	QUEEN("queen", "Q", color -> new Queen()),
+	KING("king", "K", King::new);
 	
 	private final String readableForm;
-	private final static PieceType[] promotionPieces = {KNIGHT, BISHOP, ROOK, QUEEN};
-	private final static PieceType[] lineMovers = {BISHOP, ROOK, QUEEN};
+	private final String moveLetter;
+	private final static PieceType[] PROMOTION_PIECES = {KNIGHT, BISHOP, ROOK, QUEEN};
+	private final static PieceType[] LINE_MOVERS = {BISHOP, ROOK, QUEEN};
+	private final static PieceType[] NON_KNIGHTS = {PAWN, BISHOP, ROOK, QUEEN, KING};
+	private final static PieceType[] EXPENDABLE_PIECES = {PAWN, KNIGHT, BISHOP, ROOK, QUEEN};
 	
 	/**
 	 * Holds the utility methods calculating the legal moves for this piece
 	 */
-	private final PieceUtility utilityInstance;
-	private final Set<Direction> longDistanceDirections;
+	private final Function<Color, PieceUtility> utilityInstanceConstructor;
 	
 	/**
 	 * Describes a particular type of piece.
 	 * @param readableForm How to describe this piece type in plain english
+	 * @param moveLetter The letter used to represent this piece
 	 * @param constructor A constructor for the utility class for this type of piece. A constructor
 	 * is an argument here because the utility class can't be instantiated earlier, since its constructor
 	 * takes this {@code PieceType} as an argument.
 	 */
-	private PieceType(String readableForm, Function<PieceType, PieceUtility> constructor) {
+	private PieceType(String readableForm, String moveLetter, Function<Color, PieceUtility> constructor) {
 		this.readableForm = readableForm;
-		utilityInstance = constructor.apply(this);
-		List<Direction> possibleLongDistanceDirections = (utilityInstance instanceof LineMover) ? ((LineMover) utilityInstance).getMovementDirections() : Collections.emptyList();
-		this.longDistanceDirections = possibleLongDistanceDirections.isEmpty() ? EnumSet.noneOf(Direction.class) : EnumSet.copyOf(possibleLongDistanceDirections);
+		this.utilityInstanceConstructor = constructor;
+		this.moveLetter = moveLetter;
 	}
 	
 	
@@ -64,6 +62,7 @@ public enum PieceType {
 	 */
 	public static PieceType getByLetter(String letter) {
 		switch (letter) {
+		case "":  // Alternate for a pawn 
 		case "P": return PieceType.PAWN;
 		case "N": return PieceType.KNIGHT;
 		case "B": return PieceType.BISHOP;
@@ -95,7 +94,7 @@ public enum PieceType {
 	 * @return The array of {@code PieceType}s
 	 */
 	public static PieceType[] getPromotionPieces() {
-		return promotionPieces;
+		return PROMOTION_PIECES;
 	}
 	
 	/**
@@ -103,28 +102,43 @@ public enum PieceType {
 	 * @return The array of {@code PieceType}s
 	 */
 	public static PieceType[] getLineMovers() {
-		return lineMovers;
+		return LINE_MOVERS;
 	}
 	
 	/**
-	 * Determines if this piece type can move far in a particular direction
-	 * @param dir The direction
-	 * @return true iff it can
+	 * Returns an array of the pieces that move along some line
+	 * @return The array of {@code PieceType}s
 	 */
-	public boolean movesFarInDirection(Direction dir) {
-		return longDistanceDirections.contains(dir);
+	public static PieceType[] getAllButKnight() {
+		return NON_KNIGHTS;
 	}
 	
 	/**
-	 * Gets the utility class instance for this type
-	 * @return The {@code PieceUtility}
+	 * Returns an array of the pieces that aren't the king
+	 * @return The array of {@code PieceType}s
 	 */
-	public PieceUtility getUtilityInstance() {
-		return utilityInstance;
+	public static PieceType[] getExpendablePieces() {
+		return EXPENDABLE_PIECES;
+	}
+	
+	/**
+	 * Gets the utility class constructor for this type
+	 * @return The {@code PieceUtility}'s constructor
+	 */
+	public Function<Color, PieceUtility> getUtilityInstanceConstructor() {
+		return utilityInstanceConstructor;
+	}
+	
+	/**
+	 * Gets the string name of this piece, as a human would recognize it
+	 * @return The name
+	 */
+	public String getName() {
+		return this.readableForm;
 	}
 	
 	@Override
 	public String toString() {
-		return this.readableForm;
+		return this.moveLetter;
 	}
 }

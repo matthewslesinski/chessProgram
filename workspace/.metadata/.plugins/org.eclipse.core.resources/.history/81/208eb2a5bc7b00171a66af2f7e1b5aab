@@ -1,0 +1,37 @@
+package pieces;
+
+import java.util.List;
+
+import boardFeatures.Direction;
+import support.Constants;
+
+/**
+ * Provides the utility method(s) for calculating a queen's legal moves
+ * @author matthewslesinski
+ *
+ */
+public class Queen extends LineMover {
+
+	private static final PieceType TYPE = PieceType.QUEEN;
+	private static final int ATTACK_DISTANCE = 14;
+	
+	Queen(PieceType piece) {
+		super();
+	}
+	
+
+	@Override
+	protected PieceType determinePieceType() {
+		return TYPE;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return ATTACK_DISTANCE;
+	}
+
+	@Override
+	List<Direction> getMovementDirections() {
+		return Constants.QUEEN_DIRECTIONS;
+	}
+}

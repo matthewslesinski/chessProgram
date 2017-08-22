@@ -1,0 +1,40 @@
+package gamePlaying;
+
+public class UserActions {
+	
+	public static String exit(String[] args, Game<?> game) {
+		System.exit(0);
+		return null;
+	}
+	
+	public static String redo(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String undo(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String exportPGN(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String getFEN(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String printMoves(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+	public static String printBoard(String[] args, Game<?> game) {
+		// TODO
+		return null;
+	}
+	
+}

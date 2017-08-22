@@ -21,7 +21,7 @@ public enum Rank implements Line {
 	SEVEN("7"),
 	EIGHT("8");
 	
-	
+	/** The string form of the number of this rank */
 	private String readableForm;
 	
 	/** The set of squares contained in this {@code Rank} */
@@ -82,10 +82,13 @@ public enum Rank implements Line {
 	/**
 	 * Gets the rank that has the given number
 	 * @param readableForm The number
-	 * @return The rank with the given number
+	 * @return The rank with the given number or null if the input is null
 	 * @throws BadArgumentException If the string is not a rank
 	 */
 	public static Rank getByHumanReadableForm(String readableForm) throws BadArgumentException {
+		if (readableForm == null) {
+			return null;
+		}
 		int numericalValue = -1;
 		try {
 			numericalValue = Integer.parseInt(readableForm);

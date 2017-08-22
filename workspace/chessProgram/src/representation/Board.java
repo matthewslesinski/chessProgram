@@ -70,18 +70,30 @@ public abstract class Board implements State {
 				.collect(Collectors.toList()).toArray(new Piece[Square.values().length]);
 	}
 	
+	/**
+	 * Gets the last move that was made to get to this board
+	 * @return The move
+	 */
+	public abstract Move lastMove();
+	
 	
 	@Override
 	public Set<Move> getLegalMoves() {
+		if (legalMoves == null) {
+			calculateMoves();
+		}
 		return legalMoves;
 	}
 	
+	/**
+	 * Says whether or not the king of the player whose move it is is in check
+	 * @return true iff the player's king is in check
+	 */
+	public abstract boolean isInCheck();
+	
 	@Override
 	public boolean isOver() {
-		if (legalMoves == null) {
-			// TODO log and throw exception
-		}
-		return legalMoves.isEmpty();
+		return getLegalMoves().isEmpty();
 	}
 	
 	@Override

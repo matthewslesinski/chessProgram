@@ -1,0 +1,23 @@
+package dataStructures;
+
+import java.util.Set;
+
+import boardFeatures.Square;
+
+public class Cross implements Cluster<Square> {
+
+	
+	@Override
+	public Set<Square> getWrappedSet() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Square getCenter() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+}

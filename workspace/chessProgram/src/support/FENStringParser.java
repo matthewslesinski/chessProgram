@@ -16,6 +16,8 @@ import representation.CastlingRights;
 /**
  * This class can be used to parse a FEN string into a BoardBuilder.
  * @author matthewslesinski
+ * 
+ * TODO clean up
  *
  * @param <B> The type of board that the resulting BoardBuilder is building
  */

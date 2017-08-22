@@ -1,26 +1,53 @@
 package representation;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+
 import boardFeatures.File;
 import boardFeatures.Rank;
 import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import support.Constants;
 
+/**
+ * Describes the important distinctions between the four different ways castling can be done
+ * @author matthewslesinski
+ *
+ */
 public enum CastlingRights {
-
+	
 	WHITE_KINGSIDE(Color.WHITE, Side.KINGSIDE),
 	WHITE_QUEENSIDE(Color.WHITE, Side.QUEENSIDE),
 	BLACK_KINGSIDE(Color.BLACK, Side.KINGSIDE),
 	BLACK_QUEENSIDE(Color.BLACK, Side.QUEENSIDE);
 	
+	/** Each way of castling can only be done by one {@code Color} */
 	private final Color color;
+	
+	/** Each way of castling is performed along some {@code Rank} */
 	private final Rank rank;
+	
+	/** Each way of castling involves moving toward one {@code Side} */
 	private final Side side;
+	
+	/** Each way of castling uses a rook that begins the move by sitting on some {@code File} */
 	private final File rookFile;
+	
+	/** The {@code Square} the king starts on for each way of castling */
 	private final Square kingSquare;
+	
+	/** The {@code Square} the rook starts on for each way of castling */
 	private final Square rookSquare;
+	
+	/** Each way of castling moves the king to some {@code Square} */
 	private final Square targetKingSquare;
+	
+	/** Each way of castling moves the rook to some {@code Square} */
 	private final Square targetRookSquare;
+	
+	/** Queenside castling has an extra {@code Square} in the middle, the one on the b file, that can't have a piece on it */
 	private final Square extraIntermediarySquare;
 	
 	
@@ -29,8 +56,8 @@ public enum CastlingRights {
 		this.side = side;
 		this.rank = color.isWhite() ? Rank.ONE : Rank.EIGHT;
 		this.rookFile = side.getRookFile();
-		this.kingSquare = Square.getByFileAndRank(File.E, this.rank);
-		this.rookSquare = Square.getByFileAndRank(rookFile, this.rank);
+		this.kingSquare = Square.getByFileAndRank(Constants.KING_START_FILE, this.rank);
+		this.rookSquare = Square.getByFileAndRank(side.getRookFile(), this.rank);
 		this.targetKingSquare = Square.getByFileAndRank(side.isKingside() ? File.G : File.C, rank);
 		this.targetRookSquare = Square.getByFileAndRank(side.isKingside() ? File.F : File.D, rank);
 		this.extraIntermediarySquare = side.isKingside() ? null : Square.getByFileAndRank(File.B, rank);
@@ -132,5 +159,24 @@ public enum CastlingRights {
 	 */
 	public static CastlingRights getByColorAndSide(Color color, Side side) {
 		return values()[color.isWhite() ? 0 : 2 + (side.isKingside() ? 0 : 1)];
+	}
+	
+	/**
+	 * Gets a collection of the rights that could involve a piece of the provided color starting at the provided square
+	 * @param color The color
+	 * @param square The square
+	 * @return A collection of the rights for the given color, including both kingside and queenside if the square is
+	 * that color's king start square, or just the side with the square if it's the rook start square for that color, or
+	 * an empty list
+	 */
+	public static Collection<CastlingRights> getAffectedRightsByColorAndSquare(Color color, Square square) {
+		if (square == color.getKingCastleSquare()) {
+			return Arrays.asList(getByColorAndSide(color, Side.KINGSIDE), getByColorAndSide(color, Side.QUEENSIDE));
+		}
+		CastlingRights relevantRight = getByColorAndSide(color, Side.getByRelation(square));
+		if (square == relevantRight.getRookSquare()) {
+			return Collections.singleton(relevantRight);
+		}
+		return Collections.emptyList();
 	}
 }

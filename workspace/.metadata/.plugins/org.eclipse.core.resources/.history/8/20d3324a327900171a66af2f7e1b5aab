@@ -1,0 +1,36 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Direction;
+import boardFeatures.Square;
+
+public class OutwardLinePortions implements Cluster<Square> {
+
+	private final Square center;
+	private final ListBackedByMaps<Square> elements;
+	private final Map<Direction, Square> closestInDirections;
+	
+	public OutwardLinePortions(Square center, Collection<Square> importantSquares) {
+		this.center = center;
+		this.elements = new ListBackedByMaps<>(importantSquares);
+		this.closestInDirections = new EnumMap<>(Direction.class);
+	}
+	
+	
+	@Override
+	public Set<Square> getWrappedSet() {
+		return elements;
+	}
+
+	@Override
+	public Square getCenter() {
+		return center;
+	}
+
+	
+	
+}

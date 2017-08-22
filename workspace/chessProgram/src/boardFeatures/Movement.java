@@ -2,6 +2,11 @@ package boardFeatures;
 
 import java.util.List;
 
+/**
+ * Represents a basic concept of movement. You can either move forwards, backwards, or neither
+ * @author matthewslesinski
+ *
+ */
 public enum Movement {
 	BACKWARDS,
 	NOWHERE,
@@ -25,9 +30,9 @@ public enum Movement {
 	public List<Square> getSquaresToMoveThrough(Square square, LineType lineType) {
 		switch (increment) {
 		case -1:
-			return ((Line) lineType.getLineBySquare(square)).getSquaresBehind(square);
+			return (lineType.getLineBySquare(square)).getSquaresBehind(square);
 		case 1:
-			return ((Line) lineType.getLineBySquare(square)).getSquaresInFront(square);
+			return (lineType.getLineBySquare(square)).getSquaresInFront(square);
 		default:
 			return null;
 		}

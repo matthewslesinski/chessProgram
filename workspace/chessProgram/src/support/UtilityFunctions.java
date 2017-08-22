@@ -46,6 +46,28 @@ public class UtilityFunctions {
 	}
 	
 	/**
+	 * Determines if the number is one of the perfect squares less than or equal to 64
+	 * @param number The number to check
+	 * @return true iff it's a perfect square
+	 */
+	public static boolean isPerfectSquareUpTo64(int number) {
+		switch (number) {
+		case 0:
+		case 1:
+		case 4:
+		case 9:
+		case 16:
+		case 25:
+		case 36:
+		case 49:
+		case 64:
+			return true;
+		default:
+			return false;
+		}
+	}
+	
+	/**
 	 * Returns a new list (backed by an {@code ArrayList}) that contains a reverse-order shallow
 	 * copy of the given list
 	 * @param list The list to reverse
@@ -123,5 +145,24 @@ public class UtilityFunctions {
 	@SafeVarargs
 	public static <T> List<T> concat(Collection<? extends T>... lists) {
 		return concat(Arrays.asList(lists));
+	}
+	
+	/**
+	 * Puts all the non null supplied elements in a list together
+	 * @param elements The elements, including null elements
+	 * @return The list containing the non-null elements
+	 */
+	@SafeVarargs
+	public static <T> List<T> constructListOfElements(T... elements) {
+		return Arrays.stream(elements).filter(element -> element != null).collect(Collectors.toList());
+	}
+	
+	/**
+	 * Determines if a string does not actually contain any characters
+	 * @param string The string to check
+	 * @return true iff it's null or empty
+	 */
+	public static boolean isEmpty(String string) {
+		return string == null || string.equals("");
 	}
 }

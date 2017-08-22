@@ -1,0 +1,86 @@
+package pieces;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import boardFeatures.Direction;
+import boardFeatures.Line;
+import boardFeatures.Square;
+import dataStructures.OutwardLinePortions;
+import dataStructures.SquareSet;
+import moves.ProcessedBoard;
+import support.UtilityFunctions;
+
+/**
+ * The utility super class for rooks, bishops, and queens, since they all move in a straight line for a possibly far distance
+ * @author matthewslesinski
+ *
+ */
+public abstract class LineMover extends PieceUtility {
+
+	
+	protected LineMover() {
+		super();
+	}
+	
+	/**
+	 * Retrieves the directions this piece can move in
+	 * @return The list of directions
+	 */
+	abstract List<Direction> getMovementDirections();
+	
+	@Override
+	protected Collection<Direction> getDirectionsToMoveIn() {
+		return getMovementDirections();
+	}
+	
+	@Override
+	public Collection<Square> calculatePossibleSquaresToThreaten(Square fromSquare) {
+		return UtilityFunctions.concat(getMovementDirections().stream()
+				.map(direction -> fromSquare.getSquaresInDirection(direction))
+				.collect(Collectors.toList()));
+	}
+	
+	@Override
+	public BiFunction<Function<Square, Piece>, Square, Square> getThreatsInCluster(Set<Square> relevantSquares,
+			Square perspective, Collection<Square> possibleThreats) {
+		List<Square> squaresToConsider = possibleThreats.stream().filter(square -> relevantSquares.contains(square)).collect(Collectors.toList());
+		OutwardLinePortions organizedSquares = new OutwardLinePortions(perspective, squaresToConsider);
+		return (occupants, currentSquare) -> organizedSquares.getNext(currentSquare, occupants);
+		
+	}
+	
+	@Override
+	protected List<Square> getSquaresToMoveToNoChecks(Square square, ProcessedBoard<?> board) {
+		// TODO
+	}
+	
+	@Override
+	protected List<Square> getSquaresToMoveToOneCheck(Square square, ProcessedBoard<?> board, Square check) {
+		// There is no conceivable way that a pinned piece can stop a check
+		if (board.isPiecePinned(square) != Direction.NONE) {
+			return Collections.emptyList();
+		}
+		SquareSet possibleMoves = square.getPossibleMovesByPiece(board.getPieceAtSquare(square));
+		
+		Direction attackOnKing = check.getDirectionToSquare(board.getKingSquare());
+		Set<Square> squaresOnCheckLine;
+		if (attackOnKing == Direction.NONE) {
+			squaresOnCheckLine = possibleMoves.contains(check) ? Collections.singleton(check) : Collections.emptySet();
+		} else {
+			Line checkLine = attackOnKing.getContainingLineType().getLineBySquare(check);
+			squaresOnCheckLine = possibleMoves.getSquaresOnLine(checkLine);
+		}
+		squaresOnCheckLine.stream()
+			.filter(square -> square.isBetweenSquares(check, kingSquare) && !preprocessing.isMovementBlocked(start, square) && isSpecialMoveAllowed(start, square))
+			.forEach(endSquare -> addBasicMove(start, endSquare));
+	}
+
+
+	
+}

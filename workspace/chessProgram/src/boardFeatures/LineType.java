@@ -17,15 +17,22 @@ public enum LineType {
 	
 	// Must be done after all LineTypes have been initialized, since otherwise it needs to be called in the constructor
 	// when checking to see which enum value 'this' is won't work because 'this' won't be initialized yet
-	static {
+	static void postInitialization() {
 		for (LineType type : values()) {
 			type.determineCharacteristics();
 		}
 	}
 	
+	/** The class of the {@code Line}s this type refers to */
 	private final Class<? extends Enum<? extends Line>> type;
+	
+	/** The array returned by calling {@code values()} for this type of {@code Line} */
 	private final Enum<? extends Line>[] valuesArray;
-	private Function<Square, ? extends Enum<? extends Line>> getLineBySquare;
+	
+	/** A {@code Function} that returns the {@code Line} of this type that contains the given {@code Square} */
+	private Function<Square, ? extends Line> getLineBySquare;
+	
+	/** The {@code Direction} that moves forwards along this type of {@code Line} */
 	private Direction forwardDirection;
 	
 	private LineType(Class<? extends Enum<? extends Line>> type) {
@@ -54,7 +61,7 @@ public enum LineType {
 	 * @param square The {@code Square} in this line
 	 * @return The {@code Line} of this type containing that {@code Square}
 	 */
-	public Enum<? extends Line> getLineBySquare(Square square) {
+	public Line getLineBySquare(Square square) {
 		return getLineBySquare.apply(square);
 	}
 	
@@ -74,19 +81,19 @@ public enum LineType {
 	private void determineCharacteristics() {
 		switch (this) {
 		case FILE:
-			this.getLineBySquare = (square) -> square.getFile();
+			this.getLineBySquare = square -> square.getFile();
 			this.forwardDirection = Direction.UP;
 			break;
 		case RANK:
-			this.getLineBySquare = (square) -> square.getRank();
+			this.getLineBySquare = square -> square.getRank();
 			this.forwardDirection = Direction.RIGHT;
 			break;
 		case UP_RIGHT_DIAGONAL:
-			this.getLineBySquare = (square) -> square.getUpRightDiagonal();
+			this.getLineBySquare = square -> square.getUpRightDiagonal();
 			this.forwardDirection = Direction.UP_RIGHT;
 			break;
 		case DOWN_RIGHT_DIAGONAL:
-			this.getLineBySquare = (square) -> square.getDownRightDiagonal();
+			this.getLineBySquare = square -> square.getDownRightDiagonal();
 			this.forwardDirection = Direction.DOWN_RIGHT;
 			break;
 		default:
