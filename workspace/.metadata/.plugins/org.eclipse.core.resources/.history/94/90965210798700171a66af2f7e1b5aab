@@ -91,11 +91,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
 	}
 	
-	/**
-	 * Gets the inner map with the preprocessed {@code Line}s for a particular {@code LineType}
-	 * @param type The {@code LineType}
-	 * @return The map of each {@code Line} of that type to the preprocessed version of that {@code Line}, or null otherwise
-	 */
 	private Map<Line, FixedOrderingSet<Square>> retrievePreProcessingForType(LineType type) {
 		return preProcessedLines.get(type);
 	}
