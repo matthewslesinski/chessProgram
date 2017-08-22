@@ -3,10 +3,10 @@ package moves;
 import java.util.List;
 import java.util.Set;
 
-import boardFeatures.Direction;
-import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.Direction;
+import lines.File;
 import pieces.Piece;
 import pieces.PieceType;
 import representation.Board;

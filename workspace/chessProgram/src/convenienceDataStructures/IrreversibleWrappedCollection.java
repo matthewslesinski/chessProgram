@@ -2,7 +2,7 @@ package convenienceDataStructures;
 
 import java.util.Collection;
 
-import dataStructures.KingMoveSet;
+import moveCalculationStructures.KingMoveSet;
 import support.BadArgumentException;
 
 /**

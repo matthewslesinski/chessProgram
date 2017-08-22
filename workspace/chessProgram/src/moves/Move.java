@@ -3,11 +3,11 @@ package moves;
 import java.util.List;
 import java.util.Map;
 
-import boardFeatures.File;
-import boardFeatures.Rank;
 import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.File;
+import lines.Rank;
 import pieces.PieceType;
 
 /**

@@ -3,12 +3,13 @@ package pieces;
 import java.util.Arrays;
 import java.util.List;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
-import dataStructures.SquareSet;
 import gamePlaying.Color;
+import lines.Direction;
+import moveCalculationStructures.SquareSet;
 import moves.Move;
 import moves.ProcessedBoard;
+import pieceUtilities.PieceUtility;
 import support.BadArgumentException;
 import support.Constants;
 

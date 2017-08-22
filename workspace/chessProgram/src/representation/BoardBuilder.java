@@ -1,11 +1,11 @@
 package representation;
 
-import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.File;
 import moves.Move;
 import pieces.Piece;
-import support.FENStringParser;
+import stringTranslators.FENStringParser;
 
 public abstract class BoardBuilder<B extends Board> {
 	
