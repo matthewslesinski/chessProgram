@@ -11,11 +11,13 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import boardFeatures.Direction;
+import boardFeatures.DownRightDiagonal;
 import boardFeatures.File;
 import boardFeatures.Line;
 import boardFeatures.LineType;
 import boardFeatures.Rank;
 import boardFeatures.Square;
+import boardFeatures.UpRightDiagonal;
 import dataStructures.EnumSequence;
 import dataStructures.FixedOrderingSet;
 import dataStructures.KingMoveSet;
@@ -25,6 +27,7 @@ import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
 import support.BadArgumentException;
+import support.UtilityFunctions;
 
 /**
  * Used to preprocess a board before calculating the moves, so that calculating them is easier. The main benefits of this class
@@ -57,16 +60,19 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 */
 	private final Map<Piece, List<Square>> piecesToSquares = new EnumMap<>(Piece.class);
 	
-	/** The values of the values of this map are the preprocessed lists of just the squares with pieces on them for each line */
-	private final Map<LineType, Map<Line, FixedOrderingSet<Square>>> preProcessedLines = new EnumMap<>(LineType.class);
+	/** The four following arrays of lists contain the squares with pieces on them for each of the instances of a line type */
+	@SuppressWarnings("rawtypes")
+	private final FixedOrderingSet[][] preProcessedLines = {
+		new FixedOrderingSet[File.values().length],	
+		new FixedOrderingSet[Rank.values().length],
+		new FixedOrderingSet[UpRightDiagonal.values().length],														
+		new FixedOrderingSet[DownRightDiagonal.values().length]
+	};
 	
-	/** The square with the king of the player to move */
 	private final Square kingSquare;
 	
-	/** For each {@code Square} around the king, this holds the {@code Square}s of the pieces attacking it */
 	private final Map<Square, Set<Square>> safeSquaresAroundKing = new EnumMap<>(Square.class);
 	
-	/** For each {@code Square} with a {@code Piece} that is pinned, this holds the {@code Direction} from that {@code Square} to the attacking {@code Piece}'s {@code Square} */
 	private final Map<Square, Direction> pins = new EnumMap<>(Square.class);
 	
 	
@@ -74,7 +80,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 * Initiates the preprocessing
 	 * @param board The board to decompress
 	 */
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SolidPreProcessing(B board) {
 		toMove = board.whoseMove();
 		oppositeColor = toMove.getOtherColor();
@@ -82,22 +87,17 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 			castlingRights.put(right, board.canCastle(right));
 		}
 		enPassantFile = board.enPassantCaptureFile();
-		for (LineType type : LineType.values()) {
-			preProcessedLines.put(type, new EnumMap(type.getType()));
-		}
+		
 		initializeLists(piecesToSquares, () -> (List<Square>) new ArrayList<Square>(10), Piece.realPieces());
 		parseBoard(board);
 		initializeLines();
 		kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		
 	}
 	
-	/**
-	 * Gets the inner map with the preprocessed {@code Line}s for a particular {@code LineType}
-	 * @param type The {@code LineType}
-	 * @return The map of each {@code Line} of that type to the preprocessed version of that {@code Line}, or null otherwise
-	 */
-	private Map<Line, FixedOrderingSet<Square>> retrievePreProcessingForType(LineType type) {
-		return preProcessedLines.get(type);
+	@SuppressWarnings("unchecked")
+	private FixedOrderingSet<Square>[] retrievePreProcessingForType(LineType type) {
+		return UtilityFunctions.getValueFromArray(preProcessedLines, type);
 	}
 	
 	/**
@@ -137,7 +137,7 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 * @param line The line
 	 * @param arr The array to put the preprocessing in for storage
 	 */
-	private void preProcessLine(Line line, Map<Line, FixedOrderingSet<Square>> map) {
+	private void preProcessLine(Line line, FixedOrderingSet<Square>[] arr) {
 		FixedOrderingSet<Square> list = new EnumSequence<Square>(Square.class, line.getLength(),
 										square -> square.getNeighbor(line.getForwardDirection().getOppositeDirection()), line::containsSquare);
 		line.getContainedSquares().forEach(square -> {
@@ -146,7 +146,7 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 				list.add(square);
 			}
 		});
-		map.put(line, list);
+		arr[line.getIndex()] = list;
 	}
 	
 	/**
@@ -202,8 +202,8 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 * @return The pre processing for that line
 	 */
 	private FixedOrderingSet<Square> getListOfImportantSquares(Square containedSquare, LineType lineType) {
-		Line line = lineType.getLineBySquare(containedSquare);
-		return retrievePreProcessingForType(lineType).get(line);
+		int indexOfPreProcessing = lineType.getLineBySquare(containedSquare).getIndex();
+		return retrievePreProcessingForType(lineType)[indexOfPreProcessing];
 	}
 	
 	/**
