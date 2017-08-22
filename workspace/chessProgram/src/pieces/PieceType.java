@@ -3,6 +3,13 @@ package pieces;
 import java.util.function.Function;
 
 import gamePlaying.Color;
+import pieceUtilities.Bishop;
+import pieceUtilities.King;
+import pieceUtilities.Knight;
+import pieceUtilities.Pawn;
+import pieceUtilities.PieceUtility;
+import pieceUtilities.Queen;
+import pieceUtilities.Rook;
 
 
 /**

@@ -8,9 +8,9 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import dataStructures.KingMoveSet;
-import dataStructures.SquareSet;
 import gamePlaying.Color;
+import moveCalculationStructures.KingMoveSet;
+import moveCalculationStructures.SquareSet;
 import pieces.Piece;
 import pieces.PieceType;
 import support.BadArgumentException;
