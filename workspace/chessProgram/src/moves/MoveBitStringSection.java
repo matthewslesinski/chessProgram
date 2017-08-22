@@ -17,7 +17,8 @@ public enum MoveBitStringSection {
 	IS_CASTLE(19, 1),
 	IS_PROMOTION(20, 1),
 	PROMOTION_TYPE(21, 2),
-	IS_EN_PASSANT(23, 1)
+	IS_EN_PASSANT(23, 1),
+	COLOR(24, 1)
 	;
 	
 	private final int startBit;

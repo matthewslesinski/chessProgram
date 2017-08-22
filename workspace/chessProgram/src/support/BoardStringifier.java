@@ -5,14 +5,17 @@ import java.util.Arrays;
 import boardFeatures.File;
 import boardFeatures.Rank;
 import boardFeatures.Square;
+import moves.Move;
 import pieces.Piece;
 import representation.Board;
 
 public class BoardStringifier<B extends Board> {
 
 	private static final String WHOSE_MOVE_TEXT = "Player to move: ";
+	private static final String LAST_MOVE_TEXT = "The previous move: ";
 	private final Board board;
 	private final Piece[] pieces;
+	
 	StringBuilder builder = new StringBuilder();
 	
 	public BoardStringifier(B board) {
@@ -91,14 +94,19 @@ public class BoardStringifier<B extends Board> {
 		builder.append(Constants.TRIPLE_SPACE);
 		builder.append(WHOSE_MOVE_TEXT);
 		builder.append(board.whoseMove());
+		builder.append(Constants.NEWLINE);
 	}
 	
 	/**
 	 * Includes what the last move made was, and if there's currently a check on the board
 	 */
 	private void addLastMove() {
-		// TODO
-		return;
+		Move last = board.lastMove();
+		if (last != null) {
+			builder.append(LAST_MOVE_TEXT);
+			builder.append(last.getMoveAsString(true, true));
+			builder.append(Constants.NEWLINE);
+		}
 	}
 	
 	/**
@@ -114,67 +122,4 @@ public class BoardStringifier<B extends Board> {
 		addDashedLine();
 		return builder.toString();
 	}
-	
-	/*
-	 * For reference, this is the copy/pasted version of the toString function I used in the previous attempt at a chess program.
-	 * I extracted a lot of the logic for the logic in this file, of course changing the logic where necessary and improving the code style.
-	 * I'm leaving this here because there are a few portions that I wasn't able to implement yet: specifically a row of the pieces captured,
-	 * and a description of what the last move was and if the player's in check.
-	 */
-//	public String stringify1() {
-//		String space = game.eclipse ? "\u3000" : " ";
-//		String aa = game.eclipse ? "\uff41" : "a";
-//		String bb = game.eclipse ? "\uff42" : "b";
-//		String cc = game.eclipse ? "\uff43" : "c";
-//		String dd = game.eclipse ? "\uff44" : "d";
-//		String ee = game.eclipse ? "\uff45" : "e";
-//		String ff = game.eclipse ? "\uff46" : "f";
-//		String gg = game.eclipse ? "\uff47" : "g";
-//		String hh = game.eclipse ? "\uff48" : "h";
-//		String string = "\n";
-//		for (int i = eight; i >= one; i--) {
-//			string += (i + 1) + "  ";
-//			for (int j = a; j <= h; j++) {
-//				if ((i + j) % 2 == 0) {
-//					string += (char)27 + "[47m";
-//				}
-//				string += " ";
-//				Square square = game.square(j, i);
-//				int piece = accessSquare(square);
-//				if (piece != 0) string += pieceToString(piece);
-//				else string += space;
-//				string += " ";
-//				string += (char)27 + "[0m";
-//				
-//			}
-//			string += "\n";
-//		}
-//		string += "    " + aa + "  " + bb + "  " + cc + "  " + dd + "  " + ee + "  " + ff + "  " + gg + "  " + hh + "\n";
-//		String captures = "";
-//		boolean capture = false;
-//		for (int i = queen; i >= pawn; i--) {
-//			for (int j = 0; j < howManyCaptured(white, i); j++) {
-//				capture = true;
-//				captures += pieceToString(i);
-//			}
-//		}
-//		for (int i = queen; i >= pawn; i--) {
-//			for (int j = 0; j < howManyCaptured(black, i); j++) {
-//				capture = true;
-//				captures += pieceToString(i * -1);
-//			}
-//		}
-//		if (capture) string += captures + "\n";
-//		string += "Turn: ";
-//		string += toMove ? "white" : "black";
-//		int lastCapture;
-//		if (last != null) string += "\n" + (toMove ? "black" : "white") + " just moved a " + 
-//				pieceToString(game.gameHistory.get(game.moveCount - 1).accessSquare(last.prev)) + 
-//				" from " + last.prev + " to " + last.next + 
-//				((lastCapture = lastCapture()) == 0 ? "" : ", capturing a " + pieceToString(lastCapture) + (last.isEnPassant() ? " via en passant" : "")) +
-//				(lastMovePromotion() ? (lastCapture == 0 ? ", promoting" : ", and promoting") + " to a " + pieceToString(accessSquare(last.next)): "");
-//		if (numChecks() > 0) string += "\ncheck";
-//		return string;
-//	}
-	
 }

@@ -1,0 +1,100 @@
+package pieces;
+
+import java.util.Collection;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NavigableSet;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import boardFeatures.Direction;
+import boardFeatures.Square;
+import dataStructures.EnumSequence;
+import gamePlaying.Color;
+import representation.Board;
+import support.BadArgumentException;
+import support.UtilityFunctions;
+
+/**
+ * The utility super class for rooks, bishops, and queens, since they all move in a straight line for a possibly far distance
+ * @author matthewslesinski
+ *
+ */
+public abstract class LineMover extends PieceUtility {
+
+	private static final int MOST_KING_MOVES_IN_LINE = 5;
+	
+	protected LineMover() {
+		super();
+	}
+	
+	/**
+	 * Retrieves the directions this piece can move in
+	 * @return The list of directions
+	 */
+	abstract List<Direction> getMovementDirections();
+	
+	@Override
+	public Collection<Square> calculatePossibleSquaresToThreaten(Color color, Square fromSquare) {
+		return UtilityFunctions.concat(getMovementDirections().stream()
+				.map(direction -> fromSquare.getSquaresInDirection(direction))
+				.collect(Collectors.toList()));
+	}
+	
+	@Override
+	public BiFunction<Function<Square, Piece>, Square, Square> getThreatsInCluster(Set<Square> relevantSquares,
+			Square perspective, Collection<Square> possibleThreats) {
+		Map<Direction, NavigableSet<Square>> directionalityMap = new EnumMap<>(Direction.class);
+		Map<Direction, Direction> directionProcession = new EnumMap<>(Direction.class);
+		List<Square> squaresToConsider = possibleThreats.stream().filter(square -> relevantSquares.contains(square)).collect(Collectors.toList());
+		for (Square square: squaresToConsider) {
+			Direction dir = perspective.getDirectionToSquare(square);
+			directionalityMap.putIfAbsent(dir, new EnumSequence<Square>(Square.class, MOST_KING_MOVES_IN_LINE, null, possibleCandidate -> {
+				return relevantSquares.contains(possibleCandidate) && perspective.getDirectionToSquare(possibleCandidate) == dir;
+			}));
+			NavigableSet<Square> squaresInDirection = directionalityMap.get(dir);
+			if (Square.getManhattanDistance(perspective, square) < Square.getManhattanDistance(perspective, squaresInDirection.last())) {
+				throw new BadArgumentException(square, Square.class, "Expected each new square to be further outward, or a new direction");
+			}
+			squaresInDirection.add(square);
+		}
+		
+		Direction previousDirection = null;
+		Direction first = null;
+		for (Direction dir : directionalityMap.keySet()) {
+			if (previousDirection != null) {
+				directionProcession.put(previousDirection, dir);
+			} else {
+				first = dir;
+			}
+			previousDirection = dir;
+		}
+		Direction firstDirectionInTheEnd = first;
+		
+		return (occupants, currentSquare) -> {
+			if (currentSquare == null) {
+				return directionMap.get(firstDirectionInTheEnd).first();
+			}
+			Direction dirToSquare = perspective.getDirectionToSquare(currentSquare);
+			Square nextSquareInLine = directionalityMap.get(dirToSquare).higher(currentSquare);
+			if (occupants.apply(currentSquare) != Piece.NONE || nextSquareInLine == null) {
+				Direction nextDirection = directionProcession.get(dirToSquare);
+				if (nextDirection == null) {
+					return null;
+				}
+				return directionalityMap.get(nextDirection).first();
+			}
+			return nextSquareInLine;
+		};
+		
+	}
+	
+	@Override
+	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color color) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+}

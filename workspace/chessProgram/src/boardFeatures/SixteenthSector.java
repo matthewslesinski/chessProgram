@@ -44,7 +44,10 @@ public enum SixteenthSector {
 		}
 	}
 	
+	/** Whether this Sector falls between lines or is a line */
 	final boolean isBetweenLines;
+	
+	/** The neighbor(s) of this sector */
 	List<SixteenthSector> nearestSectors;
 	
 	private SixteenthSector() {

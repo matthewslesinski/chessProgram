@@ -2,12 +2,15 @@ package pieces;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import boardFeatures.Direction;
 import boardFeatures.Square;
-import gamePlaying.Color;
-import representation.Board;
+import dataStructures.OutwardLinePortions;
+import moves.ProcessedBoard;
 import support.UtilityFunctions;
 
 /**
@@ -29,15 +32,42 @@ public abstract class LineMover extends PieceUtility {
 	abstract List<Direction> getMovementDirections();
 	
 	@Override
-	public Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare) {
+	protected Collection<Direction> getDirectionsToMoveIn() {
+		return getMovementDirections();
+	}
+	
+	@Override
+	public Collection<Square> calculatePossibleSquaresToThreaten(Square fromSquare) {
 		return UtilityFunctions.concat(getMovementDirections().stream()
 				.map(direction -> fromSquare.getSquaresInDirection(direction))
 				.collect(Collectors.toList()));
 	}
 	
 	@Override
-	protected List<Square> getSquaresToMoveTo(Square square, Board board, Color color) {
-		// TODO Auto-generated method stub
-		return null;
+	public BiFunction<Function<Square, Piece>, Square, Square> getThreatsInCluster(Set<Square> relevantSquares,
+			Square perspective, Collection<Square> possibleThreats) {
+		List<Square> squaresToConsider = possibleThreats.stream().filter(square -> relevantSquares.contains(square)).collect(Collectors.toList());
+		OutwardLinePortions organizedSquares = new OutwardLinePortions(perspective, squaresToConsider);
+		return (occupants, currentSquare) -> organizedSquares.getNext(currentSquare, occupants);
+	}
+	
+	@Override
+	protected boolean isMovementAllowed(Square start, Square end, ProcessedBoard<?> board) {
+		return !board.isMovementBlocked(start, end);
+	}
+	
+	@Override
+	protected boolean addSquareToListOfMoves(Square start, Square end, ProcessedBoard<?> board, List<Square> list) {
+		boolean shouldBreak = false;
+		Piece occupant = board.getPieceAtSquare(end);
+		if (occupant != null && occupant != Piece.NONE) {
+			shouldBreak = true;
+			if (occupant.getColor() != board.whoseMove()) {
+				list.add(end);
+			}
+		} else {
+			list.add(end);
+		}
+		return shouldBreak;
 	}
 }

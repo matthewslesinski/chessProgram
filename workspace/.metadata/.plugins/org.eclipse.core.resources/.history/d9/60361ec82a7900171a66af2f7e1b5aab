@@ -1,0 +1,21 @@
+package dataStructures;
+
+import java.util.List;
+
+import convenienceDataStructures.UnmodifiableWrappedList;
+
+public class ListBackedByMaps<E extends Enum<E>> implements UnmodifiableWrappedList<E>{
+
+	
+
+	
+
+	@Override
+	public List<E> getWrappedList() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	
+	
+}

@@ -1,0 +1,38 @@
+package gamePlaying;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+public enum PlayerType {
+
+	HUMAN(Human::new, "human"),
+	COMPUTER(Computer::new, "computer");
+	
+	private static final Map<String, PlayerType> PLAYER_TYPE_MAPPER = new HashMap<>();
+	static {
+		for (PlayerType type : values()) {
+			for (String identifier : type.identifiers) {
+				PLAYER_TYPE_MAPPER.put(identifier, type);
+			}
+		}
+	}
+	
+	private final Function<String, Player> constructor;
+	private final String[] identifiers;
+	
+	private PlayerType(Function<String, Player> constructor, String... identifiers) {
+		this.constructor = constructor;
+		this.identifiers = identifiers;
+	}
+	
+	public Player createNew(String name) {
+		return constructor.apply(name);
+	}
+	
+	public static PlayerType getByIdentifier(String identifier) {
+		return PLAYER_TYPE_MAPPER.getOrDefault(identifier.trim().toLowerCase(), HUMAN);
+	}
+	
+
+}

@@ -2,7 +2,16 @@ package convenienceDataStructures;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
+/**
+ * Represents a {@code Collection}, but a lot of the methods specified by the interface are overridden here so they
+ * don't need to be specified in implementing classes
+ * @author matthewslesinski
+ *
+ * @param <E> The element type
+ */
 public interface ModifiableWrappedCollection<E> extends Collection<E> {
 
 	/**
@@ -58,6 +67,16 @@ public interface ModifiableWrappedCollection<E> extends Collection<E> {
 			toReturn |= add(e);
 		}
 		return toReturn;
+	}
+	
+	/**
+	 * Joins together all of the elements in this collection into a string bookended by braces and separated by commas.
+	 * @param stringifier A function to make a string out of each element
+	 * @return The final string
+	 */
+	public default String toStringImpl(Function<E, String> stringifier) {
+		Iterable<String> elements = getWrappedCollection().stream().map(stringifier).collect(Collectors.toList());
+		return "[" + String.join(", ", elements) + "]";
 	}
 
 }

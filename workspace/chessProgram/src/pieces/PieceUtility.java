@@ -1,14 +1,28 @@
 package pieces;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import boardFeatures.Direction;
+import boardFeatures.Line;
 import boardFeatures.Square;
+import dataStructures.ListBackedByMaps;
+import dataStructures.SquareSet;
 import gamePlaying.Color;
+import moves.BasicMove;
 import moves.Move;
+import moves.MoveType;
+import moves.ProcessedBoard;
 import representation.Board;
+import support.BadArgumentException;
 
 /**
  * The classes that extend this abstract class hold the utility method(s) for calculating
@@ -18,43 +32,31 @@ import representation.Board;
  */
 public abstract class PieceUtility {
 	
-	/**
-	 * The type of piece this is
-	 */
+	/** The type of piece this is */
 	public final PieceType pieceType;
 	
-	public final int MAX_ATTACK_DISTANCE;
+	/** The {@code Direction}s this type of piece can possibly move along */
+	private final Set<Direction> directionsToMoveIn;
+	
+	/** The {@code Direction}s this type of piece can possibly threaten along */
+	private final Set<Direction> directionsToThreatenIn;
+	
+	/** The {@code Color} of the {@code Piece} using this utility class */
+	protected final Color color;
+	
+	protected PieceUtility() {
+		this(null);
+	}
 	
 	/**
 	 * Constructor for pieces in general. Establishes what piece this is for
 	 * @param color
 	 */
-	protected PieceUtility() {
+	protected PieceUtility(Color color) {
+		this.color = color;
 		this.pieceType = determinePieceType();
-		this.MAX_ATTACK_DISTANCE = determineMaxAttackDistance();
-	}
-	
-	public abstract Collection<Square> getPossibleSquaresToThreaten(Color color, Square fromSquare);
-	
-	/**
-	 * Gets the {@code Set} of moves for this piece
-	 * @param square The current square containing this piece
-	 * @param board The current board requesting the legal moves for this piece
-	 * @return The {@code Set} of {@code Move} at a {@code Square} on the {@code Board}
-	 */
-	public Set<Move> getLegalMoves(Square square, Board board, Color toMove) {
-		return getSquaresToMoveTo(square, board, toMove).stream()
-				.map(moveSquare -> convertSquareToMove(square, moveSquare, board))
-				.collect(Collectors.toCollection(this::setConstructor));
-	}
-	
-	/**
-	 * Constructs a new {@code Set} to hold moves
-	 * @return The {@code Set}
-	 */
-	protected Set<Move> setConstructor() {
-		// TODO
-		return null;
+		this.directionsToMoveIn = EnumSet.copyOf(getDirectionsToMoveIn());
+		this.directionsToThreatenIn = EnumSet.copyOf(getDirectionsToThreatenIn());
 	}
 	
 	/**
@@ -64,34 +66,7 @@ public abstract class PieceUtility {
 	protected abstract PieceType determinePieceType();
 	
 	/**
-	 * Determines the furthest manhattan distance removed an attacked square can be from this piece
-	 * @return The distance
-	 */
-	protected abstract int determineMaxAttackDistance();
-	
-	/**
-	 * Builds a move out of the motion from square to square on a given board
-	 * @param fromSquare The square the piece was originally on
-	 * @param toSquare The square the piece ends up on
-	 * @param board The board the move happens on
-	 * @return The Move represented
-	 */
-	protected Move convertSquareToMove(Square fromSquare, Square toSquare, Board board) {
-		// TODO
-		return null;
-	}
-	
-	/**
-	 * Gets the legal squares for the piece to move to
-	 * @param square The start square for the piece
-	 * @param board The board the piece is moving in
-	 * @param toMove The color of the player making the move
-	 * @return The List of squares to move to
-	 */
-	protected abstract List<Square> getSquaresToMoveTo(Square square, Board board, Color toMove);
-	
-	/**
-	 * Determines if the piece (or absense of a piece) at a square is not of the same color as {@code toCheck}
+	 * Determines if the piece (or absence of a piece) at a square is not of the same color as {@code toCheck}
 	 * @param square The square to check
 	 * @param board The board containing the position
 	 * @param toCheck The color to compare to
@@ -101,5 +76,262 @@ public abstract class PieceUtility {
 		Piece occupier = board.getPieceAtSquare(square);
 		return occupier == Piece.NONE || occupier.getColor() != toCheck;
 	}
-	 
+	
+	
+	/**
+	 * Calculates the directions this piece can move in
+	 * @return The directions
+	 */
+	protected Collection<Direction> getDirectionsToMoveIn() {
+		return Collections.singleton(Direction.NONE);
+	}
+	
+	/**
+	 * Calculates the directions this piece can move in
+	 * @return The directions
+	 */
+	protected Collection<Direction> getDirectionsToThreatenIn() {
+		return this.getDirectionsToMoveIn();
+	}
+	
+	/**
+	 * Determines if this piece is able, from some square, to move in the given direction
+	 * @param dir The direction to check for
+	 * @return true iff it can
+	 */
+	public boolean movesInDirection(Direction dir) {
+		return directionsToMoveIn.contains(dir);
+	}
+	
+	/**
+	 * Determines if this piece is able, from some square, to threaten in the given direction
+	 * @param dir The direction to check for
+	 * @return true iff it can
+	 */
+	public boolean threatensInDirection(Direction dir) {
+		return directionsToThreatenIn.contains(dir);
+	}
+	
+	/**
+	 * Calculates the squares this piece can threaten from a given square, when there are no other pieces in the way
+	 * @param fromSquare The square the piece is on
+	 * @return The squares that can be threatened
+	 */
+	public abstract Collection<Square> calculatePossibleSquaresToThreaten(Square fromSquare);
+	
+	/**
+	 * Calculates the squares this piece can move to from a given square, when there are no other pieces in the way, no checks, no pins, etc
+	 * @param fromSquare The square the piece is on
+	 * @return The squares that can be moved to
+	 */
+	public SquareSet calculatePossibleSquaresToMoveTo(Square fromSquare) {
+		return new SquareSet(calculatePossibleSquaresToThreaten(fromSquare), fromSquare);
+	}
+	
+	/**
+	 * Gets the {@code BiFunction} used to retrieve the next square threatened by a threatening piece.
+	 * The resulting function takes as input a separate function that tells which pieces are at which squares
+	 * in the current board, as well as the current square being looked at, and returns the next square to be considered.
+	 * 
+	 * Meant to be overridden for some pieces
+	 * 
+	 * @param relevantSquares The {@code Square}s in the cluster that we care if they're threatened
+	 * @param perspective The {@code Square} with the attacking piece
+	 * @param possibleThreats The {@code Square}s that are threatened by the piece at the {@code perspective} {@code Square}
+	 * @return The {@code BiFunction} that describes how to go from one {@code Square} to the next in the cluster that is threatened by the piece
+	 */
+	public BiFunction<Function<Square, Piece>, Square, Square> getThreatsInCluster(Set<Square> relevantSquares,
+			Square perspective, Collection<Square> possibleThreats) {
+		
+		List<Square> intersection = possibleThreats.stream().filter(relevantSquares::contains).collect(Collectors.toList());
+		if (intersection.isEmpty()) {
+			return (occupants, current) -> null;
+		}
+		ListBackedByMaps<Square> procession = new ListBackedByMaps<>(intersection);
+		return (occupants, current) -> procession.getNext(current);
+	}
+	
+	/**
+	 * Gets the {@code Set} of moves for this piece
+	 * @param square The current square containing this piece
+	 * @param board The current board requesting the legal moves for this piece
+	 * @return The {@code Set} of {@code Move} at a {@code Square} on the {@code Board}
+	 */
+	public List<Move> getLegalMoves(Square square, ProcessedBoard<?> board) {
+		Set<Square> checks = board.whoIsAttackingTheKing();
+		List<Square> squaresToMoveTo;
+		switch (checks.size()) {
+		case 0:
+			squaresToMoveTo = getSquaresToMoveToNoChecks(square, board);
+			break;
+		case 1:
+			squaresToMoveTo = getSquaresToMoveToOneCheck(square, board, checks.stream().findAny().get());
+			break;
+		case 2:
+			squaresToMoveTo = getSquaresToMoveToTwoChecks(square, board);
+			break;
+		default:
+			throw new BadArgumentException(checks, Set.class, "You can't have more than 2 checks");
+		}
+		return convertSquaresToMoves(square, squaresToMoveTo, board);
+	}
+	
+	/**
+	 * Converts all of the squares that can be moved to in the context of a board from a start square to a list of {@code Move}s
+	 * 
+	 * Meant to be overridden for some pieces
+	 * 
+	 * @param start The start square for all the moves
+	 * @param squares The list of squares that can be moved to
+	 * @param board The context for the moves
+	 * @return The list of legal moves for the piece at the start square
+	 */
+	protected List<Move> convertSquaresToMoves(Square start, List<Square> squares, ProcessedBoard<?> board) {
+		return squares.stream()
+			.map(moveSquare -> convertSquareToMove(start, moveSquare, board, inferMoveType(start, moveSquare, board), null))
+			.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Builds a move out of the motion from square to square on a given board
+	 * @param fromSquare The square the piece was originally on
+	 * @param toSquare The square the piece ends up on
+	 * @param board The board the move happens on
+	 * @param type The type of move this is
+	 * @return The Move represented
+	 */
+	protected Move convertSquareToMove(Square fromSquare, Square toSquare, ProcessedBoard<?> board, MoveType type, PieceType promotion) {
+		Piece mover = board.getPieceAtSquare(fromSquare);
+		BasicMove.Builder builder = new BasicMove.Builder(type, mover.getType(), fromSquare, toSquare, board.whoseMove());
+		switch (type) {
+		case PROMOTION_WITH_CAPTURE:
+			builder.withPromotion(promotion);
+		case CAPTURE:
+			PieceType capture = board.getPieceAtSquare(toSquare).getType();
+			builder.withCapture(capture);
+			break;
+		case PROMOTION:
+			builder.withPromotion(promotion);		
+			break;
+
+		default:
+			break;
+		}
+		return builder.build();
+	}
+	
+	/**
+	 * Infers the type of move represented by the movement from the start and end squares in the context of a board
+	 * 
+	 * Meant to be overridden for some pieces
+	 * 
+	 * @param start The start of the move
+	 * @param end The end of the move
+	 * @param board The board that the move happens on
+	 * @return The move type
+	 */
+	protected MoveType inferMoveType(Square start, Square end, ProcessedBoard<?> board) {
+		return MoveType.infer(end, board);
+	}
+	
+	/**
+	 * Adds the end square to the list of squares that can be moved to from start, if moving to the end square is allowed
+	 * 
+	 * Meant to be overridden for some pieces
+	 * 
+	 * @param start The square to be moved from
+	 * @param end The square to be moved to
+	 * @param board The context of the move
+	 * @param list The list storing squares that can be moved to
+	 * @return if there seems to be a piece in the way going forward, and if the loop over all squares to consider in this direction should be broken
+	 */
+	protected boolean addSquareToListOfMoves(Square start, Square end, ProcessedBoard<?> board, List<Square> list) {
+		Piece occupant = board.getPieceAtSquare(end);
+		if (occupant == null || occupant == Piece.NONE || occupant.getColor() != board.whoseMove()) {
+			list.add(end);
+		}
+		return false;
+	}
+	
+	/**
+	 * Used to determine if moving from a start to end square, when that movement is already guaranteed to be from a piece's
+	 * possible move set (so it doesn't need to be validated that the piece could ever make that movement), is allowed.
+	 * True is always returned here, but this should be overridden for other pieces, like pawns, to include more complex logic
+	 * 
+	 * As noted, this should be overridden for some pieces
+	 * 
+	 * @param start The start of the movement
+	 * @param end The end of the movement
+	 * @param board The board the movement happens on
+	 * @return true iff it's allowed
+	 */
+	protected boolean isMovementAllowed(Square start, Square end, ProcessedBoard<?> board) {
+		return true;
+	}
+	
+	/**
+	 * Gets the legal squares for the piece to move to
+	 * @param square The start square for the piece
+	 * @param board The board the piece is moving in
+	 * @return The List of squares to move to
+	 */
+	protected List<Square> getSquaresToMoveToNoChecks(Square square, ProcessedBoard<?> board) {
+		SquareSet possibleMoves = square.getPossibleMovesByPiece(board.getPieceAtSquare(square));
+		
+		// Get the directions that can be moved to, including filtering out extraneous directions when there's a pin
+		Direction pin = board.isPiecePinned(square);
+		Collection<Direction> directionsToRetrieve = pin == Direction.NONE ? getDirectionsToMoveIn() : Arrays.asList(pin, pin.getOppositeDirection());
+		List<Square> collectedEndSquares = new LinkedList<>();
+		directionsToRetrieve.forEach(direction -> {
+			List<Square> squaresInDirection = possibleMoves.getSquaresInDirectionFromCenter(direction);
+			for (Square possibleMove : squaresInDirection) {
+				// If further movement is blocked, don't continue along this direction
+				boolean shouldBreak = addSquareToListOfMoves(square, possibleMove, board, collectedEndSquares);
+				if (shouldBreak) {
+					break;
+				}
+			}
+		});
+		return collectedEndSquares;
+	}
+	
+	/**
+	 * Gets the legal squares for the piece to move to, specifically when there is one check
+	 * @param square The start square for the piece
+	 * @param board The board the piece is moving in
+	 * @param check The square with the piece giving a check
+	 * @return The List of squares to move to
+	 */
+	protected List<Square> getSquaresToMoveToOneCheck(Square square, ProcessedBoard<?> board, Square check) {
+		// There is no conceivable way that a pinned piece can stop a check
+		if (board.isPiecePinned(square) != Direction.NONE) {
+			return Collections.emptyList();
+		}
+		SquareSet possibleMoves = square.getPossibleMovesByPiece(board.getPieceAtSquare(square));
+		
+		// Get the Squares in possibleMoves that block or capture the checking piece
+		Square kingSquare = board.getKingSquare();
+		Direction attackOnKing = check.getDirectionToSquare(kingSquare);
+		Set<Square> squaresOnCheckLine;
+		if (attackOnKing == Direction.NONE) {
+			squaresOnCheckLine = possibleMoves.contains(check) ? Collections.singleton(check) : Collections.emptySet();
+		} else {
+			Line checkLine = attackOnKing.getContainingLineType().getLineBySquare(check);
+			squaresOnCheckLine = possibleMoves.getSquaresOnLine(checkLine);
+		}
+		// Only include the squares that are actually blocking/capturing the check, and that can actually be moved to
+		return squaresOnCheckLine.stream()
+			.filter(endSquare -> endSquare.isBetweenSquares(check, kingSquare) && isMovementAllowed(square, endSquare, board))
+			.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Gets the legal squares for the piece to move to, specifically when there are two checks
+	 * @param square The start square for the piece
+	 * @param board The board the piece is moving in
+	 * @return The List of squares to move to
+	 */
+	protected List<Square> getSquaresToMoveToTwoChecks(Square square, ProcessedBoard<?> board) {
+		throw new BadArgumentException(square, Square.class, "If there two checks, only kings can move");
+	}
 }

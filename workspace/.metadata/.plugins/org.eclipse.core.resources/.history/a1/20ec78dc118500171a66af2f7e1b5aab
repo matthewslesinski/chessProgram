@@ -1,0 +1,65 @@
+package immutableArrayBoard;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.ProcessedBoard;
+import moves.SolidPreProcessing;
+import pieces.Piece;
+import pieces.PieceType;
+import moves.BasicMove;
+import moves.Move;
+import moves.MoveSet;
+import representation.MoveGenerator;
+import support.UtilityFunctions;
+
+/**
+ * Calculates the moves for a given position. This is a mutable object, and 
+ * @author matthewslesinski
+ *
+ */
+public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
+	
+		
+	private ProcessedBoard<ImmutableArrayBoard> preprocessing;
+	private Set<Square> checks;
+	private List<Move> moves = new LinkedList<Move>();
+	private Color toMove;
+	private Square kingSquare;
+	
+	/**
+	 * A function to get all of the squares that have a piece of the type provided
+	 */
+	private Function<PieceType, List<Square>> getSquaresForPiecesOfThisColor;
+	
+	
+	@Override
+	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
+		preprocessing = new SolidPreProcessing<>(board);
+		preprocessing.calculateKingSafety();
+		checks = preprocessing.whoIsAttackingTheKing();
+		toMove = preprocessing.whoseMove();
+		getSquaresForPiecesOfThisColor =
+				UtilityFunctions.bind(Piece::getByColorAndType, toMove).andThen(preprocessing::getListOfSquaresForPiece);
+		kingSquare = preprocessing.getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		realizeMoves();
+		return new MoveSet(moves, BasicMove::new);
+	}
+	
+	/**
+	 * Actually calculates the moves that are legal for all the pieces
+	 */
+	private void realizeMoves() {
+		Collection<Square> pieceSquares = checks.size() > 1 ? Collections.singleton(kingSquare) :
+			UtilityFunctions.concat(Arrays.stream(PieceType.values()).map(getSquaresForPiecesOfThisColor).collect(Collectors.toList()));
+		pieceSquares.stream().map(square -> preprocessing.getPieceAtSquare(square).getLegalMoves(square, preprocessing)).forEach(moves::addAll);
+	}
+}

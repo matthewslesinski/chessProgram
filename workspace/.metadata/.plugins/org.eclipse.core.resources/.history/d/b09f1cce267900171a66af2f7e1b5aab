@@ -1,0 +1,123 @@
+package dataStructures;
+
+import java.util.Collection;
+import java.util.Map;
+import java.util.Set;
+
+/**
+ * An undirected linkage between two types of elements, such that each mapping from an element on the left to an element on the right
+ * has a corresponding mapping from that element on the right to that element on the left, and vice versa.
+ * @author matthewslesinski
+ *
+ * @param <E> The type of the leftward elements
+ * @param <F> The type of the righward elements
+ */
+public interface Isomorphism<E, F> {
+	
+	/**
+	 * Gets a map from the elements on the left to the elements on the right
+	 * @return The map
+	 */
+	public Map<E, F> getLeftwardMap();
+	
+	/**
+	 * Gets a map from the elements on the right to the elements on the left
+	 * @return The map
+	 */
+	public Map<F, E> getRightwardMap();
+	
+	/**
+	 * The size of the isomorphism
+	 * @return The size
+	 */
+	public default int size() {
+		return getLeftwardMap().size();
+	}
+
+	/**
+	 * If there are any relations in this isomorphism
+	 * @return
+	 */
+	public default boolean isEmpty() {
+		return getLeftwardMap().isEmpty();
+	}
+
+	public default boolean containsKeyOnLeft(Object key) {
+		return getLeftwardMap().containsKey(key);
+	}
+
+	public default boolean containsKeyOnRight(Object key) {
+		return getRightwardMap().containsKey(key);
+	}
+
+	public default F getOnLeft(Object key) {
+		return getLeftwardMap().get(key);
+	}
+	
+	public default E getOnRight(Object key) {
+		return getRightwardMap().get(key);
+	}
+
+	public default boolean put(E leftKey, F rightKey) {
+		Map<E, F> leftMap = getLeftwardMap();
+		Map<F, E> rightMap = getRightwardMap();
+		if (leftMap.containsKey(leftKey) || rightMap.containsKey(rightKey)) {
+			return false;
+		}
+		leftMap.put(leftKey, rightKey);
+		rightMap.put(rightKey, leftKey);
+		return true;
+	}
+
+	public default F removeFromLeft(Object key) {
+		Map<E, F> leftMap = getLeftwardMap();
+		Map<F, E> rightMap = getRightwardMap();
+		F toReturn;
+		if ((toReturn = leftMap.remove(key)) == null) {
+			return null;
+		}
+		rightMap.remove(toReturn);
+		return toReturn;
+	}
+	
+	public default E removeFromRight(Object key) {
+		Map<E, F> leftMap = getLeftwardMap();
+		Map<F, E> rightMap = getRightwardMap();
+		E toReturn;
+		if ((toReturn = rightMap.remove(key)) == null) {
+			return null;
+		}
+		leftMap.remove(toReturn);
+		return toReturn;
+	}
+
+	public default void putAllFromLeft(Map<? extends E, ? extends F> m) {
+		m.entrySet().forEach(entry -> put(entry.getKey(), entry.getValue()));
+	}
+	
+	public default void putAllFromRight(Map<? extends F, ? extends E> m) {
+		m.entrySet().forEach(entry -> put(entry.getValue(), entry.getKey()));
+	}
+
+	public default void clear() {
+		getLeftwardMap().clear();
+		getRightwardMap().clear();
+	}
+
+	public default Set<E> leftSet() {
+		return getLeftwardMap().keySet();
+	}
+
+	public default Collection<F> rightSet() {
+		return getRightwardMap().keySet();
+	}
+
+	public default Set<java.util.Map.Entry<E, F>> leftEntrySet() {
+		return getLeftwardMap().entrySet();
+	}
+	
+	public default Set<java.util.Map.Entry<F, E>> rightEntrySet() {
+		return getRightwardMap().entrySet();
+	}
+	
+}

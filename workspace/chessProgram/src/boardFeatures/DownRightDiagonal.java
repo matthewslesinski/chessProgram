@@ -24,10 +24,13 @@ public enum DownRightDiagonal implements Line {
 	G8_H7,
 	H8;
 		
-	
+	/** The ordinal of the long diagonal */
 	private static final int CENTER_INDEX = 7;
+	
+	/** The maximum length any of these diagonals can be */
 	private static final int MAX_LENGTH = 8;
 	
+	// These are set in the setContainedSquares method, which is called by the StaticInitializer to avoid circular dependencies
 	/** The set of squares contained in this {@code DownRightDiagonal} */
 	private List<Square> containedSquares;
 

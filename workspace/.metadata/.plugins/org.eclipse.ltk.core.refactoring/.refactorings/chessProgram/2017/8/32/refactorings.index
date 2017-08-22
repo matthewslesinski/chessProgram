@@ -1,0 +1,13 @@
+1502081733177	Delete element
+1502140124401	Rename field 'lineMovers'
+1502140138523	Rename field 'promotionPieces'
+1502144979295	Change method 'calculatePossibleSquaresToThreaten'
+1502145055777	Change method 'calculatePossibleSquaresToMoveTo'
+1502145375297	Change method 'getSquaresToMoveTo'
+1502147771471	Change method 'calculatePossibleSquaresToThreaten'
+1502147789940	Change method 'calculatePossibleSquaresToMoveTo'
+1502147947835	Change method 'getPossibleThreatsFromSquare'
+1502148004392	Change method 'calculatePossibleSquaresToThreaten'
+1502245852150	Rename method 'getRelevantSquares'
+1502249708023	Rename type 'BasicPreProcessing'
+1502370191750	Rename method 'calculateSafeKingMoves'

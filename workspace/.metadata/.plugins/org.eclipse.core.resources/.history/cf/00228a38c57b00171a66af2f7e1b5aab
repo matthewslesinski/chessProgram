@@ -1,0 +1,81 @@
+package pieces;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import boardFeatures.Direction;
+import boardFeatures.Square;
+import gamePlaying.Color;
+import moves.Move;
+import representation.Board;
+import support.UtilityFunctions;
+
+/**
+ * Provides the utility method(s) for calculating a pawn's legal moves
+ * @author matthewslesinski
+ *
+ */
+public class Pawn extends PieceUtility {
+
+	private final Color color;
+	
+	Pawn(Color color) {
+		super();
+		this.color = color;
+	}
+	
+	@Override
+	public Set<Move> getLegalMoves(Square square, Board board, Color color) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	protected PieceType determinePieceType() {
+		return PieceType.PAWN;
+	}
+
+	@Override
+	protected int determineMaxAttackDistance() {
+		return 2;
+	}
+	
+	/**
+	 * Calculates the squares a pawn can move to without capturing, in all possible situations
+	 * @param fromSquare The square it starts from
+	 * @return The collection of the possible squares
+	 */
+	private Collection<Square> calculatePossibleNonCaptureMoves(Square fromSquare) {
+		List<Square> possibleSquares = new LinkedList<>();
+		Direction forwards = color.getPawnPushDirection();
+		Square pushSquare = fromSquare.getNeighbor(forwards);
+		possibleSquares.add(pushSquare);
+		if (fromSquare.getRank() == color.getPawnStartRank()) {
+			possibleSquares.add(pushSquare.getNeighbor(forwards));
+		}
+		return possibleSquares;
+	}
+	
+	@Override
+	public Collection<Square> calculatePossibleSquaresToMoveTo(Square fromSquare) {
+		return UtilityFunctions.concat(super.calculatePossibleSquaresToMoveTo(fromSquare), calculatePossibleNonCaptureMoves(fromSquare));
+	}
+
+	@Override
+	protected List<Square> getSquaresToMoveTo(Square square, Board board) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public Collection<Square> calculatePossibleSquaresToThreaten(Square fromSquare) {
+		return Arrays.asList(color.getLeftPawnCaptureDirection(), color.getRightPawnCaptureDirection()).stream()
+				.map(direction -> fromSquare.getNeighbor(direction)).filter(square -> square != null)
+				.collect(Collectors.toList());
+	}
+	
+}

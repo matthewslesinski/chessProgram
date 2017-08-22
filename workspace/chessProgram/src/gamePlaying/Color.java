@@ -2,6 +2,7 @@ package gamePlaying;
 
 import boardFeatures.Direction;
 import boardFeatures.Rank;
+import boardFeatures.Square;
 
 /**
  * Holds a representation of the two possible colors in a game, white and black. 
@@ -12,6 +13,7 @@ public enum Color {
 	WHITE,
 	BLACK;
 	
+	/** A boolean representation backing the {@code Color} */
 	private final boolean value = this.ordinal() == 0 ? true : false;
 	
 	
@@ -60,15 +62,39 @@ public enum Color {
 	 * @return The {@code Rank}
 	 */
 	public Rank getQueeningRank() {
-		return value ? Rank.ONE : Rank.EIGHT;
+		return value ? Rank.EIGHT : Rank.ONE;
 	}
 	
 	/**
-	 * Gets the rank that this color performs en passant on
+	 * Gets the rank that this color performs en passant from
 	 * @return The {@code Rank}
 	 */
-	public Rank getEnPassantRank() {
+	public Rank getEnPassantCaptureRank() {
 		return value ? Rank.FIVE : Rank.FOUR;
+	}
+	
+	/**
+	 * Gets the rank that this color performs en passant and lands on
+	 * @return The {@code Rank}
+	 */
+	public Rank getEnPassantDestinationRank() {
+		return value ? Rank.SIX : Rank.THREE;
+	}
+	
+	/**
+	 * Gets the rank pawns start on for this color
+	 * @return The {@code Rank}
+	 */
+	public Rank getPawnStartRank() {
+		return value ? Rank.TWO : Rank.SEVEN;
+	}
+	
+	/**
+	 * Gets the square that the king of this color can castle from
+	 * @return The square
+	 */
+	public Square getKingCastleSquare() {
+		return value ? Square.E1 : Square.E8;
 	}
 	
 	/**
@@ -80,6 +106,7 @@ public enum Color {
 		return isWhite ? WHITE : BLACK;
 	}
 	
+	@Override
 	public String toString() {
 		return value ? "white" : "black";
 	}

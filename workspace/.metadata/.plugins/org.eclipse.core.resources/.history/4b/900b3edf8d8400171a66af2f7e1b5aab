@@ -1,0 +1,77 @@
+package gamePlaying;
+
+import java.io.IOException;
+
+import moves.Move;
+import representation.Board;
+import support.Constants;
+import support.MoveParser;
+
+public class UserActions {
+	
+	private static final String ILLEGAL_MOVE = "The attempted move is illegal. For a complete list of legal moves, type \"moves\".";
+	
+	public static String exit(String[] args, Game game) {
+		try {
+			Constants.INPUT_READER.close();
+		} catch(IOException e) {
+			// TODO log this
+		}
+		System.exit(0);
+		return null;
+	}
+	
+	public static String redo(String[] args, Game game) {
+		game.undoPlies(1);
+		return null;
+	}
+	
+	public static String undo(String[] args, Game game) {
+		String argument = args[0];
+		if (!argument.matches("\\d+")) {
+			return "Can only undo an integer number of plies";
+		}
+		game.undoPlies(Integer.parseInt(argument));
+		return null;
+	}
+	
+	public static String exportPGN(String[] args, Game game) {
+		// TODO
+		return null;
+	}
+	
+	public static String getFEN(String[] args, Game game) {
+		// TODO
+		return null;
+	}
+	
+	public static String printMoves(String[] args, Game game) {
+		if (args.length == 0) {
+			return "Legal Moves: " + game.getCurrentPosition().getLegalMoves().toString();
+		}
+		// TODO
+		return null;
+	}
+	
+	public static String printBoard(String[] args, Game game) {
+		return game.getCurrentPosition().toString();
+	}
+	
+	public static String poke(String[] args, Game game) {
+		// TODO
+		return null;
+	}
+	
+	public static String makeMove(String[] args, Game game) {
+		String moveString = args[0];
+		Board currentPosition = game.getCurrentPosition();
+		Move nextMove = MoveParser.parseAlgebraicNotation(currentPosition, moveString);
+		if (nextMove == null) {
+			return ILLEGAL_MOVE;
+		}
+		Board nextPosition = currentPosition.performMove(nextMove);
+		game.addPosition(nextPosition);
+		return null;
+	}
+	
+}

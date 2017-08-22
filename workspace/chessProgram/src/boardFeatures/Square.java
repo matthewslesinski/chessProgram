@@ -5,14 +5,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
-import java.util.function.Predicate;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import dataStructures.EvenlySpacedCircle;
-import dataStructures.EvenlySpacedCircleImpl;
-import dataStructures.Ring;
-import pieces.Knight;
+import dataStructures.KingMoveSet;
+import dataStructures.SquareSet;
+import gamePlaying.Color;
 import pieces.Piece;
+import pieces.PieceType;
 import support.BadArgumentException;
 import support.UtilityFunctions;
 
@@ -88,37 +88,35 @@ public enum Square {
 		StaticInitializer.initialize();
 	}
 	
+	/** The {@code File} containing this {@code Square} */
 	private final File file;
+	
+	/** The {@code Rank} containing this {@code Square} */
 	private final Rank rank;
+	
+	/** The {@code UpRightDiagonal} containing this {@code Square} */
 	private final UpRightDiagonal upRightDiagonal;
+	
+	/** The {@code DownRightDiagonal} containing this {@code Square} */
 	private final DownRightDiagonal downRightDiagonal;
-	private List<Square>[] surroundingLines;
 	
-	private Map<Piece, Set<Square>> attackSquares;
+	/** For each outward {@code Direction}, the {@code List} of {@code Square}s extending outwards from this one in that {@code Direction} */
+	private Map<Direction, List<Square>> surroundingLines;
 	
-	private Set<Square> pawnAttacks;
-	private Set<Square> pawnSlides;
-	private Ring<Square> knightJumps;
-	private Set<Square> bishopMoves;
-	private Set<Square> rookMoves;
-	private Set<Square> kingAttacks;
-	private Set<Square> kingSlides;
+	/** For each {@code Piece}, the set of squares it can threaten from this one, if there's a piece on it */
+	private Map<Piece, SquareSet> threatSquares;
+	
+	/** For each {@code Piece}, the set of squares it can move to from this one, in general */
+	private Map<Piece, SquareSet> moveSquares;
+	
 	
 	private Square() {
 		int file = this.ordinal() / 8;
 		int rank = this.ordinal() % 8;
-		File fileValue = null;
-		Rank rankValue = null;
-		this.attackSquares = new EnumMap<Piece, Set<Square>>(Piece.class);
-		try {
-			fileValue = File.getByIndex(file);
-			rankValue = Rank.getByIndex(rank);
-		} catch (BadArgumentException e) {
-			// TODO log this
-			System.exit(1);
-		}
-		this.file = fileValue;
-		this.rank = rankValue;
+		this.threatSquares = new EnumMap<Piece, SquareSet>(Piece.class);
+		this.moveSquares = new EnumMap<Piece, SquareSet>(Piece.class);
+		this.file = File.getByIndex(file);
+		this.rank = Rank.getByIndex(rank);
 		this.upRightDiagonal = UpRightDiagonal.getBySquare(this);
 		this.downRightDiagonal = DownRightDiagonal.getBySquare(this);		
 	}
@@ -130,7 +128,10 @@ public enum Square {
 	static void postInitialization() {
 		for (Square square: values()) {
 			square.surroundingLines = square.determineSurroundingLines();
-			square.calculateKnightMoves();
+			for (Piece piece : Piece.realPieces()) {
+				square.threatSquares.put(piece, piece.getPossibleThreatsFromSquare(square));
+				square.moveSquares.put(piece, piece.getPossibleMovesFromSquare(square));
+			}
 		}
 	}
 	
@@ -138,24 +139,10 @@ public enum Square {
 	 * Calculates all the lists of squares that go outward from the current square along a {@code Line}
 	 * @return The array of lists of squares
 	 */
-	@SuppressWarnings("unchecked")
-	private List<Square>[] determineSurroundingLines() {
-		return (List<Square>[]) Direction.getOutwardDirections().stream()
-			.map(dir ->	dir.getMovement().getSquaresToMoveThrough(this, dir.getContainingLineType()))
-			.collect(Collectors.toList()).toArray(new List[Direction.getOutwardDirections().size()]);
-	}
-	
-	/**
-	 * Stores in {@code knightJumps} the list of squares a knight can jump to from this one
-	 */
-	private void calculateKnightMoves() {
-		List<Square> possibleJumps = Knight.KNIGHT_MOVE_OFFSETS.stream().map(list -> {
-			int fileOffset = list.get(0);
-			int rankOffset = list.get(1);
-			return getSquareByOffset(fileOffset, rankOffset);
-		}).filter(square -> square != null).collect(Collectors.toList());
-		EvenlySpacedCircle circle = new EvenlySpacedCircleImpl(this, possibleJumps);
-		this.knightJumps = new Ring.OfSquares(circle);
+	private Map<Direction, List<Square>> determineSurroundingLines() {
+		return Direction.getOutwardDirections().stream()
+				.collect(Collectors.toMap(dir -> dir,
+						dir -> dir.getMovement().getSquaresToMoveThrough(this, dir.getContainingLineType())));
 	}
 	
 	/**
@@ -210,6 +197,17 @@ public enum Square {
 	 * Gets the square neighboring the current square in a particular direction
 	 * Returns null if the square is out of bounds
 	 * @param dir The {@code Direction} the square is in
+	 * @param steps The number of steps in that direction to take
+	 * @return The neighbor or null
+	 */
+	public Square getNeighbor(Direction dir, int steps) {
+		return getSquareByOffset(dir.getFileDelta() * steps, dir.getRankDelta() * steps);
+	}
+	
+	/**
+	 * Gets the square neighboring the current square in a particular direction
+	 * Returns null if the square is out of bounds
+	 * @param dir The {@code Direction} the square is in
 	 * @return The neighbor or null
 	 */
 	public Square getNeighbor(Direction dir) {
@@ -242,31 +240,49 @@ public enum Square {
 		}
 		return getByFileAndRank(file, rank);
 	}
-
-	/**
-	 * Provides access to the list of squares a knight's jump away from this one
-	 * @return The squares
-	 */
-	public Ring<Square> getKnightJumps() {
-		return knightJumps;
-	}
 	
 	
 	/**
 	 * Gets the direction traveled to get from this square to another
 	 * @param that The target square
-	 * @return The direction, or null if the other square is the same as this one or not in a line from this one
+	 * @return The direction, or null if the other square is the same as this one, not in a line from this one, or null
 	 */
 	public Direction getDirectionToSquare(Square that) {
+		if (that == null) {
+			return Direction.NONE;
+		}
 		int fileDelta = that.getFile().getIndex() - this.getFile().getIndex();
 		int rankDelta = that.getRank().getIndex() - this.getRank().getIndex();
 		// How to determine if the other square is in the same line as this: the magnitudes of
 		// the fileDelta and rankDelta must either be the same or one of them must be 0. Therefore, their
 		// product's magnitude must be a perfect square
-		if (this == that || (double) Math.abs(fileDelta * rankDelta) != Math.pow(fileDelta, 2)) {
-			return null;
+		if (this == that || !UtilityFunctions.isPerfectSquareUpTo64(Math.abs(fileDelta * rankDelta))) {
+			return Direction.NONE;
 		}
 		return Direction.getByDeltas(UtilityFunctions.getSign(fileDelta), UtilityFunctions.getSign(rankDelta));
+	}
+	
+	/**
+	 * Determines which of the two squares is closer to this, and returns that one
+	 * @param some one square to consider
+	 * @param other the other one to consider
+	 * @return The one that's closer to this
+	 */
+	public Square whichIsCloser(Square some, Square other) {
+		if (getManhattanDistance(this, some) > getManhattanDistance(this, other)) {
+			return other;
+		}
+		return some;
+	}
+	
+	/**
+	 * Determines if this square falls between the two given squares, exclusive, or if it is the same as the first of the given squares
+	 * @param oneSide One end to be between (inclusive)
+	 * @param otherSide The other end to be between (exclusive)
+	 * @return If this is between the two (or not on the same line)
+	 */
+	public boolean isBetweenSquares(Square oneSide, Square otherSide) {
+		return this == oneSide || getDirectionToSquare(oneSide) == getDirectionToSquare(otherSide).getOppositeDirection();
 	}
 	
 	/**
@@ -275,7 +291,7 @@ public enum Square {
 	 * @return The {@code List} of {@code Square}
 	 */
 	public List<Square> getSquaresInDirection(Direction dir) {
-		return surroundingLines[dir.ordinal()];
+		return surroundingLines.get(dir);
 	}
 	
 	/**
@@ -288,6 +304,34 @@ public enum Square {
 	}
 	
 	/**
+	 * Gets the set of {@code Square}s the given {@code Piece} can threaten from this {@code Square}
+	 * @param piece The given {@code Piece}
+	 * @return The {@code SquareSet} containing the {@code Square}s
+	 */
+	public SquareSet getPossibleThreatsByPiece(Piece piece) {
+		return threatSquares.get(piece);
+	}
+	
+	/**
+	 * Gets the set of {@code Square}s the given {@code Piece} can move to from this {@code Square}
+	 * @param piece The given {@code Piece}
+	 * @return The {@code SquareSet}, {@code KingMoveSet}, or {@code PawnMoveSet} containing the {@code Square}s
+	 */
+	public SquareSet getPossibleMovesByPiece(Piece piece) {
+		return moveSquares.get(piece);
+	}
+	
+	/**
+	 * Gets the set of {@code Square}s the king of the given {@code Color} can move to from this {@code Square},
+	 * and because this is for a {@code King}, it can be assumed that the returned set is a {@code KingMoveSet}
+	 * @param color
+	 * @return
+	 */
+	public KingMoveSet getKingMoves(Color color) {
+		return (KingMoveSet) moveSquares.get(Piece.getByColorAndType(color, PieceType.KING));
+	}
+	
+	/**
 	 * Retrieves a function that, given a boolean function to determine if squares are blocked, will map each square in a set of relevant
 	 * squares to the next square to consider, given a piece who is making the move. This is specifically with the purpose of building an
 	 * iterator over the relevant squares to consider when determining if a piece is threatening a set of squares
@@ -295,9 +339,8 @@ public enum Square {
 	 * @param relevantSquares The set of squares to create the mapping over
 	 * @return A function that describes the mapping
 	 */
-	public BiFunction<Predicate<Square>, Square, Square> pieceThreats(Piece occupant, Set<Square> relevantSquares) {
-		// TODO
-		return null;
+	public BiFunction<Function<Square, Piece>, Square, Square> pieceThreats(Piece occupant, Set<Square> relevantSquares) {
+		return occupant.getUtilityInstance().getThreatsInCluster(relevantSquares, this, getPossibleThreatsByPiece(occupant));
 	}
 	
 	/**

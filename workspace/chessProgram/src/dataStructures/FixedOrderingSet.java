@@ -1,14 +1,24 @@
 package dataStructures;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.NavigableSet;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.IntFunction;
 
 import convenienceDataStructures.IrreversibleWrappedCollection;
 import support.BadArgumentException;
+import support.UtilityFunctions;
 
+/**
+ * A {@code Set} of elements that are ordered, but also are fixed, so it's easy to get elements some
+ * distance away.
+ * @author matthewslesinski
+ *
+ * @param <E> The type of the elements
+ */
 public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappedCollection<E> {
 
 	
@@ -21,14 +31,63 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	public E retrieveOffsetFromElement(E element, int offset);
 	
 	/**
-	 * The function used to retrieve an index
+	 * Gets the actual function used to retrieve an element at some index
 	 * @return The function
 	 */
 	public IntFunction<E> getIndexFunction();
 
+	/**
+	 * Gets the neighbors on either side of the given element in this set
+	 * @param e The element
+	 * @param elementsToExclude possible elements to gloss over and not include
+	 * @return The neighbors on either side
+	 */
+	public default Collection<E> getNeighbors(E e, Set<E> elementsToExclude) {
+		return UtilityFunctions.constructListOfElements(lower(e, elementsToExclude), higher(e, elementsToExclude));
+	}
+	
+	/**
+	 * Gets the neighbors on either side of the given element in this set
+	 * @param e The element
+	 * @return The neighbors on either side
+	 */
+	public default Collection<E> getNeighbors(E e) {
+		return UtilityFunctions.constructListOfElements(lower(e), higher(e));
+	}
+	
+	/**
+	 * Determines if the second element is higher or lower than the first, and gets the next element in the sequence in that direction
+	 * @param first The first element
+	 * @param second The second one, setting a direction from first
+	 * @return The third element in that direction
+	 */
+	public default E getThirdInSequence(E first, E second) {
+		switch (UtilityFunctions.getSign(comparator().compare(first, second))) {
+		case -1:
+			return higher(second);
+		case 1:
+			return lower(second);
+		default:
+			throw new BadArgumentException(Arrays.asList(first, second), first.getClass(), "The two provided elements must be in a sequence and not be the same");
+		}
+	}
+	
 	@Override
 	public default E lower(E e) {
 		return retrieveOffsetFromElement(e, -1);
+	}
+	
+	/**
+	 * Returns the previous element in the set that is not one of the elements to exclude
+	 * @param e The one to get the previous for
+	 * @param elementsToExclude elements to gloss over
+	 * @return The previous in the set
+	 */
+	public default E lower(E e, Set<E> elementsToExclude) {
+		do {
+			e = lower(e);
+		} while (elementsToExclude.contains(e));
+		return e;
 	}
 
 	@Override
@@ -46,6 +105,19 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 		return retrieveOffsetFromElement(e, 1);
 	}
 	
+	/**
+	 * Returns the next element in the set that is not one of the elements to exclude
+	 * @param e The one to get the next for
+	 * @param elementsToExclude elements to gloss over
+	 * @return The next in the set
+	 */
+	public default E higher(E e, Set<E> elementsToExclude) {
+		do {
+			e = higher(e);
+		} while (elementsToExclude.contains(e));
+		return e;
+	}
+	
 	@Override
 	public default E first() {
 		return isEmpty() ? null : getIndexFunction().apply(0);
@@ -58,12 +130,12 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 
 	@Override
 	public default E pollFirst() {
-		throw new BadArgumentException(this, this.getClass(), REMOVAL_MESSAGE);
+		throw new BadArgumentException(this, this.getClass(), MODIFICATION_MESSAGE);
 	}
 
 	@Override
 	public default E pollLast() {
-		throw new BadArgumentException(this, this.getClass(), REMOVAL_MESSAGE);
+		throw new BadArgumentException(this, this.getClass(), MODIFICATION_MESSAGE);
 	}
 	
 	@Override
@@ -161,5 +233,4 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	public default void clear() {
 		IrreversibleWrappedCollection.super.clear();
 	}
-	
 }

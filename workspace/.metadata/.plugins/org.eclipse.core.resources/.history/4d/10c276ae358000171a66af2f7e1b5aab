@@ -1,0 +1,40 @@
+package immutableArrayBoard;
+
+import immutableArrayBoard.ImmutableArrayBoard.Builder;
+import moves.Move;
+import representation.BoardBuilder;
+import representation.MoveMaker;
+
+public class ImmutableArrayBoardMoveMaker extends MoveMaker<ImmutableArrayBoard> {
+
+	@Override
+	public ImmutableArrayBoard performMove(Move move, ImmutableArrayBoard board) {
+		if (!board.getLegalMoves().contains(move)) {
+			return null;
+		}
+		BoardBuilder<ImmutableArrayBoard> builder = Builder.fromBoard(board);
+		switch (move.getMovingPiece()) {
+		case PAWN:
+			
+			break;
+		case KING:
+			if (move.isCastle()) {
+				
+			}
+			break;
+		case ROOK:
+			
+			break;
+
+		default:
+			break;
+		}
+		// TODO handle rights
+		return builder.build();
+	}	
+	
+	protected BoardBuilder<ImmutableArrayBoard> switchSquares(BoardBuilder<ImmutableArrayBoard> builder, Move move) {
+		
+	}
+
+}

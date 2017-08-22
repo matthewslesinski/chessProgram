@@ -13,21 +13,14 @@ import support.Constants;
 public class Queen extends LineMover {
 
 	private static final PieceType TYPE = PieceType.QUEEN;
-	private static final int ATTACK_DISTANCE = 14;
 	
-	Queen(PieceType piece) {
+	Queen() {
 		super();
 	}
-	
 
 	@Override
 	protected PieceType determinePieceType() {
 		return TYPE;
-	}
-
-	@Override
-	protected int determineMaxAttackDistance() {
-		return ATTACK_DISTANCE;
 	}
 
 	@Override

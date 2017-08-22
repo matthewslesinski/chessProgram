@@ -1,0 +1,10 @@
+package gamePlaying;
+
+import moves.Move;
+import representation.Board;
+
+public interface Player {
+
+	
+	public Move getNextMove(Board currentPosition);
+}

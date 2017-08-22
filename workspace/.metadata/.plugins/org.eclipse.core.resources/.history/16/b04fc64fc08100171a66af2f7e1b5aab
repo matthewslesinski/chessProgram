@@ -1,0 +1,74 @@
+package support;
+
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
+import boardFeatures.Direction;
+import boardFeatures.File;
+import gamePlaying.PlayerType;
+import immutableArrayBoard.ImmutableArrayBoard;
+import representation.Board;
+import representation.BoardBuilder;
+
+/**
+ * Holds a bunch of constants
+ * @author matthewslesinski
+ *
+ */
+public class Constants {
+
+	/** Whether or not the instance of this program is running from eclipse */
+	public static final boolean RUNNING_FROM_ECLIPSE = Boolean.getBoolean("eclipse");
+	
+	public static final PlayerType PLAYER_1_TYPE = PlayerType.getByIdentifier(System.getProperty("player1"));
+	public static final PlayerType PLAYER_2_TYPE = PlayerType.getByIdentifier(System.getProperty("player2"));
+	public static final String PLAYER_1_NAME = System.getProperty("player1Name");
+	public static final String PLAYER_2_NAME = System.getProperty("player2Name");
+	public static final Function<String, BoardBuilder<? extends Board>> BOARD_BUILDER_CONSTRUCTOR = ImmutableArrayBoard.Builder::fromFen;
+
+	
+	/** The newline character in string form */
+	public static final String NEWLINE = "\n";
+	
+	/** The escape character (ESC, not \) in character form */
+	public static final String ESCAPE_CHARACTER = Character.toString((char) 27);
+	
+	/**
+	 * The ansi string to color code the background for dark squares. Ironically, this code colors the background
+	 * what is supposed to be white, but it looks darker.
+	 */
+	public static final String ANSI_DARK_SQUARE = "[47m";
+	
+	/**
+	 * The ansi code to reset the current set of attributes. This can be used to get rid of any previously set
+	 * color codes.
+	 */
+	public static final String ANSI_RESET_ATTRIBUTES = "[0m";
+	
+	/** A space */
+	public static final String SINGLE_SPACE = " ";
+	
+	/** Two spaces */
+	public static final String DOUBLE_SPACE = "  ";
+
+	/** Three spaces */
+	public static final String TRIPLE_SPACE = "   ";
+	
+
+	public static final File KING_START_FILE = File.E;
+	public static final File KINGSIDE_ROOK_START_FILE = File.H;
+	public static final File QUEENSIDE_ROOK_START_FILE = File.A;
+	
+	public static final String STANDARD_START_POSITION = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+	
+	/** The directions a bishop can move */
+	public static final List<Direction> BISHOP_DIRECTIONS = Arrays.asList(Direction.UP_RIGHT, Direction.DOWN_RIGHT, Direction.DOWN_LEFT, Direction.UP_LEFT);
+	
+	/** The directions a rook can move */
+	public static final List<Direction> ROOK_DIRECTIONS = Arrays.asList(Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT);
+	
+	/** The directions a queen can move */
+	public static final List<Direction> QUEEN_DIRECTIONS = UtilityFunctions.concat(BISHOP_DIRECTIONS, ROOK_DIRECTIONS);
+	
+}

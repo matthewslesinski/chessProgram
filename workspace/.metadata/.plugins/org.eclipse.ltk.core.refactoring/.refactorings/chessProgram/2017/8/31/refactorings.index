@@ -4,3 +4,11 @@
 1501630407623	Move compilation unit
 1501722721648	Rename type 'SquareSet'
 1501724360328	Infer generic type arguments
+1501799678911	Rename local variable 'shouldTraverse'
+1501800932491	Rename method 'getPossibleSquaresToThreaten'
+1501855676366	Rename field 'REMOVAL_MESSAGE'
+1501858933673	Rename type 'IsoMorphism'
+1501861190408	Rename type 'ListBackedByMaps'
+1501862052969	Rename type 'Cross'
+1501862411868	Rename type 'ListBackedByMap'
+1501863707069	Infer generic type arguments

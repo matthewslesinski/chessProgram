@@ -1,0 +1,18 @@
+package gamePlaying;
+
+import moves.Move;
+import representation.Board;
+
+public class Human extends Player {
+
+	public Human(String name) {
+		super(name);
+	}
+	
+	@Override
+	public Move getNextInput(Board currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+}

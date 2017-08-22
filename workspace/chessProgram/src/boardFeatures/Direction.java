@@ -7,7 +7,16 @@ import java.util.stream.Collectors;
 
 import support.UtilityFunctions;
 
-
+/**
+ * Directions are used to indicate a relative motion along either a diagonal, file, or rank. If the motion is not along
+ * such a line, then it is represented by NONE. Each {@code Direction} is defined by an increment in the x and y directions.
+ * The increments are all the number of columns/rows over the next square in that direction would be. Furthermore, {@code Direction}s
+ * all have a {@code LineType} that they operate in, though they can't have specific {@code Line}s they're within since they're
+ * relative motion. Exactly two {@code Direction}s will have the same {@code LineType}, and those {@code Direction}s are trivially
+ * the opposite direction from each other. 
+ * @author matthewslesinski
+ *
+ */
 public enum Direction {
 
 	DOWN_LEFT(-1, -1),
@@ -20,12 +29,29 @@ public enum Direction {
 	RIGHT(1, 0),
 	UP_RIGHT(1, 1);
 	
+	/** Holds all the {@code Directions}s that aren't NONE */
+	private static final List<Direction> outwardDirections = calculateOutwardDirections();
+	
+	
+	/** The ordinal of NONE */
 	private static final int CENTER_INDEX = 4;
+	
+	/** The ordinal of the last {@code Direction} in the order listed */
+	private static final int LAST_INDEX = CENTER_INDEX << 1;
+	
+	/** The increment for this direction along the x axis */
 	private final int fileDelta;
+	
+	/** The increment for this direction along the y axis */
 	private final int rankDelta;
+	
+	/** The type of line this direction moves along. This is null for NONE */
 	private final LineType containingLineType;
+	
+	/** Whether this {@code Direction} moves forwards or backwards along the {@code Line}s it can move along */
 	private final Movement movement;
-	private static final List<Direction> outwardDirections = calculateOutwardDirections(); 
+	
+
 	private Direction(int fileDelta, int rankDelta) {
 		this.fileDelta = fileDelta;
 		this.rankDelta = rankDelta;
@@ -38,7 +64,7 @@ public enum Direction {
 	 * @return The opposite {@code Direction}
 	 */
 	public Direction getOppositeDirection() {
-		return values()[CENTER_INDEX - this.ordinal()];
+		return values()[LAST_INDEX - this.ordinal()];
 	}
 	
 	/**
@@ -98,7 +124,7 @@ public enum Direction {
 	 */
 	public static Direction getByDeltas(int fileDelta, int rankDelta) {
 		if (Math.abs(fileDelta) > 1 || Math.abs(rankDelta) > 1) {
-			return null;
+			return Direction.NONE;
 		}
 		return Direction.values()[(fileDelta + 1) * 3 + rankDelta + 1];
 	}

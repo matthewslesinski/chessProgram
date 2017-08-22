@@ -13,9 +13,8 @@ import support.Constants;
 public class Bishop extends LineMover {
 
 	private static final PieceType TYPE = PieceType.BISHOP;
-	private static final int ATTACK_DISTANCE = 14;
 	
-	Bishop(PieceType piece) {
+	Bishop() {
 		super();
 	}
 
@@ -23,12 +22,7 @@ public class Bishop extends LineMover {
 	protected PieceType determinePieceType() {
 		return TYPE;
 	}
-
-	@Override
-	protected int determineMaxAttackDistance() {
-		return ATTACK_DISTANCE;
-	}
-
+	
 	@Override
 	List<Direction> getMovementDirections() {
 		return Constants.BISHOP_DIRECTIONS;

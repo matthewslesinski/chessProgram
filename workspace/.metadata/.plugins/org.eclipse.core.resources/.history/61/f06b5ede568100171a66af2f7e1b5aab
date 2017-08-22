@@ -1,0 +1,60 @@
+package gamePlaying;
+
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import immutableArrayBoard.ImmutableArrayBoard;
+import moves.Move;
+import representation.Board;
+import representation.BoardBuilder;
+import support.Constants;
+
+public class Game<B extends Board> {
+
+	private final List<Board> positions = new LinkedList<>();
+	private final Player player1;
+	private final Player player2;
+	private final Map<Color, Player> colorMapping = new EnumMap<>(Color.class);
+	
+	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<B>> constructor) {
+		this(player1Type, name1, player2Type, name2, constructor, Constants.STANDARD_START_POSITION);
+	}
+	
+	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<B>> constructor, String startPosition) {
+		this.player1 = player1Type.createNew(name1);
+		this.player2 = player2Type.createNew(name2);
+		colorMapping.put(Color.WHITE, player1);
+		colorMapping.put(Color.BLACK, player2);
+		positions.add(constructor.apply(startPosition).build());
+	}
+	
+	private Board getCurrentPosition() {
+		return positions.get(positions.size() - 1);
+	}
+	
+	public Board takeTurn() {
+		Board currentPosition = getCurrentPosition();
+		Player player = colorMapping.get(currentPosition.whoseMove());
+		Move nextMove = player.getNextMove(currentPosition);
+		Board nextPosition = currentPosition.performMove(nextMove);
+		positions.add(nextPosition);
+		return nextPosition;
+	}
+	
+	public void play() {
+		while(true) {
+			if (takeTurn() == null) {
+				break;
+			}
+		}
+		System.exit(0);
+	}
+	
+	public static void main(String[] args) {
+		Game<ImmutableArrayBoard> game = new Game<>(PlayerType.HUMAN, "Matthew", PlayerType.HUMAN, "Luke", ImmutableArrayBoard.Builder::fromFen);
+		game.play();
+	}
+}

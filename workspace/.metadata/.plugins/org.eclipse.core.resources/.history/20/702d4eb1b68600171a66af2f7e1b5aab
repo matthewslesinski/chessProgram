@@ -1,0 +1,30 @@
+package gamePlaying;
+
+import representation.Board;
+
+public class Computer extends Player {
+	
+	private static final String DEFAULT_NAME = "Computer";
+	
+	private static final UserInput DEFAULT_ADDON = new UserInput(InputType.PRINT_BOARD);
+	
+	public Computer() {
+		this(DEFAULT_NAME);
+	}
+	
+	public Computer(String name) {
+		super(name);
+	}
+	
+	@Override
+	public UserInput getNextInput(Board currentPosition) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public UserInput getDefaultAddonInput() {
+		return DEFAULT_ADDON;
+	}
+
+}

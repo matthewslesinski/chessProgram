@@ -1,0 +1,41 @@
+package gamePlaying;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+
+public enum PlayerType {
+
+	HUMAN(Human::new, "human"),
+	COMPUTER(Computer::new, "computer");
+	
+	private static final Map<String, PlayerType> PLAYER_TYPE_MAPPER = new HashMap<>();
+	static {
+		for (PlayerType type : values()) {
+			for (String identifier : type.identifiers) {
+				PLAYER_TYPE_MAPPER.put(identifier, type);
+			}
+		}
+	}
+	
+	private final BiFunction<String, BufferedReader, Player> constructor;
+	private final String[] identifiers;
+	
+	private PlayerType(BiFunction<String, BufferedReader, Player> constructor, String... identifiers) {
+		this.constructor = constructor;
+		this.identifiers = identifiers;
+	}
+	
+	public Player createNew(String name, BufferedReader r) {
+		return constructor.apply(name, r);
+	}
+	
+	public static PlayerType getByIdentifier(String identifier) {
+		return PLAYER_TYPE_MAPPER.getOrDefault(identifier.trim().toLowerCase(), HUMAN);
+	}
+	
+
+}

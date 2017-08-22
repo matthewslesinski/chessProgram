@@ -1,7 +1,6 @@
 package dataStructures;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.EnumMap;
@@ -38,6 +37,7 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 	protected final Class<E> type;
 	private final Map<E, Integer> indicesMap;
 	private final List<E> elements;
+	private final int maxSize;
 	private int size = 0;
 	private final Function<E, E> getPreviousPossibleValue;
 	private final Predicate<E> isPossibleValue;
@@ -51,10 +51,10 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 	 * added to this sequence, so that an unbroken line from start to finish can essentially be created
 	 * @param isPossibleValue A function to determine if the given element could possibly belong in this sequence
 	 */
-	@SuppressWarnings("unchecked")
 	public EnumSequence(Class<E> type, int maxSize, Function<E, E> getPreviousPossibleValue, Predicate<E> isPossibleValue) {
 		this.indicesMap = new EnumMap<E, Integer>(type);
-		this.elements = Arrays.asList((E[]) Array.newInstance(type, maxSize));
+		this.maxSize = maxSize;
+		this.elements = new ArrayList<E>(maxSize);
 		this.getPreviousPossibleValue = getPreviousPossibleValue;
 		this.type = type;
 		this.isPossibleValue = isPossibleValue;
@@ -96,7 +96,7 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 	@Override
 	public boolean add(E e) {
 		// If there's not enough space for this element, something went wrong
-		if (size >= elements.size()) {
+		if (size >= maxSize) {
 			throw new BadArgumentException(e, e.getClass(), "Can't add too many elements to this sequence");
 		}
 		if (!isPossibleValue.test(e)) {
@@ -115,7 +115,7 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 		}
 		
 		// put the current element in its spot in the elements array
-		elements.set(size++, e);
+		elements.add(size++, e);
 
 		return true;
 	}
@@ -234,5 +234,9 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 	public IntFunction<E> getIndexFunction() {
 		return this::getIndex;
 	}
-
+	
+	@Override
+	public String toString() {
+		return toStringImpl(element -> element.toString());
+	}
 }
