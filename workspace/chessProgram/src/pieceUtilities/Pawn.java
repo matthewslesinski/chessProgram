@@ -6,9 +6,9 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.Direction;
 import moveCalculationStructures.SquareSet;
 import moves.Move;
 import moves.MoveType;

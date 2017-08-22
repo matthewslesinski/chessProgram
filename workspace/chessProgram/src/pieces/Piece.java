@@ -3,9 +3,9 @@ package pieces;
 import java.util.Arrays;
 import java.util.List;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.Direction;
 import moveCalculationStructures.SquareSet;
 import moves.Move;
 import moves.ProcessedBoard;

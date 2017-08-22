@@ -6,10 +6,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import boardFeatures.Direction;
-import boardFeatures.File;
 import gamePlaying.PlayerType;
 import immutableArrayBoard.ImmutableArrayBoard;
+import lines.Direction;
+import lines.File;
 import representation.Board;
 import representation.BoardBuilder;
 

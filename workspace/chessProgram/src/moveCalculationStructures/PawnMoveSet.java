@@ -2,9 +2,9 @@ package moveCalculationStructures;
 
 import java.util.Collection;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.Direction;
 
 /**
  * This is an extension of {@code SquareSet}s that alters the way that directions are calculated between {@code Square}s.

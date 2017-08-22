@@ -8,10 +8,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
-import dataStructures.Cluster;
-import dataStructures.ListBackedByMaps;
+import independentDataStructures.Cluster;
+import independentDataStructures.ListBackedByMaps;
+import lines.Direction;
 import pieces.Piece;
 
 public class OutwardLinePortions implements Cluster<Square> {

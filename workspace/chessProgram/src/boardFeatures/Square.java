@@ -9,6 +9,11 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import gamePlaying.Color;
+import lines.Direction;
+import lines.DownRightDiagonal;
+import lines.File;
+import lines.Rank;
+import lines.UpRightDiagonal;
 import moveCalculationStructures.KingMoveSet;
 import moveCalculationStructures.SquareSet;
 import pieces.Piece;

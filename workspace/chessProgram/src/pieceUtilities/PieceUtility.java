@@ -11,11 +11,11 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import boardFeatures.Direction;
-import boardFeatures.Line;
 import boardFeatures.Square;
-import dataStructures.ListBackedByMaps;
 import gamePlaying.Color;
+import independentDataStructures.ListBackedByMaps;
+import lines.Direction;
+import lines.Line;
 import moveCalculationStructures.SquareSet;
 import moves.BasicMove;
 import moves.Move;

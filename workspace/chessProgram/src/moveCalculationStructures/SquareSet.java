@@ -10,11 +10,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
 
-import boardFeatures.Direction;
-import boardFeatures.Line;
-import boardFeatures.LineType;
 import boardFeatures.Square;
-import dataStructures.Cluster;
+import independentDataStructures.Cluster;
+import lines.Direction;
+import lines.Line;
+import lines.LineType;
 import support.UtilityFunctions;
 
 /**

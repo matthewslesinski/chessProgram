@@ -14,10 +14,10 @@ import java.util.function.Predicate;
 import java.util.function.Supplier;
 
 import boardFeatures.Square;
-import dataStructures.AttackStructure;
-import dataStructures.BreadthFirstTraversal;
-import dataStructures.Cluster;
-import dataStructures.EnumSequence;
+import independentDataStructures.AttackStructure;
+import independentDataStructures.BreadthFirstTraversal;
+import independentDataStructures.Cluster;
+import independentDataStructures.EnumSequence;
 import support.BadArgumentException;
 import support.UtilityFunctions;
 

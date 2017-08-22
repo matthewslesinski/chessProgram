@@ -4,12 +4,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.State;
+import lines.File;
 import moves.Move;
 import pieces.Piece;
-import support.BoardStringifier;
+import stringTranslators.BoardStringifier;
 
 /**
  * Instances of this class represent a board position at a given point in time. As opposed to {@code State},

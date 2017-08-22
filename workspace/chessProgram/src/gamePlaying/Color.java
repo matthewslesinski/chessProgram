@@ -1,8 +1,8 @@
 package gamePlaying;
 
-import boardFeatures.Direction;
-import boardFeatures.Rank;
 import boardFeatures.Square;
+import lines.Direction;
+import lines.Rank;
 
 /**
  * Holds a representation of the two possible colors in a game, white and black. 

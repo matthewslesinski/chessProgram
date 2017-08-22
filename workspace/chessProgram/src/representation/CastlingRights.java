@@ -4,11 +4,11 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
-import boardFeatures.File;
-import boardFeatures.Rank;
 import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.File;
+import lines.Rank;
 import support.Constants;
 
 /**

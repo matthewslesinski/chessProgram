@@ -2,7 +2,7 @@ package pieceUtilities;
 
 import java.util.List;
 
-import boardFeatures.Direction;
+import lines.Direction;
 import pieces.PieceType;
 import support.Constants;
 

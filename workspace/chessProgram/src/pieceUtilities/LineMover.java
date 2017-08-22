@@ -7,8 +7,8 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import boardFeatures.Direction;
 import boardFeatures.Square;
+import lines.Direction;
 import moveCalculationStructures.OutwardLinePortions;
 import moves.ProcessedBoard;
 import pieces.Piece;

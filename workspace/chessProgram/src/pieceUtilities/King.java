@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.function.BiPredicate;
 import java.util.stream.Collectors;
 
-import boardFeatures.Direction;
 import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.Direction;
 import moveCalculationStructures.KingMoveSet;
 import moveCalculationStructures.SquareSet;
 import moves.MoveType;

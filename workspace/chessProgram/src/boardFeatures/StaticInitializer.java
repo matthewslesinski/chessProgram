@@ -3,6 +3,12 @@ package boardFeatures;
 import java.util.LinkedList;
 import java.util.List;
 
+import lines.DownRightDiagonal;
+import lines.File;
+import lines.LineType;
+import lines.Rank;
+import lines.UpRightDiagonal;
+
 /**
  * Used to control the initialization order of the various classes in this package, since there are various circular dependencies
  * @author matthewslesinski

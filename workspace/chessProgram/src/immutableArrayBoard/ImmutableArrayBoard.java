@@ -4,9 +4,9 @@ package immutableArrayBoard;
 import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
-import boardFeatures.File;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.File;
 import moves.BasicMove;
 import moves.Move;
 import pieces.Piece;

@@ -1,5 +1,6 @@
 package boardFeatures;
 
+import lines.File;
 import support.Constants;
 
 /**

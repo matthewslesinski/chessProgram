@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import moves.Move;
 import representation.Board;
+import stringTranslators.MoveParser;
 import support.Constants;
-import support.MoveParser;
 
 /**
  * A utility class used to define the methods used to perform the actions a player intends whenever they give some input. Ideally,
