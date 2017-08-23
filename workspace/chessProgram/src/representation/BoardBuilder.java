@@ -62,6 +62,8 @@ public abstract class BoardBuilder<B extends Board> {
 	 */
 	public abstract BoardBuilder<B> withEnPassant(File file);
 
+	public abstract BoardBuilder<B> withFiftyMoveRuleCount(int count);
+	
 	/**
 	 * Sets the move made to reach this board to the given move
 	 * @param move The last move

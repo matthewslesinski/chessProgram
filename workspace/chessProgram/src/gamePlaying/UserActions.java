@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import moves.Move;
 import representation.Board;
+import stringTranslators.FENStringWriter;
 import stringTranslators.MoveParser;
 import support.Constants;
 
@@ -77,8 +78,10 @@ public class UserActions {
 	}
 	
 	public static String getFEN(String[] args, Game game) {
-		// TODO
-		return null;
+		Board currentPosition = game.getCurrentPosition();
+		int moveNumber = (game.getPlyNumber() + 1) / 2;
+		FENStringWriter writer = new FENStringWriter(currentPosition, moveNumber);
+		return writer.makeFEN();
 	}
 	
 	/**

@@ -33,8 +33,6 @@ public abstract class MoveMaker<B extends Board> {
 			return null;
 		}
 		BoardBuilder<B> builder = getNewBuilderFromBoard(board);
-		// reset the en passant permissions
-		builder.withEnPassant(null);
 		Color movingColor = move.getMovingColor();
 		switch (move.getMovingPiece()) {
 		case PAWN:
@@ -70,6 +68,9 @@ public abstract class MoveMaker<B extends Board> {
 		default:
 			// perform the move
 			switchSquares(builder, move);
+			if (!move.isCapture()) {
+				builder.withFiftyMoveRuleCount(board.pliesSinceLastIrreversibleChange() + 1);
+			}
 			break;
 		}
 		// If we're capturing a rook, we need to get rid of the castling rights involving that rook. Although it may seem that this is

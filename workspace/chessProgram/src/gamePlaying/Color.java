@@ -97,6 +97,10 @@ public enum Color {
 		return value ? Square.E1 : Square.E8;
 	}
 	
+	public String adjustCapitalization(String string) {
+		return value ? string.toUpperCase() : string.toLowerCase();
+	}
+	
 	/**
 	 * returns the {@code Color} enum when given a boolean for if it should be white
 	 * @param isWhite If the {@code Color} should be the white or black color

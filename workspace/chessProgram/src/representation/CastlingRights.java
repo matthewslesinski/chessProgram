@@ -18,10 +18,10 @@ import support.Constants;
  */
 public enum CastlingRights {
 	
-	WHITE_KINGSIDE(Color.WHITE, Side.KINGSIDE),
-	WHITE_QUEENSIDE(Color.WHITE, Side.QUEENSIDE),
-	BLACK_KINGSIDE(Color.BLACK, Side.KINGSIDE),
-	BLACK_QUEENSIDE(Color.BLACK, Side.QUEENSIDE);
+	WHITE_KINGSIDE(Color.WHITE, Side.KINGSIDE, 'K'),
+	WHITE_QUEENSIDE(Color.WHITE, Side.QUEENSIDE, 'Q'),
+	BLACK_KINGSIDE(Color.BLACK, Side.KINGSIDE, 'k'),
+	BLACK_QUEENSIDE(Color.BLACK, Side.QUEENSIDE, 'q');
 	
 	/** Each way of castling can only be done by one {@code Color} */
 	private final Color color;
@@ -50,8 +50,10 @@ public enum CastlingRights {
 	/** Queenside castling has an extra {@code Square} in the middle, the one on the b file, that can't have a piece on it */
 	private final Square extraIntermediarySquare;
 	
+	private final char readableForm;
 	
-	private CastlingRights(Color color, Side side) {
+	
+	private CastlingRights(Color color, Side side, char readableForm) {
 		this.color = color;
 		this.side = side;
 		this.rank = color.isWhite() ? Rank.ONE : Rank.EIGHT;
@@ -61,6 +63,7 @@ public enum CastlingRights {
 		this.targetKingSquare = Square.getByFileAndRank(side.isKingside() ? File.G : File.C, rank);
 		this.targetRookSquare = Square.getByFileAndRank(side.isKingside() ? File.F : File.D, rank);
 		this.extraIntermediarySquare = side.isKingside() ? null : Square.getByFileAndRank(File.B, rank);
+		this.readableForm = readableForm;
 	}
 	
 	/**
@@ -69,6 +72,10 @@ public enum CastlingRights {
 	 */
 	public int getIndex() {
 		return this.ordinal();
+	}
+	
+	public char getReadableForm() {
+		return readableForm;
 	}
 	
 	/**
@@ -178,5 +185,25 @@ public enum CastlingRights {
 			return Collections.singleton(relevantRight);
 		}
 		return Collections.emptyList();
+	}
+	
+	public static CastlingRights getByCharacter(char character) {
+		switch (character) {
+		case 'K':
+			return WHITE_KINGSIDE;
+		case 'Q':
+			return WHITE_QUEENSIDE;
+		case 'k':
+			return BLACK_KINGSIDE;
+		case 'q':
+			return BLACK_QUEENSIDE;
+		default:
+			return null;
+		}
+	}
+	
+	@Override
+	public String toString() {
+		return Character.toString(readableForm);
 	}
 }

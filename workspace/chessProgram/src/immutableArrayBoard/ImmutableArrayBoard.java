@@ -56,7 +56,11 @@ public class ImmutableArrayBoard extends Board {
 	private static final int FOUR_ONES = 0b1111;
 	
 	/** A bit mask that only has a one in the same bit as the one used to keep track of if the king is in check */
-	private static final int CHECK_MASK = 0x200;
+	private static final int CHECK_MASK = 0x10000;
+	
+	private static final int FIFTY_MOVE_RULE_MASK = 0xFE00;
+	
+	private static final int FIFTY_MOVE_RULE_INDEX = 9;
 	
 	/**
 	 * The array containing the pieces and other board information, and so the actual internal representation of this {@code Board}.
@@ -89,7 +93,7 @@ public class ImmutableArrayBoard extends Board {
 
 	@Override
 	public Color whoseMove() {
-		return Color.getColor((board[RIGHTS_INDEX] & COLOR_MASK) != 0);
+		return Color.getColor((board[RIGHTS_INDEX] & COLOR_MASK) == 0);
 	}
 	
 	@Override
@@ -102,6 +106,11 @@ public class ImmutableArrayBoard extends Board {
 		int relevantInfo = board[RIGHTS_INDEX] >>> EN_PASSANT_INDEX;
 		return (relevantInfo & EN_PASSANT_PERMISSION_MASK) != 0 ?
 				File.getByIndex(relevantInfo & 0b111) : null;
+	}
+	
+	@Override
+	public int pliesSinceLastIrreversibleChange() {
+		return (board[RIGHTS_INDEX] & FIFTY_MOVE_RULE_MASK) >>> FIFTY_MOVE_RULE_INDEX;
 	}
 	
 	@Override
@@ -161,7 +170,7 @@ public class ImmutableArrayBoard extends Board {
 		public static Builder fromBoard(int[] board) {
 			Builder builder = new Builder();
 			builder.board = board.clone();
-			builder.setRightsByBitMask(CHECK_MASK, false);
+			builder.board[RIGHTS_INDEX] = (FOUR_ONES << FIRST_CASTLING_RIGHT_BIT) & board[RIGHTS_INDEX];
 			return builder;
 		}
 		
@@ -201,7 +210,7 @@ public class ImmutableArrayBoard extends Board {
 		
 		@Override
 		public Builder withColorToMove(Color color) {
-			setRightsByBitMask(COLOR_MASK, color.isWhite());
+			setRightsByBitMask(COLOR_MASK, !color.isWhite());
 			return this;
 		}
 		
@@ -224,6 +233,13 @@ public class ImmutableArrayBoard extends Board {
 					file != null);
 			return this;
 		}
+		
+		@Override
+		public Builder withFiftyMoveRuleCount(int count) {
+			setRightsByBitMask(FIFTY_MOVE_RULE_MASK & (count << FIFTY_MOVE_RULE_INDEX), true);
+			return this;
+		}
+
 		
 		@Override
 		public Builder withLastMove(Move move) {

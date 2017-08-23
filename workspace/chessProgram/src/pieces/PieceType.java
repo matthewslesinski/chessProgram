@@ -19,15 +19,16 @@ import pieceUtilities.Rook;
  */
 public enum PieceType {
 
-	PAWN("pawn", "", Pawn::new),
-	KNIGHT("knight", "N", color -> new Knight()),
-	BISHOP("bishop", "B", color -> new Bishop()),
-	ROOK("rook", "R", color -> new Rook()),
-	QUEEN("queen", "Q", color -> new Queen()),
-	KING("king", "K", King::new);
+	PAWN("pawn", "", "p", Pawn::new),
+	KNIGHT("knight", "N", "n", color -> new Knight()),
+	BISHOP("bishop", "B", "b", color -> new Bishop()),
+	ROOK("rook", "R", "r", color -> new Rook()),
+	QUEEN("queen", "Q", "q", color -> new Queen()),
+	KING("king", "K", "k", King::new);
 	
 	private final String readableForm;
 	private final String moveLetter;
+	private final String pieceLetter;
 	private final static PieceType[] PROMOTION_PIECES = {KNIGHT, BISHOP, ROOK, QUEEN};
 	private final static PieceType[] LINE_MOVERS = {BISHOP, ROOK, QUEEN};
 	private final static PieceType[] NON_KNIGHTS = {PAWN, BISHOP, ROOK, QUEEN, KING};
@@ -42,14 +43,16 @@ public enum PieceType {
 	 * Describes a particular type of piece.
 	 * @param readableForm How to describe this piece type in plain english
 	 * @param moveLetter The letter used to represent this piece
+	 * @param pieceLetter The letter used to abbreviate this piece type
 	 * @param constructor A constructor for the utility class for this type of piece. A constructor
 	 * is an argument here because the utility class can't be instantiated earlier, since its constructor
 	 * takes this {@code PieceType} as an argument.
 	 */
-	private PieceType(String readableForm, String moveLetter, Function<Color, PieceUtility> constructor) {
+	private PieceType(String readableForm, String moveLetter, String pieceLetter, Function<Color, PieceUtility> constructor) {
 		this.readableForm = readableForm;
 		this.utilityInstanceConstructor = constructor;
 		this.moveLetter = moveLetter;
+		this.pieceLetter = pieceLetter;
 	}
 	
 	
@@ -68,7 +71,7 @@ public enum PieceType {
 	 * @return The piece type corresponding to the input letter.
 	 */
 	public static PieceType getByLetter(String letter) {
-		switch (letter) {
+		switch (letter.toUpperCase()) {
 		case "":  // Alternate for a pawn 
 		case "P": return PieceType.PAWN;
 		case "N": return PieceType.KNIGHT;
@@ -142,6 +145,14 @@ public enum PieceType {
 	 */
 	public String getName() {
 		return this.readableForm;
+	}
+	
+	/**
+	 * Gets the letter that this piece type commonly gets abbreviated to
+	 * @return The letter
+	 */
+	public String getAbbreviationLetter() {
+		return pieceLetter;
 	}
 	
 	@Override

@@ -171,6 +171,10 @@ public enum Piece {
 		return getUtilityInstance().getLegalMoves(square, board);
 	}
 	
+	public String toFENCharacter() {
+		return this.color.adjustCapitalization(this.type.getAbbreviationLetter());
+	}
+	
 	@Override
 	public String toString() {
 		return this.stringPicture;

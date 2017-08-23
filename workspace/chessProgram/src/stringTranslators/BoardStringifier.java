@@ -107,6 +107,13 @@ public class BoardStringifier<B extends Board> {
 		if (last != null) {
 			builder.append(LAST_MOVE_TEXT);
 			builder.append(last.getMoveAsString(true, true));
+			if (board.isInCheck()) {
+				if (board.isOver()) {
+					builder.append(Constants.CHECKMATE_SYMBOL);
+				} else {
+					builder.append(Constants.CHECK_SYMBOL);
+				}
+			}
 			builder.append(Constants.NEWLINE);
 		}
 	}

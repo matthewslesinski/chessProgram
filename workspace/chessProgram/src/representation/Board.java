@@ -59,6 +59,12 @@ public abstract class Board implements State {
 	 * @return The destination {@code File} for the pawn
 	 */
 	public abstract File enPassantCaptureFile();
+	
+	/**
+	 * Returns the number of plies since the last move that involved either a pawn move or a capture
+	 * @return The number of plies
+	 */
+	public abstract int pliesSinceLastIrreversibleChange();
 
 	/**
 	 * Returns a {@code Piece[]} that describes the arrangement of the pieces on this board
