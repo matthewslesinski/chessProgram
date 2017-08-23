@@ -400,6 +400,4 @@ public enum Square {
 	public String toString() {
 		return file.getHumanReadableForm() + rank.getHumanReadableForm();
 	}
-	
-	
 }

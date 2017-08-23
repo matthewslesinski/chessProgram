@@ -71,6 +71,18 @@ public class Constants {
 	/** Three spaces */
 	public static final String TRIPLE_SPACE = "   ";
 	
+	/** A dash */
+	public static final String DASH = "-";
+	
+	/** A slash */
+	public static final String SLASH = "/";
+	
+	/** The symbol for check */
+	public static final String CHECK_SYMBOL = "+";
+	
+	/** The symbol for checkmate */
+	public static final String CHECKMATE_SYMBOL = "#";
+	
 	/** The {@code File} the king starts on */
 	public static final File KING_START_FILE = File.E;
 

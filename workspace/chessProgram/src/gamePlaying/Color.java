@@ -98,6 +98,15 @@ public enum Color {
 	}
 	
 	/**
+	 * Makes a string uppercase if this is WHITE, or lowercase if this is BLACK
+	 * @param string The string to adjust
+	 * @return The uppercase or lowercase version of the string
+	 */
+	public String adjustCapitalization(String string) {
+		return value ? string.toUpperCase() : string.toLowerCase();
+	}
+	
+	/**
 	 * returns the {@code Color} enum when given a boolean for if it should be white
 	 * @param isWhite If the {@code Color} should be the white or black color
 	 * @return 

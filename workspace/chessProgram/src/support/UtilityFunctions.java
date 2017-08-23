@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -101,6 +102,16 @@ public class UtilityFunctions {
 	}
 	
 	/**
+	 * Binds an argument to an action, like the function above, except for a different type of action
+	 * @param action The action to bind
+	 * @param arg1 The argument to bind to that action
+	 * @return The resulting action, which doesn't take any arguments
+	 */
+	public static <T> Runnable bind(Consumer<T> action, T arg1) {
+		return () -> action.accept(arg1);
+	}
+	
+	/**
 	 * Sorts two elements naively, since there's only two so the complications of logarithmic sort are unnecessary
 	 * @param list The list to sort
 	 * @param comparator A comparator for sorting
@@ -164,5 +175,23 @@ public class UtilityFunctions {
 	 */
 	public static boolean isEmpty(String string) {
 		return string == null || string.equals("");
+	}
+	
+	/**
+	 * Performs some action on each of the items, as well as some intermediate action in between each action
+	 * @param items The items to perform the actions on
+	 * @param action The main action to perform
+	 * @param joiner The action to perform in between each main action
+	 */
+	public static <T> void joinActions(Iterable<Runnable> actions, Runnable joiner) {
+		Iterator<Runnable> iterator = actions.iterator();
+		if (!iterator.hasNext()) {
+			return;
+		}
+		iterator.next().run();
+		iterator.forEachRemaining(action -> {
+			joiner.run();
+			action.run();
+		});
 	}
 }
