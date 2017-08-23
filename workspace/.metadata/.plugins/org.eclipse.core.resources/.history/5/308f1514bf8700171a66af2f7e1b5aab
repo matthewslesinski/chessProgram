@@ -97,11 +97,6 @@ public enum Color {
 		return value ? Square.E1 : Square.E8;
 	}
 	
-	/**
-	 * Makes a string uppercase if this is WHITE, or lowercase if this is BLACK
-	 * @param string The string to adjust
-	 * @return The uppercase or lowercase version of the string
-	 */
 	public String adjustCapitalization(String string) {
 		return value ? string.toUpperCase() : string.toLowerCase();
 	}

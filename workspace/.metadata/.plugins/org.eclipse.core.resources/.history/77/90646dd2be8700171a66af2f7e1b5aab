@@ -171,10 +171,6 @@ public enum Piece {
 		return getUtilityInstance().getLegalMoves(square, board);
 	}
 	
-	/**
-	 * Turns this piece into the character that represents it in a FEN string
-	 * @return The representation for the FEN string
-	 */
 	public String toFENCharacter() {
 		return this.color.adjustCapitalization(this.type.getAbbreviationLetter());
 	}

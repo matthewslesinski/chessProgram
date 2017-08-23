@@ -62,11 +62,6 @@ public abstract class BoardBuilder<B extends Board> {
 	 */
 	public abstract BoardBuilder<B> withEnPassant(File file);
 
-	/**
-	 * Builds the board with the specified count towards the fifty move rule
-	 * @param count The count
-	 * @return The builder, with the recorded count
-	 */
 	public abstract BoardBuilder<B> withFiftyMoveRuleCount(int count);
 	
 	/**

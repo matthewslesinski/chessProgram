@@ -61,7 +61,7 @@ public class ImmutableArrayBoard extends Board {
 	/** The mask covering only the bits used for the fifty move rule count */
 	private static final int FIFTY_MOVE_RULE_MASK = 0xFE00;
 	
-	/** The index for the fifty move rule count is kept */
+	/** The index for the fifty move rule count is kept
 	private static final int FIFTY_MOVE_RULE_INDEX = 9;
 	
 	/**
