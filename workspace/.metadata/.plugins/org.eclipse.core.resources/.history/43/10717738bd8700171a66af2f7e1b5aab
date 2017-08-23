@@ -101,12 +101,6 @@ public class UtilityFunctions {
 		return otherArgument -> originalFunction.apply(defaultArgument, otherArgument);
 	}
 	
-	/**
-	 * Binds an argument to an action, like the function above, except for a different type of action
-	 * @param action The action to bind
-	 * @param arg1 The argument to bind to that action
-	 * @return The resulting action, which doesn't take any arguments
-	 */
 	public static <T> Runnable bind(Consumer<T> action, T arg1) {
 		return () -> action.accept(arg1);
 	}

@@ -108,11 +108,6 @@ public class FENStringWriter {
 		builder.append(board.whoseMove().toString().charAt(0));
 	}
 	
-	/**
-	 * Adds the castling rights that are allowed, or a dash if none
-	 * @param board The board
-	 * @param builder The builder, to add material to
-	 */
 	private static void addCastlingRights(Board board, StringBuilder builder) {
 		boolean addedCastleRight = false;
 		for (CastlingRights right : CastlingRights.values()) {
@@ -123,13 +118,6 @@ public class FENStringWriter {
 		}
 	}
 	
-	/**
-	 * Adds the castling right if it's was taken away in the past
-	 * @param board The board being written
-	 * @param builder The string builder containing all the input
-	 * @param right The castling right
-	 * @return When or not it's allowed
-	 */
 	private static boolean addCastlingRight(Board board, StringBuilder builder, CastlingRights right) {
 		boolean canCastle = board.canCastle(right);
 		if (canCastle) {
@@ -138,11 +126,6 @@ public class FENStringWriter {
 		return canCastle;
 	}
 	
-	/**
-	 * Adds the rights allowed by en passant
-	 * @param board The board
-	 * @param builder The builder for the string to pass back to the user
-	 */
 	private static void addEnPassantRights(Board board, StringBuilder builder) {
 		File enPassantFile = board.enPassantCaptureFile();
 		if (enPassantFile != null) {
@@ -152,28 +135,14 @@ public class FENStringWriter {
 		}
 	}
 	
-	/**
-	 * Adds the number of plies that have gone without a pawn move/capture
-	 * @param board The board
-	 * @param builder The builder to add it to
-	 */
 	private static void addPliesSinceChange(Board board, StringBuilder builder) {
 		builder.append(String.valueOf(board.pliesSinceLastIrreversibleChange()));
 	}
 	
-	/**
-	 * Adds the number of moves since the start
-	 * @param writer The writer to record that
-	 */
 	private static void addMoveNumber(FENStringWriter writer) {
 		writer.builder.append(String.valueOf(writer.moveNumber));
 	}
 	
-	/**
-	 * Turns a function of two arguments into a function of one argument
-	 * @param originalAction The original action
-	 * @return The modified version
-	 */
 	private static Consumer<FENStringWriter> expand(BiConsumer<Board, StringBuilder> originalAction) {
 		return writer -> originalAction.accept(writer.board, writer.builder);
 	}
