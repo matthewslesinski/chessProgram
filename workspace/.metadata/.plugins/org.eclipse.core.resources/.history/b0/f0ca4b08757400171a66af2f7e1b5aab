@@ -1,7 +1,0 @@
-package dataStructures;
-
-import java.util.Collection;
-
-public interface UnmodifiableWrappedCollection<E> extends Collection<E> {
-
-}

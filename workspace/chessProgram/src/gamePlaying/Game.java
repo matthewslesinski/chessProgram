@@ -10,6 +10,7 @@ import java.util.function.Function;
 import representation.Board;
 import representation.BoardBuilder;
 import support.Constants;
+import support.Constructors;
 
 /**
  * Comprises a complete game
@@ -35,7 +36,7 @@ public class Game {
 	
 	/** Builds the {@code Game} using constants passed as System properties */
 	public Game() {
-		this(Constants.PLAYER_1_TYPE, Constants.PLAYER_1_NAME, Constants.PLAYER_2_TYPE, Constants.PLAYER_2_NAME, Constants.BOARD_BUILDER_CONSTRUCTOR);
+		this(Constants.PLAYER_1_TYPE, Constants.PLAYER_1_NAME, Constants.PLAYER_2_TYPE, Constants.PLAYER_2_NAME, Constructors.BOARD_BUILDER_CONSTRUCTOR);
 	}
 	
 	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor) {

@@ -1,5 +1,0 @@
-package convenienceDataStructures;
-
-public interface UnmodifiableWrappedMap<E> extends UnmodifiableWrappedCollection<E> {
-
-}

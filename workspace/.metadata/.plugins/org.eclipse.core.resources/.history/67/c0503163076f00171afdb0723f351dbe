@@ -1,6 +1,0 @@
-package support;
-
-public class Constants {
-
-	public static final boolean RUNNING_FROM_ECLIPSE = Boolean.getBoolean("eclipse");
-}

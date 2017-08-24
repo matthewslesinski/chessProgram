@@ -64,10 +64,13 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	private final Square kingSquare;
 	
 	/** For each {@code Square} around the king, this holds the {@code Square}s of the pieces attacking it */
-	private final Map<Square, Set<Square>> safeSquaresAroundKing = new EnumMap<>(Square.class);
+	private final Map<Square, Set<Square>> attackedSquaresAroundKing = new EnumMap<>(Square.class);
 	
 	/** For each {@code Square} with a {@code Piece} that is pinned, this holds the {@code Direction} from that {@code Square} to the attacking {@code Piece}'s {@code Square} */
 	private final Map<Square, Direction> pins = new EnumMap<>(Square.class);
+	
+	/** This holds the {@code Square}s the king can safely move to. It is lazily instantiated */
+	private Set<Square> safeKingDestinations = null;
 	
 	
 	/**
@@ -277,9 +280,9 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		for (Square knightSquare : piecesToSquares.get(opposingKnight)) {
 			coveredAttackers.add(knightSquare);
 			for (Square attackedSquare : kingMoves.getAttackedSquares(knightSquare, this::getPieceAtSquare)) {
-				Set<Square> attackers = safeSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
+				Set<Square> attackers = attackedSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
 				attackers.add(knightSquare);
-				safeSquaresAroundKing.putIfAbsent(attackedSquare, attackers);
+				attackedSquaresAroundKing.putIfAbsent(attackedSquare, attackers);
 			}
 		}
 	}
@@ -323,8 +326,8 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 					if (attackedSquare == potentiallyAttackedSquare) {
 						squareIsAttacked = true;
 					}
-					Set<Square> attackersOfSquare = safeSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
-					safeSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
+					Set<Square> attackersOfSquare = attackedSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
+					attackedSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
 					attackersOfSquare.add(neighbor);
 				}
 				if (squareIsAttacked) {
@@ -364,8 +367,8 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 */
 	private void recordThreat(Square threat, Set<Square> coveredAttackers) {
 		if (!coveredAttackers.contains(threat) && canAttackKing(threat)) {
-			Set<Square> kingAttackers = safeSquaresAroundKing.getOrDefault(kingSquare, EnumSet.noneOf(Square.class));
-			safeSquaresAroundKing.putIfAbsent(kingSquare, kingAttackers);
+			Set<Square> kingAttackers = attackedSquaresAroundKing.getOrDefault(kingSquare, EnumSet.noneOf(Square.class));
+			attackedSquaresAroundKing.putIfAbsent(kingSquare, kingAttackers);
 			kingAttackers.add(threat);
 		}
 	}
@@ -402,7 +405,7 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		// Calculate
 		calculateKnightAttacks(kingMoves, coveredAttackers);
 		for (Square square : kingMoves) {
-			if (safeSquaresAroundKing.get(square) == null) {
+			if (attackedSquaresAroundKing.get(square) == null) {
 				calculateSquareAttackers(square, kingMoves, coveredAttackers, squareToIgnore);
 			}
 		}
@@ -413,14 +416,17 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	
 	@Override
 	public Set<Square> whoIsAttackingTheKing() {
-		return safeSquaresAroundKing.getOrDefault(kingSquare, Collections.emptySet());
+		return attackedSquaresAroundKing.getOrDefault(kingSquare, Collections.emptySet());
 	}
 
 	@Override
 	public Set<Square> getSafeKingDestinations() {
-		return kingSquare.getKingMoves(toMove).stream()
-				.filter(square -> safeSquaresAroundKing.get(square) == null)
+		if (safeKingDestinations == null) {
+			safeKingDestinations = kingSquare.getKingMoves(toMove).stream()
+				.filter(square -> attackedSquaresAroundKing.get(square) == null)
 				.collect(Collectors.toCollection(() -> EnumSet.noneOf(Square.class)));
+		}
+		return safeKingDestinations;
 	}
 
 	

@@ -4,14 +4,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import gamePlaying.PlayerType;
-import immutableArrayBoard.ImmutableArrayBoard;
 import lines.Direction;
 import lines.File;
-import representation.Board;
-import representation.BoardBuilder;
 
 /**
  * Holds a bunch of constants
@@ -37,9 +33,6 @@ public class Constants {
 	
 	/** The name to use for the second player */
 	public static final String PLAYER_2_NAME = System.getProperty("player2Name");
-	
-	/** The constructor to use to create boards. This in the end determines the class used to represent the board */
-	public static final Function<String, BoardBuilder<? extends Board>> BOARD_BUILDER_CONSTRUCTOR = ImmutableArrayBoard.Builder::fromFen;
 	
 	/** A buffered reader used to read from System.in. This must be closed on exit (such as in UserActions.java) */
 	public static final BufferedReader INPUT_READER = new BufferedReader(new InputStreamReader(System.in));

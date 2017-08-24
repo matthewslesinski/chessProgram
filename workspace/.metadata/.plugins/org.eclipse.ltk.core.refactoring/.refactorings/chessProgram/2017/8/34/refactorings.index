@@ -14,3 +14,5 @@
 1503434648375	Rename package 'dataStructures'
 1503434739104	Move compilation units
 1503450731552	Rename method 'bind'
+1503539120760	Rename method 'MOVE_CONSTRUCTOR'
+1503540033840	Rename field 'safeSquaresAroundKing'
