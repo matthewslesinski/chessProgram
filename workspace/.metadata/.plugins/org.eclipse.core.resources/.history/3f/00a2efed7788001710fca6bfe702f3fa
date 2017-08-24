@@ -1,14 +1,17 @@
 package moves;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import boardFeatures.Square;
+import gamePlaying.Color;
 import independentDataStructures.EnumSequence;
 import independentDataStructures.FixedOrderingSet;
 import lines.Direction;
@@ -20,6 +23,7 @@ import moveCalculationStructures.KingMoveSet;
 import pieces.Piece;
 import pieces.PieceType;
 import representation.Board;
+import representation.CastlingRights;
 import support.BadArgumentException;
 
 /**
@@ -57,6 +61,7 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 	private Map<Line, FixedOrderingSet<Square>> retrievePreProcessingForType(LineType type) {
 		return preProcessedLines.get(type);
 	}
+	
 	
 	/**
 	 * Initializes all list in the appropriate array, using the index of the array that each list will be in
@@ -173,8 +178,17 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 		return square;
 	}
 	
-	@Override
-	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves, Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
+	/**
+	 * Given a square around the king, this method finds a threat from any direction, by determining the nearest piece in that direction and determining if it's
+	 * threatening, and for each of that threatening piece's threats near the king, the threatened square near the king records that threatening square as an attacker.
+	 * Once the currently inspected square has been attacked, this method returns, since we only care if the square's attacked at least once.
+	 * @param potentiallyAttackedSquare The square to inspect
+	 * @param kingMoves The set of squares around the king, in a structure that provides utility methods for finding just the squares in the set that are threatened
+	 * by a particular piece
+	 * @param coveredAttackers All the threats that have already been discovered and don't need to be looked at again
+	 * @param squaresToIgnore Squares to not consider as blocking to threats along a line possibly containing those squares
+	 */
+	private void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves, Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
 		boolean squareIsAttacked = false;
 		for (Direction dir : Direction.getOutwardDirections()) {
 			Square neighbor = getNextSquareWithPiece(potentiallyAttackedSquare, dir, squaresToIgnore);
@@ -221,8 +235,11 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 		}
 	}
 	
-	@Override
-	protected void calculateKingAttackers(Set<Square> coveredAttackers) {
+	/**
+	 * Finds the rest of the attackers not yet discovered who attack the king, and also records pins
+	 * @param coveredAttackers Attackers that have already been discovered
+	 */
+	private void calculateKingAttackers(Set<Square> coveredAttackers) {
 		for (Direction dir : Direction.getOutwardDirections()) {
 			Square neighbor = getNextSquareWithPiece(kingSquare, dir);
 			if (neighbor == null) {
@@ -237,6 +254,26 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 				}
 			}
 		}
+	}
+	
+	@Override
+	public void calculateKingSafety() {
+		// Set up
+		KingMoveSet kingMoves = kingSquare.getKingMoves(toMove);
+		Piece king = getPieceAtSquare(kingSquare);
+		pieces.put(kingSquare, Piece.NONE);
+		Set<Square> squareToIgnore = Collections.singleton(kingSquare);
+		Set<Square> coveredAttackers = EnumSet.noneOf(Square.class);
+		// Calculate
+		calculateKnightAttacks(kingMoves, coveredAttackers);
+		for (Square square : kingMoves) {
+			if (attackedSquaresAroundKing.get(square) == null) {
+				calculateSquareAttackers(square, kingMoves, coveredAttackers, squareToIgnore);
+			}
+		}
+		calculateKingAttackers(coveredAttackers);
+		// reset the board
+		pieces.put(kingSquare, king);
 	}
 	
 	@Override

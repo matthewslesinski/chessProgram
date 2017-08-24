@@ -173,6 +173,16 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 		return square;
 	}
 	
+	/**
+	 * Given a square around the king, this method finds a threat from any direction, by determining the nearest piece in that direction and determining if it's
+	 * threatening, and for each of that threatening piece's threats near the king, the threatened square near the king records that threatening square as an attacker.
+	 * Once the currently inspected square has been attacked, this method returns, since we only care if the square's attacked at least once.
+	 * @param potentiallyAttackedSquare The square to inspect
+	 * @param kingMoves The set of squares around the king, in a structure that provides utility methods for finding just the squares in the set that are threatened
+	 * by a particular piece
+	 * @param coveredAttackers All the threats that have already been discovered and don't need to be looked at again
+	 * @param squaresToIgnore Squares to not consider as blocking to threats along a line possibly containing those squares
+	 */
 	@Override
 	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves, Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
 		boolean squareIsAttacked = false;
