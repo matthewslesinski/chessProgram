@@ -210,7 +210,7 @@ public class BasicMove implements Move {
 		return getMoveAsString(true, true);
 	}
 	
-	public static class Builder {
+	public static class Builder implements MoveBuilder<BasicMove> {
 		
 		private Square start = null;
 		private Square end = null;
@@ -226,7 +226,7 @@ public class BasicMove implements Move {
 		 * @param movingPiece The type of piece making the move
 		 * @param start The starting square
 		 * @param end The ending square
-		 * @param movingColor The color of the playermaking the move
+		 * @param movingColor The color of the player making the move
 		 */
 		public Builder(MoveType type, PieceType movingPiece, Square start, Square end, Color movingColor) {
 			this.type = type;
@@ -251,11 +251,7 @@ public class BasicMove implements Move {
 			
 		}
 		
-		/**
-		 * Specifies the type of piece that this move captures. While en passants involve capturing, though, this should not be called for an en passant
-		 * @param capturedPiece The type of captured piece
-		 * @return This builder
-		 */
+		@Override
 		public Builder withCapture(PieceType capturedPiece) {
 			argCheck(this.capturedPiece, PieceType.class, null);
 			if (this.type == MoveType.CAPTURE || this.type == MoveType.PROMOTION_WITH_CAPTURE) {
@@ -266,11 +262,7 @@ public class BasicMove implements Move {
 			return this;
 		}
 		
-		/**
-		 * Specifies the type of piece that 
-		 * @param promotionPiece
-		 * @return
-		 */
+		@Override
 		public Builder withPromotion(PieceType promotionPiece) {
 			argCheck(this.promotionPiece, PieceType.class, null);
 			
@@ -282,10 +274,7 @@ public class BasicMove implements Move {
 			return this;
 		}
 		
-		/**
-		 * Hatches this cocoon into a {@code BasicMove}. 
-		 * @return The {@code BasicMove}
-		 */
+		@Override
 		public BasicMove build() {
 			PieceType promotionArg = null;
 			PieceType capturedArg = null;

@@ -1,17 +1,14 @@
 package moves;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 import boardFeatures.Square;
-import gamePlaying.Color;
 import independentDataStructures.EnumSequence;
 import independentDataStructures.FixedOrderingSet;
 import lines.Direction;
@@ -23,7 +20,6 @@ import moveCalculationStructures.KingMoveSet;
 import pieces.Piece;
 import pieces.PieceType;
 import representation.Board;
-import representation.CastlingRights;
 import support.BadArgumentException;
 
 /**
@@ -34,61 +30,23 @@ import support.BadArgumentException;
  * @author matthewslesinski
  *
  */
-public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
-	
-	/** The color to move */
-	private final Color toMove;
-	
-	/** The opposite color of the one to move */
-	private final Color oppositeColor;
-		
-	/** Array of the booleans for each castling right, for if it's allowed without accounting for specifics of the position */
-	private final Map<CastlingRights, Boolean> castlingRights = new EnumMap<>(CastlingRights.class);
-	
-	/** The file to capture onto with en passant, or null if not allowed */
-	private final File enPassantFile;
-	
-	/** Stores the pieces on the board in the most intuitive arrangement. Each index of the array will be the piece at the square with that index as its index */
-	private final Piece[] pieces = new Piece[Square.values().length];
-	
-	/**
-	 * Stores the pieces on the board in another intuitive arrangement. Each index of the array
-	 * will be the list with the squares that the piece with that ordinal (minus 1 because Piece.NONE is not included) is on
-	 */
-	private final Map<Piece, List<Square>> piecesToSquares = new EnumMap<>(Piece.class);
+public class SolidPreProcessing<B extends Board> extends StraightforwardPreProcessing<B> {
 	
 	/** The values of the values of this map are the preprocessed lists of just the squares with pieces on them for each line */
 	private final Map<LineType, Map<Line, FixedOrderingSet<Square>>> preProcessedLines = new EnumMap<>(LineType.class);
-	
-	/** The square with the king of the player to move */
-	private final Square kingSquare;
-	
-	/** For each {@code Square} around the king, this holds the {@code Square}s of the pieces attacking it */
-	private final Map<Square, Set<Square>> safeSquaresAroundKing = new EnumMap<>(Square.class);
-	
-	/** For each {@code Square} with a {@code Piece} that is pinned, this holds the {@code Direction} from that {@code Square} to the attacking {@code Piece}'s {@code Square} */
-	private final Map<Square, Direction> pins = new EnumMap<>(Square.class);
-	
-	
+		
 	/**
 	 * Initiates the preprocessing
 	 * @param board The board to decompress
 	 */
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public SolidPreProcessing(B board) {
-		toMove = board.whoseMove();
-		oppositeColor = toMove.getOtherColor();
-		for (CastlingRights right : CastlingRights.values()) {
-			castlingRights.put(right, board.canCastle(right));
-		}
-		enPassantFile = board.enPassantCaptureFile();
+		super(board);
 		for (LineType type : LineType.values()) {
 			preProcessedLines.put(type, new EnumMap(type.getType()));
 		}
 		initializeLists(piecesToSquares, () -> (List<Square>) new ArrayList<Square>(10), Piece.realPieces());
-		parseBoard(board);
 		initializeLines();
-		kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
 	}
 	
 	/**
@@ -101,20 +59,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	}
 	
 	/**
-	 * Parses a board into a state where it is easy to see which piece is on which square and also which squares have particular pieces
-	 * @param board The board to parse
-	 */
-	private void parseBoard(B board) {
-		for (Square square : Square.values()) {
-			Piece piece = board.getPieceAtSquare(square);
-			if (piece != null && piece != Piece.NONE) {
-				pieces[square.getIndex()] = piece;
-				piecesToSquares.get(piece).add(square);
-			}
-		}
-	}
-	
-	/**
 	 * Initializes all list in the appropriate array, using the index of the array that each list will be in
 	 * @param arr The array to put the lists in
 	 * @param constructor How to initialize each list
@@ -123,13 +67,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		for (S key : keys) {
 			map.put(key, constructor.get());
 		}
-	}
-	
-	
-	
-	@Override
-	public Square getKingSquare() {
-		return kingSquare;
 	}
 
 	/**
@@ -141,7 +78,7 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		FixedOrderingSet<Square> list = new EnumSequence<Square>(Square.class, line.getLength(),
 										square -> square.getNeighbor(line.getForwardDirection().getOppositeDirection()), line::containsSquare);
 		line.getContainedSquares().forEach(square -> {
-			Piece piece = square.getValueOfSquareInArray(pieces);
+			Piece piece = getPieceAtSquare(square);
 			if (piece != null && piece != Piece.NONE) {
 				list.add(square);
 			}
@@ -162,37 +99,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 				}		
 			});
 		}
-	}
-	
-	@Override
-	public Color whoseMove() {
-		return toMove;
-	}
-	
-	@Override
-	public boolean canCastle(CastlingRights right) {
-		return castlingRights.getOrDefault(right, false);
-	}
-	
-	@Override
-	public File getEnPassantFile() {
-		return enPassantFile;
-	}
-	
-	@Override
-	public List<Square> getListOfSquaresForPiece(Piece piece) {
-		if (piece == Piece.NONE) {
-			throw new BadArgumentException(piece, Piece.class, "An absent piece cannot be associated with a square");
-		}
-		return piecesToSquares.get(piece);
-	}
-	
-	@Override
-	public Piece getPieceAtSquare(Square square) {
-		if (square == null) {
-			return null;
-		}
-		return square.getValueOfSquareInArray(pieces);
 	}
 	
 	/**
@@ -267,53 +173,8 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 		return square;
 	}
 	
-	/**
-	 * Records all of the attacks of the enemy knights on the king and his surrounding squares
-	 * @param kingMoves The set of squares around the king, including his square
-	 * @param coveredAttackers The set of squares of attackers that have already been looked at
-	 */
-	private void calculateKnightAttacks(KingMoveSet kingMoves, Set<Square> coveredAttackers) {
-		Piece opposingKnight = Piece.getByColorAndType(oppositeColor, PieceType.KNIGHT);
-		for (Square knightSquare : piecesToSquares.get(opposingKnight)) {
-			coveredAttackers.add(knightSquare);
-			for (Square attackedSquare : kingMoves.getAttackedSquares(knightSquare, this::getPieceAtSquare)) {
-				Set<Square> attackers = safeSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
-				attackers.add(knightSquare);
-				safeSquaresAroundKing.putIfAbsent(attackedSquare, attackers);
-			}
-		}
-	}
-	
-	/**
-	 * Determines if the piece at a square can attack the target square, assuming nothing in the way
-	 * @param possibleAttacker The possible square with the attacker
-	 * @return true iff it could
-	 */
-	private boolean canAttackSquare(Square possibleAttacker, Square target) {
-		return possibleAttacker.getPossibleThreatsByPiece(getPieceAtSquare(possibleAttacker)).contains(target);
-	}
-	
-	/**
-	 * Determines if the piece at a square is of the opposite color from the current player
-	 * @param potentialAttacker The square of the potential attacking piece to determine if its color is threatening
-	 * @return true iff it is
-	 */
-	private boolean isThreat(Square potentialAttacker) {
-		Piece attacker = getPieceAtSquare(potentialAttacker);
-		return attacker != null && attacker.getColor() == oppositeColor;
-	}
-	
-	/**
-	 * Given a square around the king, this method finds a threat from any direction, by determining the nearest piece in that direction and determining if it's
-	 * threatening, and for each of that threatening piece's threats near the king, the threatened square near the king records that threatening square as an attacker.
-	 * Once the currently inspected square has been attacked, this method returns, since we only care if the square's attacked at least once.
-	 * @param potentiallyAttackedSquare The square to inspect
-	 * @param kingMoves The set of squares around the king, in a structure that provides utility methods for finding just the squares in the set that are threatened
-	 * by a particular piece
-	 * @param coveredAttackers All the threats that have already been discovered and don't need to be looked at again
-	 * @param squaresToIgnore Squares to not consider as blocking to threats along a line possibly containing those squares
-	 */
-	private void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves, Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
+	@Override
+	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves, Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
 		boolean squareIsAttacked = false;
 		for (Direction dir : Direction.getOutwardDirections()) {
 			Square neighbor = getNextSquareWithPiece(potentiallyAttackedSquare, dir, squaresToIgnore);
@@ -323,8 +184,8 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 					if (attackedSquare == potentiallyAttackedSquare) {
 						squareIsAttacked = true;
 					}
-					Set<Square> attackersOfSquare = safeSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
-					safeSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
+					Set<Square> attackersOfSquare = attackedSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
+					attackedSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
 					attackersOfSquare.add(neighbor);
 				}
 				if (squareIsAttacked) {
@@ -333,16 +194,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 			}
 		}
 	}
-	
-	/**
-	 * Determines if the piece at a square can attack the king's square, assuming nothing in the way
-	 * @param possibleAttacker The possible square with the attacker
-	 * @return true iff it could
-	 */
-	private boolean canAttackKing(Square possibleAttacker) {
-		return canAttackSquare(possibleAttacker, kingSquare);
-	}
-	
 	
 	/**
 	 * Determines if the square is pinned to the king
@@ -364,17 +215,14 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 	 */
 	private void recordThreat(Square threat, Set<Square> coveredAttackers) {
 		if (!coveredAttackers.contains(threat) && canAttackKing(threat)) {
-			Set<Square> kingAttackers = safeSquaresAroundKing.getOrDefault(kingSquare, EnumSet.noneOf(Square.class));
-			safeSquaresAroundKing.putIfAbsent(kingSquare, kingAttackers);
+			Set<Square> kingAttackers = attackedSquaresAroundKing.getOrDefault(kingSquare, EnumSet.noneOf(Square.class));
+			attackedSquaresAroundKing.putIfAbsent(kingSquare, kingAttackers);
 			kingAttackers.add(threat);
 		}
 	}
 	
-	/**
-	 * Finds the rest of the attackers not yet discovered who attack the king, and also records pins
-	 * @param coveredAttackers Attackers that have already been discovered
-	 */
-	private void calculateKingAttackers(Set<Square> coveredAttackers) {
+	@Override
+	protected void calculateKingAttackers(Set<Square> coveredAttackers) {
 		for (Direction dir : Direction.getOutwardDirections()) {
 			Square neighbor = getNextSquareWithPiece(kingSquare, dir);
 			if (neighbor == null) {
@@ -390,39 +238,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 			}
 		}
 	}
-	
-	@Override
-	public void calculateKingSafety() {
-		// Set up
-		KingMoveSet kingMoves = kingSquare.getKingMoves(toMove);
-		Piece king = pieces[kingSquare.getIndex()];
-		pieces[kingSquare.getIndex()] = Piece.NONE;
-		Set<Square> squareToIgnore = Collections.singleton(kingSquare);
-		Set<Square> coveredAttackers = EnumSet.noneOf(Square.class);
-		// Calculate
-		calculateKnightAttacks(kingMoves, coveredAttackers);
-		for (Square square : kingMoves) {
-			if (safeSquaresAroundKing.get(square) == null) {
-				calculateSquareAttackers(square, kingMoves, coveredAttackers, squareToIgnore);
-			}
-		}
-		calculateKingAttackers(coveredAttackers);
-		// reset the board
-		pieces[kingSquare.getIndex()] = king;
-	}
-	
-	@Override
-	public Set<Square> whoIsAttackingTheKing() {
-		return safeSquaresAroundKing.getOrDefault(kingSquare, Collections.emptySet());
-	}
-
-	@Override
-	public Set<Square> getSafeKingDestinations() {
-		return kingSquare.getKingMoves(toMove).stream()
-				.filter(square -> safeSquaresAroundKing.get(square) == null)
-				.collect(Collectors.toCollection(() -> EnumSet.noneOf(Square.class)));
-	}
-
 	
 	@Override
 	public boolean isMovementBlocked(Square start, Square end) {
@@ -441,11 +256,6 @@ public class SolidPreProcessing<B extends Board> implements ProcessedBoard<B> {
 			return false;
 		}
 		return listOfSquares.retrieveOffsetFromElement(end, dir.getMovement().getIncrement()) != start;
-	}
-	
-	@Override
-	public Direction isPiecePinned(Square square) {
-		return pins.getOrDefault(square, Direction.NONE);
 	}
 
 	@Override

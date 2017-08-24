@@ -1,8 +1,0 @@
-package dataStructures;
-
-import boardFeatures.Square;
-
-public interface EvenlySpacedCircle extends Iterable<Square>{
-
-	Square getNearestSquare(Square remote);
-}

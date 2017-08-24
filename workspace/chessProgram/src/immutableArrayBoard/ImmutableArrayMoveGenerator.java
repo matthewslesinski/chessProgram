@@ -12,14 +12,13 @@ import java.util.stream.Collectors;
 import boardFeatures.Square;
 import gamePlaying.Color;
 import moves.ProcessedBoard;
-import moves.SolidPreProcessing;
 import pieces.Piece;
 import pieces.PieceType;
-import moves.BasicMove;
 import moves.Move;
-import moves.MoveSet;
 import representation.MoveGenerator;
+import representation.Board;
 import support.BadArgumentException;
+import support.Constructors;
 import support.UtilityFunctions;
 
 /**
@@ -31,7 +30,7 @@ import support.UtilityFunctions;
 public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoard> {
 	
 	/** Preprocessing that calculates the import details about the board that are necessary for move calculation */
-	private ProcessedBoard<ImmutableArrayBoard> preprocessing;
+	private ProcessedBoard<Board> preprocessing;
 	/** The {@code Set} of {@code Square}s containing {@code Piece}s that are giving check */
 	private Set<Square> checks;
 	/** The list of legal moves */
@@ -49,7 +48,7 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 	
 	@Override
 	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
-		preprocessing = new SolidPreProcessing<>(board);
+		preprocessing = Constructors.PRE_PROCESSING_CONSTRUCTOR.apply(board);
 		preprocessing.calculateKingSafety();
 		checks = preprocessing.whoIsAttackingTheKing();
 		toMove = preprocessing.whoseMove();
@@ -58,7 +57,7 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 				UtilityFunctions.bind(Piece::getByColorAndType, toMove).andThen(preprocessing::getListOfSquaresForPiece);
 		kingSquare = preprocessing.getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
 		realizeMoves();
-		return new MoveSet(moves, BasicMove::new);
+		return Constructors.MOVESET_CONSTRUCTOR.apply(moves);
 	}
 	
 	/**

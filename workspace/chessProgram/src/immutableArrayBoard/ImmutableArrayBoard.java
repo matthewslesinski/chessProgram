@@ -1,13 +1,11 @@
 package immutableArrayBoard;
 
 
-import java.util.function.IntFunction;
 import java.util.function.Supplier;
 
 import boardFeatures.Square;
 import gamePlaying.Color;
 import lines.File;
-import moves.BasicMove;
 import moves.Move;
 import pieces.Piece;
 import representation.Board;
@@ -15,6 +13,7 @@ import representation.BoardBuilder;
 import representation.CastlingRights;
 import representation.MoveGenerator;
 import representation.MoveMaker;
+import support.Constructors;
 
 /**
  * This is the most intuitive representation of a board. It holds a place for each square (at some index and some bit in the {@code board} array) and
@@ -78,11 +77,7 @@ public class ImmutableArrayBoard extends Board {
 	
 	/** Used to construct a move generator */
 	private static final Supplier<MoveGenerator<ImmutableArrayBoard>> MOVE_GENERATOR_CONSTRUCTOR = ImmutableArrayMoveGenerator::new;
-	
-	/** A method used to get a {@code Move} decompressed from the ints stored in the list of moves */ 
-	private static final IntFunction<Move> MOVE_DECOMPRESSOR = BasicMove::new;
 		
-	
 	private ImmutableArrayBoard(int[] board) {
 		this.board = board;
 	}
@@ -118,7 +113,7 @@ public class ImmutableArrayBoard extends Board {
 	@Override
 	public Move lastMove() {
 		int compressed = board[LAST_MOVE_INDEX];
-		return compressed == 0 ? null : MOVE_DECOMPRESSOR.apply(compressed);
+		return compressed == 0 ? null : Constructors.MOVE_DECOMPRESSOR.apply(compressed);
 	}
 
 	

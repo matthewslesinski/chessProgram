@@ -1,8 +1,0 @@
-package dataStructures;
-
-import java.util.Queue;
-
-public class BreadthFirstPath<T> implements Queue<T> {
-
-	
-}

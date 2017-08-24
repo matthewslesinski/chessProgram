@@ -7,11 +7,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.IntFunction;
 
 import boardFeatures.Square;
 import convenienceDataStructures.UnmodifiableWrappedSet;
 import pieces.PieceType;
+import support.Constructors;
 
 /**
  * Represents a {@code Set} of {@code Move} by compressing each move into an int
@@ -20,23 +20,15 @@ import pieces.PieceType;
  */
 public class MoveSet implements UnmodifiableWrappedSet<Move> {
 
-	/**
-	 * Stores the compressed moves
-	 */
+	/** Stores the compressed moves */
 	protected int[] moveStore;
 	
-	/**
-	 * Used to create moves from the ints stored in this class
-	 */
-	protected final IntFunction<Move> constructor;
 	
 	/**
 	 * Initializes this {@code MoveSet} with all of its moves
 	 * @param moves The moves to include in this {@code MoveSet}
-	 * @param constructor The constructor for recreating {@code Move}s from the compressed versions
 	 */
-	public MoveSet(Collection<Move> moves, IntFunction<Move> constructor) {
-		this.constructor = constructor;
+	public MoveSet(Collection<Move> moves) {
 		moveStore = new int[moves.size()];
 		int index = 0;
 		Iterator<Move> iterator = moves.iterator();
@@ -72,7 +64,7 @@ public class MoveSet implements UnmodifiableWrappedSet<Move> {
 
 			@Override
 			public Move next() {
-				return constructor.apply(moveStore[index++]);
+				return Constructors.MOVE_DECOMPRESSOR.apply(moveStore[index++]);
 			}
 			
 		};

@@ -78,7 +78,8 @@ public class King extends PieceUtility {
 	 */
 	private boolean canCastle(Square end, ProcessedBoard<?> board) {
 		CastlingRights rights = CastlingRights.getByColorAndSide(color, Side.getByRelation(end));
-		return board.canCastle(rights) && !board.isMovementBlocked(rights.getKingSquare(), rights.getRookSquare());
+		return board.canCastle(rights) && !board.isMovementBlocked(rights.getKingSquare(), rights.getRookSquare())
+				&& board.getSafeKingDestinations().contains(rights.getTargetRookSquare());
 	}
 	
 	/**

@@ -10,6 +10,7 @@ import pieceUtilities.Pawn;
 import pieceUtilities.PieceUtility;
 import pieceUtilities.Queen;
 import pieceUtilities.Rook;
+import support.BadArgumentException;
 
 
 /**
@@ -79,7 +80,7 @@ public enum PieceType {
 		case "R": return PieceType.ROOK;
 		case "Q": return PieceType.QUEEN;
 		case "K": return PieceType.KING;
-		default: throw new IllegalArgumentException(String.format("Input string \"%s\" does not correspond to a piece.", letter));
+		default: throw new BadArgumentException(letter, String.class, String.format("Input string \"%s\" does not correspond to a piece.", letter));
 		}
 	}
 	
