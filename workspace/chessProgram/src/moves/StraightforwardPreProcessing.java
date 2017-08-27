@@ -1,11 +1,14 @@
 package moves;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import boardFeatures.Square;
@@ -18,6 +21,7 @@ import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
 import support.BadArgumentException;
+import support.UtilityFunctions;
 
 public abstract class StraightforwardPreProcessing<B extends Board> implements ProcessedBoard<B> {
 
@@ -65,8 +69,20 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 			castlingRights.put(right, board.canCastle(right));
 		}
 		enPassantFile = board.enPassantCaptureFile();
+		initializeLists(piecesToSquares, () -> new LinkedList<Square>(), Piece.realPieces());
 		parseBoard(board);
 		kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+	}
+	
+	/**
+	 * Initializes all list in the appropriate array, using the index of the array that each list will be in
+	 * @param arr The array to put the lists in
+	 * @param constructor How to initialize each list
+	 */
+	private <S, T> void initializeLists(Map<S, T> map, Supplier<T> constructor, S[] keys) {
+		for (S key : keys) {
+			map.put(key, constructor.get());
+		}
 	}
 	
 	/**
@@ -76,11 +92,23 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	protected void parseBoard(B board) {
 		for (Square square : Square.values()) {
 			Piece piece = board.getPieceAtSquare(square);
-			if (piece != null && piece != Piece.NONE) {
+			if (!isNotAPiece(piece)) {
 				pieces.put(square, piece);
 				piecesToSquares.get(piece).add(square);
 			}
 		}
+	}
+	
+	/**
+	 * Returns the squares that contain any of the pieces of the types specified and the color specified
+	 * @param color The color for the pieces
+	 * @param types The types they can be
+	 * @return All the squares containing one of them
+	 */
+	protected List<Square> getListOfSquaresForPiecesOfColor(Color color, PieceType... types) {
+		return Arrays.stream(types)
+			.map(UtilityFunctions.bind(Piece::getByColorAndType, color).andThen(this::getListOfSquaresForPiece))
+			.reduce(Collections.emptyList(), UtilityFunctions::concat);
 	}
 	
 	/**
@@ -99,7 +127,7 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	 */
 	protected boolean isThreat(Square potentialAttacker) {
 		Piece attacker = getPieceAtSquare(potentialAttacker);
-		return attacker != null && attacker.getColor() == oppositeColor;
+		return !isNotAPiece(attacker) && attacker.getColor() == oppositeColor;
 	}
 	
 	/**

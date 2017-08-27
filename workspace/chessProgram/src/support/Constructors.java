@@ -9,12 +9,12 @@ import convenienceDataStructures.UnmodifiableWrappedSet;
 import gamePlaying.Color;
 import immutableArrayBoard.ImmutableArrayBoard;
 import moves.BasicMove;
+import moves.LazyPreProcessing;
 import moves.Move;
 import moves.MoveBuilder;
 import moves.MoveSet;
 import moves.MoveType;
 import moves.ProcessedBoard;
-import moves.SolidPreProcessing;
 import pieces.PieceType;
 import representation.Board;
 import representation.BoardBuilder;
@@ -30,7 +30,7 @@ import representation.BoardBuilder;
 public class Constructors {
 
 	/** Used to create the preprocessing for move generation for a board */
-	public static final Function<Board, ProcessedBoard<Board>> PRE_PROCESSING_CONSTRUCTOR = SolidPreProcessing<Board>::new; 
+	public static final Function<Board, ProcessedBoard<Board>> PRE_PROCESSING_CONSTRUCTOR = LazyPreProcessing<Board>::new; 
 	
 	/** A method used to get a {@code Move} decompressed from the ints stored in a list of moves */ 
 	public static final IntFunction<Move> MOVE_DECOMPRESSOR = BasicMove::new;

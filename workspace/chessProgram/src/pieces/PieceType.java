@@ -30,6 +30,7 @@ public enum PieceType {
 	private final String readableForm;
 	private final String moveLetter;
 	private final String pieceLetter;
+	private final static PieceType[] HORIZONTAL_MOVERS = {ROOK, QUEEN};
 	private final static PieceType[] PROMOTION_PIECES = {KNIGHT, BISHOP, ROOK, QUEEN};
 	private final static PieceType[] LINE_MOVERS = {BISHOP, ROOK, QUEEN};
 	private final static PieceType[] NON_KNIGHTS = {PAWN, BISHOP, ROOK, QUEEN, KING};
@@ -106,6 +107,14 @@ public enum PieceType {
 	 */
 	public static PieceType[] getPromotionPieces() {
 		return PROMOTION_PIECES;
+	}
+	
+	/**
+	 * Returns an array of the pieces that move long range horizontally
+	 * @return The array of {@code PieceType}s
+	 */
+	public static PieceType[] getHorizontalMovers() {
+		return HORIZONTAL_MOVERS;
 	}
 	
 	/**

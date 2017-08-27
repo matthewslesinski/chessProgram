@@ -1,0 +1,84 @@
+package moves;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Square;
+import lines.Direction;
+import lines.File;
+import moveCalculationStructures.KingMoveSet;
+import pieces.Piece;
+import representation.Board;
+
+public class LazyPreProcessing<B extends Board> extends StraightforwardPreProcessing<B> {
+
+	public LazyPreProcessing(B board) {
+		super(board);
+		// TODO
+	}
+
+
+	@Override
+	protected void calculateKingAttackers(Set<Square> coveredAttackers) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves,
+			Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
+		boolean squareIsAttacked = false;
+		Piece potentiallyAttackedOccupant = getPieceAtSquare(potentiallyAttackedSquare);
+		if (isNotSameColor(potentiallyAttackedOccupant)) {
+			for (Direction direction : Direction.getOutwardDirections()) {
+				Square curr = potentiallyAttackedSquare;
+				while ((curr = curr.getNeighbor(direction)) != null) {
+					Piece occupant = getPieceAtSquare(curr);
+					if (!isNotAPiece(occupant)) {
+						if (occupant.getColor() != toMove && !coveredAttackers.contains(curr)) {
+							boolean lineMover = occupant.getType().isLongRange();
+							Map<Direction, Boolean> unblockedDirections = null;
+							if (lineMover) {
+								unblockedDirections = new EnumMap<>(Direction.class);
+								unblockedDirections.put(curr.getDirectionToSquare(potentiallyAttackedSquare), true);
+							}
+							coveredAttackers.add(curr);
+							for (Square attackedSquare : kingMoves.getAttackedSquares(curr, this::getPieceAtSquare)) {
+								Direction toAttackedSquare = curr.getDirectionToSquare(attackedSquare);
+								if (lineMover && !unblockedDirections.containsKey(toAttackedSquare)) {
+									unblockedDirections.put(toAttackedSquare, !isMovementBlocked(attackedSquare, curr));
+								}
+								if (!lineMover || unblockedDirections.get(toAttackedSquare) == Boolean.TRUE) {
+									if (attackedSquare == potentiallyAttackedSquare) {
+										squareIsAttacked = true;
+									}
+									Set<Square> attackersOfSquare = attackedSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
+									attackedSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
+									attackersOfSquare.add(curr);
+								}
+							}
+							if (squareIsAttacked) {
+								return;
+							}
+						}					
+						break;
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean isMovementBlocked(Square start, Square end) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean isEnPassantPinned(File movingPawnFile) {
+		// TODO Auto-generated method stub
+		return false;
+	}
+}

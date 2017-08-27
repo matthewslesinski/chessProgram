@@ -165,7 +165,7 @@ public enum CastlingRights {
 	 * @return The {@code CastlingRights} with those values
 	 */
 	public static CastlingRights getByColorAndSide(Color color, Side side) {
-		return values()[color.isWhite() ? 0 : 2 + (side.isKingside() ? 0 : 1)];
+		return values()[(color.isWhite() ? 0 : 2) + (side.isKingside() ? 0 : 1)];
 	}
 	
 	/**
