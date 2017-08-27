@@ -66,6 +66,15 @@ public interface ProcessedBoard<B extends Board> {
 	 */
 	public default boolean isEmptySquare(Square square) {
 		Piece piece = getPieceAtSquare(square);
+		return isNotAPiece(piece);
+	}
+	
+	/**
+	 * Checks if the given piece is meaningful or not
+	 * @param piece The piece to check
+	 * @return true iff the given piece is null/NONE
+	 */
+	public default boolean isNotAPiece(Piece piece) {
 		return piece == null || piece == Piece.NONE;
 	}
 	
@@ -76,7 +85,16 @@ public interface ProcessedBoard<B extends Board> {
 	 */
 	public default boolean isNotSameColor(Square square) {
 		Piece piece = getPieceAtSquare(square);
-		return piece == null || piece == Piece.NONE || piece.getColor() != whoseMove();
+		return isNotSameColor(piece);
+	}
+	
+	/**
+	 * Checks if the piece (can be null) is not the same color as the moving side
+	 * @param piece The piece to check
+	 * @return true iff the given piece is null/NONE or of the other color
+	 */
+	public default boolean isNotSameColor(Piece piece) {
+		return isNotAPiece(piece) || piece.getColor() != whoseMove();
 	}
 	
 	/**

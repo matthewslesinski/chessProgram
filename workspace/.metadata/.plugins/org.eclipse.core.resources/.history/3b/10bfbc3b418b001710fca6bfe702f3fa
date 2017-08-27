@@ -1,0 +1,141 @@
+package moves;
+
+import java.util.EnumMap;
+import java.util.EnumSet;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+
+import boardFeatures.Square;
+import lines.Direction;
+import lines.File;
+import lines.Rank;
+import moveCalculationStructures.KingMoveSet;
+import pieces.Piece;
+import pieces.PieceType;
+import representation.Board;
+import support.UtilityFunctions;
+
+public class LazyPreProcessing<B extends Board> extends StraightforwardPreProcessing<B> {
+
+	private final Map<Direction, Square> possiblePinners;
+	
+	public LazyPreProcessing(B board) {
+		super(board);
+		possiblePinners = getListOfSquaresForPiecesOfColor(toMove.getOtherColor(), PieceType.getLineMovers())
+			.stream().filter(this::canAttackKing)
+			.collect(Collectors.toMap(kingSquare::getDirectionToSquare, UtilityFunctions::identity, kingSquare::whichIsCloser, () -> new EnumMap<>(Direction.class)));
+			
+	}
+
+
+	@Override
+	protected void calculateKingAttackers(Set<Square> coveredAttackers) {
+		// Nothing needs to be done here that wasn't done in calculateSquareAttackers
+		return;
+	}
+
+	private Square getNextSquareWithPieceUnderConstraints(Square curr, Direction direction, Predicate<Square> hitTheEnd, int numToPass) {
+		int passed = 0;
+		while (!hitTheEnd.test(curr = curr.getNeighbor(direction))) {
+			if (!isEmptySquare(curr) && passed == numToPass) {
+				return curr;
+			}
+			passed += 1;
+		}
+		return passed == numToPass ? curr : null;
+	}
+	
+	/**
+	 * Checks each successive {@code Square} in the given {@code Direction} until a {@code Square} with a {@code Piece} is found or we fall off the board
+	 * @param curr The {@code Square} to search from
+	 * @param direction The {@code Direction} to search
+	 * @return The next {@code Square} in that {@code Direction} with a {@code Piece}, or null if none
+	 */
+	private Square getNextSquareWithPiece(Square curr, Direction direction) {
+		return getNextSquareWithPieceUnderConstraints(curr, direction, UtilityFunctions::isNull, 0);
+	}
+	
+	@Override
+	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves,
+			Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
+		boolean squareIsAttacked = false;
+		Piece potentiallyAttackedOccupant = getPieceAtSquare(potentiallyAttackedSquare);
+		if (isNotSameColor(potentiallyAttackedOccupant)) {
+			for (Direction direction : Direction.getOutwardDirections()) {
+				Square nextWithOccupant = getNextSquareWithPiece(potentiallyAttackedSquare, direction);
+				Piece occupant = getPieceAtSquare(nextWithOccupant);
+				if (!isNotAPiece(occupant) && occupant.getColor() != toMove && !coveredAttackers.contains(nextWithOccupant)) {
+					boolean lineMover = occupant.getType().isLongRange();
+					Map<Direction, Boolean> unblockedDirections = null;
+					if (lineMover) {
+						unblockedDirections = new EnumMap<>(Direction.class);
+						unblockedDirections.put(nextWithOccupant.getDirectionToSquare(potentiallyAttackedSquare), true);
+					}
+					coveredAttackers.add(nextWithOccupant);
+					for (Square attackedSquare : kingMoves.getAttackedSquares(nextWithOccupant, this::getPieceAtSquare)) {
+						Direction toAttackedSquare = nextWithOccupant.getDirectionToSquare(attackedSquare);
+						if (lineMover && !unblockedDirections.containsKey(toAttackedSquare)) {
+							unblockedDirections.put(toAttackedSquare, !isMovementBlocked(nextWithOccupant, attackedSquare));
+						}
+						if (!lineMover || unblockedDirections.get(toAttackedSquare) == Boolean.TRUE) {
+							if (attackedSquare == potentiallyAttackedSquare) {
+								squareIsAttacked = true;
+							}
+							Set<Square> attackersOfSquare = attackedSquaresAroundKing.getOrDefault(attackedSquare, EnumSet.noneOf(Square.class));
+							attackedSquaresAroundKing.putIfAbsent(attackedSquare, attackersOfSquare);
+							attackersOfSquare.add(nextWithOccupant);
+						}
+					}
+					if (squareIsAttacked) {
+						return;
+					}
+				} else if (!isNotAPiece(occupant) && occupant.getColor() == toMove) {
+					Direction fromKing = kingSquare.getDirectionToSquare(nextWithOccupant);
+					if (fromKing == direction && possiblePinners.containsKey(fromKing) &&
+							getNextSquareWithPiece(nextWithOccupant, fromKing) == possiblePinners.get(fromKing)) {
+						pins.put(nextWithOccupant, fromKing);
+					}
+				}
+			}
+		}
+	}
+
+	@Override
+	public boolean isMovementBlocked(Square start, Square end) {
+		Direction dir = end.getDirectionToSquare(start);
+		if (dir == Direction.NONE) {
+			return false;
+		}
+		Square intermediate = end;
+		return getNextSquareWithPieceUnderConstraints(intermediate, dir, ((Predicate<Square>) this::isEmptySquare).negate().or(Predicate.isEqual(start)), 0) != start;
+	}
+
+	@Override
+	public boolean isEnPassantPinned(File movingPawnFile) {
+		File captureFile = getEnPassantFile();
+		if (captureFile == null) {
+			return false;
+		}
+		Rank enPassantRank = toMove.getEnPassantCaptureRank();
+		if (kingSquare.getRank() != enPassantRank) {
+			return false;
+		}
+		Square pawnSquare = Square.getByFileAndRank(captureFile, enPassantRank);
+		Direction fromKing = kingSquare.getDirectionToSquare(pawnSquare);
+		Optional<Square> attackingHorizontalMoverOptional = getListOfSquaresForPiecesOfColor(toMove, PieceType.getHorizontalMovers()).stream()
+			.filter(square -> kingSquare.getDirectionToSquare(square) == fromKing).reduce(kingSquare::whichIsCloser);
+		if (!attackingHorizontalMoverOptional.isPresent()) {
+			return false;
+		}
+		Square pinningPiece = attackingHorizontalMoverOptional.get();
+		if (kingSquare.whichIsCloser(pinningPiece, pawnSquare) == pinningPiece) {
+			return false;
+		}
+		Square curr = kingSquare;
+		return getNextSquareWithPieceUnderConstraints(curr, fromKing, Predicate.isEqual(pinningPiece), 2) == pinningPiece;
+
+	}
+}
