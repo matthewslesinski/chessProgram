@@ -1,0 +1,117 @@
+package hashing;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import boardFeatures.Square;
+import lines.File;
+import moves.Move;
+import pieces.Piece;
+import representation.Board;
+import representation.CastlingRights;
+import support.UtilityFunctions;
+
+public class ZobristHasher extends Hasher {
+
+	private static final int NUMBER_OF_FEATURES = 781;
+	private static final long[] FEATURE_VALUES = new PseudoRandomNumbers().generateNumbers(NUMBER_OF_FEATURES);
+	private static final long STARTER_CODE = 0L;
+	private static final int NUMBER_OF_POSSIBLE_PIECES = 12;
+	private static final int PIECE_INDEX_BASE = 0;
+	private static final int COLOR_BASE = NUMBER_OF_POSSIBLE_PIECES * Square.values().length + PIECE_INDEX_BASE;
+	private static final int CASTLING_RIGHTS_BASE = COLOR_BASE + 1;
+	private static final int EN_PASSANT_BASE = CASTLING_RIGHTS_BASE + CastlingRights.values().length;
+	
+	public ZobristHasher() {}
+	
+	private static long getFeatureWithIndex(int index) {
+		return FEATURE_VALUES[index];
+	}
+	
+	private List<Integer> getPresentFeatures(Board board) {
+		List<Integer> presentFeatures = new LinkedList<>();
+		for (Square square : Square.values()) {
+			Piece occupant = board.getPieceAtSquare(square);
+			if (occupant != null && occupant != Piece.NONE) {
+				addPieceAtSquareFeature(square, occupant, presentFeatures);
+			}
+		}
+		if (board.whoseMove().isWhite()) {
+			addColorFeature(presentFeatures);
+		}
+		for (CastlingRights right : CastlingRights.values()) {
+			if (board.canCastle(right)) {
+				addCastlingRightsFeature(right, presentFeatures);
+			}
+		}
+		File enPassantFile = board.enPassantCaptureFile();
+		if (enPassantFile != null) {
+			addEnPassantFileFeature(enPassantFile, presentFeatures);
+		}
+		return presentFeatures;
+	}
+	
+	private List<Integer> getChangedFeatures(Move transition) {
+		List<Integer> changedFeatures = new LinkedList<>();
+		addPieceMovement(transition, changedFeatures);
+		if (transition.isCapture()) {
+			Square captureSquare = transition.getCaptureSquare();
+			addPieceAtSquareFeature(captureSquare, Piece.getByColorAndType(transition.getMovingColor().getOtherColor(), transition.getCapturedPieceType()), changedFeatures);
+		}
+		if (transition.isCastle()) {
+			addPieceAtSquareFeature(transition.getSecondaryStartSquareForCastling(), transition.getSecondaryMovingPieceForCastling(), changedFeatures);
+			addPieceAtSquareFeature(transition.getSecondaryEndSquareForCastling(), transition.getSecondaryMovingPieceForCastling(), changedFeatures);
+		}
+		addColorFeature(changedFeatures);
+		for (CastlingRights right : transition.newlyDisabledCastlingRights()) {
+			addCastlingRightsFeature(right, changedFeatures);
+		}
+		if (transition.removesEnPassantPrivileges()) {
+			addEnPassantFileFeature(transition.removedEnPassantFile(), changedFeatures);
+		}
+		if (transition.allowsEnPassant()) {
+			addEnPassantFileFeature(transition.allowedEnPassantFile(), changedFeatures);
+		}
+		return changedFeatures;
+	}
+	
+	private void addPieceMovement(Move transition, List<Integer> presentFeatures) {
+		addPieceAtSquareFeature(transition.getStartSquare(), transition.getMovingPiece(), presentFeatures);
+		addPieceAtSquareFeature(transition.getDestinationSquare(), transition.getEndPiece(), presentFeatures);
+	}
+	
+	private void addPieceAtSquareFeature(Square square, Piece occupant, List<Integer> presentFeatures) {
+		int index = square.getIndex() * NUMBER_OF_POSSIBLE_PIECES + occupant.getBitRepresentation() - 1 + PIECE_INDEX_BASE;
+		presentFeatures.add(index);
+	}
+	
+	private void addColorFeature(List<Integer> presentFeatures) {
+		presentFeatures.add(COLOR_BASE);
+	}
+	
+	private void addCastlingRightsFeature(CastlingRights right, List<Integer> presentFeatures) {
+		int index = right.getIndex() + CASTLING_RIGHTS_BASE;
+		presentFeatures.add(index);
+	}
+	
+	private void addEnPassantFileFeature(File enPassantFile, List<Integer> presentFeatures) {
+		int index = enPassantFile.getIndex() + EN_PASSANT_BASE;
+		presentFeatures.add(index);
+	}
+	
+	
+	@Override
+	public long getHash(Board board) { 
+		return getPresentFeatures(board).stream()
+				.mapToLong(ZobristHasher::getFeatureWithIndex)
+				.reduce(STARTER_CODE, UtilityFunctions::xor);
+	}
+	
+	@Override
+	public long getNextHash(Board previous, Move transition) {
+		return getChangedFeatures(transition).stream()
+				.mapToLong(ZobristHasher::getFeatureWithIndex)
+				.reduce(previous.getHashCode(), UtilityFunctions::xor);
+	}
+
+}

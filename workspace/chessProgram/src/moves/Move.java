@@ -1,5 +1,6 @@
 package moves;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -8,7 +9,9 @@ import boardFeatures.Square;
 import gamePlaying.Color;
 import lines.File;
 import lines.Rank;
+import pieces.Piece;
 import pieces.PieceType;
+import representation.CastlingRights;
 
 /**
  * Represents a move in the game. There are various default implementations in this interface.
@@ -28,7 +31,15 @@ public interface Move {
 	 * Returns the {@code PieceType} that gets moved
 	 * @return the {@code PieceType} that moves
 	 */
-	public PieceType getMovingPiece();
+	public PieceType getMovingPieceType();
+	
+	/**
+	 * Gets the {@code Piece} that the movement is performed on
+	 * @return The {@code Piece}
+	 */
+	public default Piece getMovingPiece() {
+		return Piece.getByColorAndType(getMovingColor(), getMovingPieceType());
+	}
 	
 	/**
 	 * Gets the {@code Square} the {@code Piece} making this move starts from
@@ -54,8 +65,24 @@ public interface Move {
 	 * Gets the type of captured piece for this move.
 	 * @return The {@code PieceType}
 	 */
-	public default PieceType getCapturedPiece() {
+	public default PieceType getCapturedPieceType() {
 		return null;
+	}
+	
+	/**
+	 * Gets the {@code Piece} that gets captured by this move
+	 * @return The {@code Piece}
+	 */
+	public default Piece getCapturedPiece() {
+		return Piece.getByColorAndType(getMovingColor().getOtherColor(), getCapturedPieceType());
+	}
+	
+	/**
+	 * Gets the {@code Square} that the captured {@code Piece} is on
+	 * @return The {@code Square}
+	 */
+	public default Square getCaptureSquare() {
+		return isEnPassant() ? getEnPassantCaptureSquare() : getEndSquare();
 	}
 	
 	/**
@@ -89,11 +116,51 @@ public interface Move {
 	}
 	
 	/**
+	 * Gets the {@code Square} that the moving piece lands on
+	 * @return The {@code Square}
+	 */
+	public default Square getDestinationSquare() {
+		return isEnPassant() ? getEnPassantDestinationSquare() : getEndSquare();
+	}
+	
+	/**
 	 * Determines if this move involves castling or not
 	 * @return true iff it does
 	 */
 	public default boolean isCastle() {
 		return false;
+	}
+	
+	/**
+	 * Gets the {@code CastlingRights} that represent the way of castling that is done, assuming this move is a castle
+	 * @return The {@code CastlingRights}
+	 */
+	public default CastlingRights getUsedCastlingRight() {
+		return CastlingRights.getByColorAndSide(getMovingColor(), Side.getByRelation(getEndSquare()));
+	}
+	
+	/**
+	 * Gets the {@code Piece} representing a rook of the moving color if this move is a castle, or null otherwise
+	 * @return The {@code Piece}
+	 */
+	public default Piece getSecondaryMovingPieceForCastling() {
+		return isCastle() ? Piece.getByColorAndType(getMovingColor(), PieceType.ROOK) : null;
+	}
+	
+	/**
+	 * Gets the {@code Square} the rook starts on when castling, assuming this move is a castle
+	 * @return The {@code Square}
+	 */
+	public default Square getSecondaryStartSquareForCastling() {
+		return getUsedCastlingRight().getRookSquare();
+	}
+	
+	/**
+	 * Gets the {@code Square} the rook ends on when castling, assuming this move is a castle
+	 * @return The {@code Square}
+	 */
+	public default Square getSecondaryEndSquareForCastling() {
+		return getUsedCastlingRight().getTargetRookSquare();
 	}
 	
 	/**
@@ -119,8 +186,110 @@ public interface Move {
 	 * Determines what type of piece the pawn promotes to with this move
 	 * @return The {@code PieceType}
 	 */
-	public default PieceType getPromotionPiece() {
+	public default PieceType getPromotionPieceType() {
 		return null;
+	}
+	
+	/**
+	 * Gets the {@code Piece} that this move promotes to
+	 * @return The {@code Piece}
+	 */
+	public default Piece getPromotionPiece() {
+		return Piece.getByColorAndType(getMovingColor(), getPromotionPieceType());
+	}
+	
+	/**
+	 * Gets the {@code Piece} that ends up on the {@code Square} this move ends on
+	 * @return The {@code Piece}
+	 */
+	public default Piece getEndPiece() {
+		return isPromotion() ? getPromotionPiece() : getMovingPiece();
+	}
+	
+	/**
+	 * Tells if this move takes away the ability to en passant
+	 * @return true iff it does
+	 */
+	public default boolean removesEnPassantPrivileges() {
+		return false;
+	}
+	
+	/**
+	 * Tells the {@code File} that en passant privileges gets removed for capturing ont
+	 * @return The {@code File}
+	 */
+	public default File removedEnPassantFile() {
+		return null;
+	}
+	
+	/**
+	 * Tells if this takes away the ability for white to castling kingside
+	 * @return true iff it does
+	 */
+	public default boolean preventsWhiteKingsideCastling() {
+		return false;
+	}
+	
+	/**
+	 * Tells if this takes away the ability for white to castling queenside
+	 * @return true iff it does
+	 */
+	public default boolean preventsWhiteQueensideCastling() {
+		return false;
+	}
+	
+	/**
+	 * Tells if this takes away the ability for black to castling kingside
+	 * @return true iff it does
+	 */
+	public default boolean preventsBlackKingsideCastling() {
+		return false;
+	}
+	
+	/**
+	 * Tells if this takes away the ability for black to castling queenside
+	 * @return true iff it does
+	 */
+	public default boolean preventsBlackQueensideCastling() {
+		return false;
+	}
+	
+	/**
+	 * Tells if this move will allow the opponent to potentially move en passant
+	 * @return true iff it does
+	 */
+	public default boolean allowsEnPassant() {
+		return getMovingPieceType() == PieceType.PAWN && getStartSquare().getRank() == getMovingColor().getPawnStartRank() &&
+				getEndSquare().getRank() == getMovingColor().getOtherColor().getEnPassantCaptureRank();
+	}
+	
+	/**
+	 * Assuming this move potentially allows the opponent to perform en passant, this tells which {@code File} the en passant would capture onto
+	 * @return The {@code File}
+	 */
+	public default File allowedEnPassantFile() {
+		return getStartSquare().getFile();
+	}
+	
+	/**
+	 * Returns the list of {@code CastlingRights} that get disabled by making this move
+	 * @return The {@code List} of {@code CastlingRights}
+	 */
+	public default List<CastlingRights> newlyDisabledCastlingRights() {
+		List<CastlingRights> newlyDisabledRights = new LinkedList<>();
+		if (preventsWhiteKingsideCastling()) {
+			newlyDisabledRights.add(CastlingRights.WHITE_KINGSIDE);
+		}
+		if (preventsWhiteQueensideCastling()) {
+			newlyDisabledRights.add(CastlingRights.WHITE_QUEENSIDE);
+		}
+		if (preventsBlackKingsideCastling()) {
+			newlyDisabledRights.add(CastlingRights.BLACK_KINGSIDE);
+		}
+		if (preventsBlackQueensideCastling()) {
+			newlyDisabledRights.add(CastlingRights.BLACK_QUEENSIDE);
+		}
+		return newlyDisabledRights;
 	}
 	
 	/**
@@ -140,7 +309,7 @@ public interface Move {
 		boolean includeRank = false;
 		File startFile = getStartSquare().getFile();
 		Rank startRank = getStartSquare().getRank();
-		List<Move> candidates = endSquareMap.get(this.getMovingPiece()).get(this.getEndSquare());
+		List<Move> candidates = endSquareMap.get(this.getMovingPieceType()).get(this.getEndSquare());
 		if (candidates.size() > 1) {
 			boolean otherCandidates = false;
 			for (Move candidate : candidates) {
@@ -173,8 +342,8 @@ public interface Move {
 			return Side.getByRelation(getEndSquare()).isKingside() ? "0-0" : "0-0-0";
 		}
 		StringBuilder builder = new StringBuilder();
-		builder.append(getMovingPiece());
-		if (includeFile || (getMovingPiece() == PieceType.PAWN && isCapture())) {
+		builder.append(getMovingPieceType());
+		if (includeFile || (getMovingPieceType() == PieceType.PAWN && isCapture())) {
 			builder.append(getStartSquare().getFile().getHumanReadableForm());
 		}
 		if (includeRank) {
@@ -185,7 +354,7 @@ public interface Move {
 		}
 		builder.append(getEndSquare());
 		if (isPromotion()) {
-			builder.append("=").append(getPromotionPiece());
+			builder.append("=").append(getPromotionPieceType());
 		}
 		return builder.toString();
 	}

@@ -5,6 +5,7 @@ import java.util.function.Supplier;
 
 import boardFeatures.Square;
 import gamePlaying.Color;
+import hashing.Hasher;
 import lines.File;
 import moves.Move;
 import pieces.Piece;
@@ -14,6 +15,7 @@ import representation.CastlingRights;
 import representation.MoveGenerator;
 import representation.MoveMaker;
 import support.Constructors;
+import support.UtilityFunctions;
 
 /**
  * This is the most intuitive representation of a board. It holds a place for each square (at some index and some bit in the {@code board} array) and
@@ -31,7 +33,16 @@ public class ImmutableArrayBoard extends Board {
 	private static final int RIGHTS_INDEX = 8;
 	
 	/** The number of ints it takes to represent a board */
-	private static final int ARRAY_SIZE = 10;
+	private static final int ARRAY_SIZE = 12;
+	
+	/** The index of the int that stores the righter bits of the hashcode for this board */
+	private static final int HASHCODE_INDEX_1 = 10;
+	
+	/** The index of the int that stores the lefter bits of the hashcode for this board */
+	private static final int HASHCODE_INDEX_2 = 11;
+	
+	/** The number of bits in an int */
+	private static final int INT_SIZE = 32;
 	
 	/** The index of the int that keeps track of the last move */
 	private static final int LAST_MOVE_INDEX = 9;
@@ -63,6 +74,9 @@ public class ImmutableArrayBoard extends Board {
 	/** The index for the fifty move rule count is kept */
 	private static final int FIFTY_MOVE_RULE_INDEX = 9;
 	
+	/** Contains 1 in the bits that matter, in the int keeping track of rights, for determining equality between boards */
+	private static final int EQUALITY_RIGHTS_MASK = 0b111111111;
+	
 	/**
 	 * The array containing the pieces and other board information, and so the actual internal representation of this {@code Board}.
 	 * The first 8 indices contain ints representing the file with that index. Each of those ints is divided into 8 groups of four bits.
@@ -70,8 +84,9 @@ public class ImmutableArrayBoard extends Board {
 	 * the file to get the rank. The last index of the array holds the extra information about board state, such as who's to move. This int
 	 * says what castling is potentially allowed, using the first four bits, now or in a deeper position from this one. It also uses the second 4 bits
 	 * to say what file a pawn could take a pawn from through en passant, it uses the first bit of the next quarter of the int to say whose move it is,
-	 * and it uses the next bit to say if it's in check. Everything except the check bit is calculated by the builder, but the check is set when calculating
-	 * moves.
+	 * and it uses the next bit to say if it's in check. After the check bit, the next 7 bits are used to store how many plies it has been since an
+	 * irreversible change in the board, as used by the 50 move draw rule. Everything except the check bit is calculated by the builder,
+	 * but the check is set when calculating moves.
 	 */
 	private final int[] board;
 	
@@ -80,6 +95,19 @@ public class ImmutableArrayBoard extends Board {
 		
 	private ImmutableArrayBoard(int[] board) {
 		this.board = board;
+	}
+	
+	/**
+	 * Records hashcode, a long, for this {@code Board}, based on the board preceding this one and the move used to get to this one
+	 * @param previousBoard The {@code Board} preceding this one. Note the {@code Move} to get to this one is already stored in this board
+	 * @return This {@code Board}, for the sake of convenience
+	 */
+	private ImmutableArrayBoard withCalculatedHash(Board previousBoard) {
+		Hasher hasher = Hasher.getGlobalHasher();
+		long code = previousBoard == null ? hasher.getHash(this) : hasher.getNextHash(previousBoard, lastMove());
+		board[HASHCODE_INDEX_1] = (int) code;
+		board[HASHCODE_INDEX_2] = (int) (code >>> INT_SIZE);
+		return this;
 	}
 	
 	@Override
@@ -116,6 +144,10 @@ public class ImmutableArrayBoard extends Board {
 		return compressed == 0 ? null : Constructors.MOVE_DECOMPRESSOR.apply(compressed);
 	}
 
+	@Override
+	public long getHashCode() {
+		return (((long) board[HASHCODE_INDEX_2]) << INT_SIZE) | board[HASHCODE_INDEX_1];
+	}
 	
 	@Override
 	public Board performMove(Move move) {
@@ -144,6 +176,31 @@ public class ImmutableArrayBoard extends Board {
 		}
 	}
 	
+	@Override
+	public int hashCode() {
+		return board[HASHCODE_INDEX_1];
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (o == null) {
+			return false;
+		}
+		if (o == this) {
+			return true;
+		}
+		if (!(o instanceof ImmutableArrayBoard)) {
+			return false;
+		}
+		ImmutableArrayBoard that = (ImmutableArrayBoard) o;
+		for (int index : UtilityFunctions.getPrimitiveRange(0, RIGHTS_INDEX)) {
+			if (this.board[index] != that.board[index]) {
+				return false;
+			}
+		}
+		return (this.board[RIGHTS_INDEX] & EQUALITY_RIGHTS_MASK) == (that.board[RIGHTS_INDEX] & EQUALITY_RIGHTS_MASK);
+	}
+	
 	/**
 	 * Unlike all the other board information, the bit keeping track of if the board is in check is
 	 * set only when moves are calculated, instead of when the board is built. This sets that bit
@@ -156,6 +213,7 @@ public class ImmutableArrayBoard extends Board {
 	public static class Builder extends BoardBuilder<ImmutableArrayBoard> {
 		
 		private int[] board;
+		private Board previousBoard = null;
 		
 		private Builder() {}
 		
@@ -239,14 +297,15 @@ public class ImmutableArrayBoard extends Board {
 
 		
 		@Override
-		public Builder withLastMove(Move move) {
-			board[LAST_MOVE_INDEX] = move.compress();
+		public Builder withPreviousBoardAndLastMove(Board previousBoard, Move move) {
+			this.board[LAST_MOVE_INDEX] = move.compress();
+			this.previousBoard = previousBoard;
 			return this;
 		}
 
 		@Override
 		public ImmutableArrayBoard build() {
-			return new ImmutableArrayBoard(board);
+			return new ImmutableArrayBoard(board).withCalculatedHash(previousBoard);
 		}
 		
 		/**

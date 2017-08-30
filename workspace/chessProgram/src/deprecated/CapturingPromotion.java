@@ -8,7 +8,7 @@ public interface CapturingPromotion extends Capture {
 
 	
 	@Override
-	public default PieceType getMovingPiece() {
+	public default PieceType getMovingPieceType() {
 		return PieceType.PAWN;
 	}
 

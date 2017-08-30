@@ -1,0 +1,34 @@
+package hashing;
+
+import moves.Move;
+import representation.Board;
+import support.Constructors;
+
+/**
+ * Implementations of this class provide functionality for hashing a board into a long.
+ * Since only one hashing object is needed, but we also want to allow for inheritance and
+ * hiding the names of the implementation class, this class keeps track of a static reference
+ * to that lone hashing object that can be accessed globally
+ * @author matthewslesinski
+ *
+ */
+public abstract class Hasher {
+
+	private static Hasher GLOBAL_HASHER = null;
+	
+	protected Hasher() {
+		GLOBAL_HASHER = this;
+	}
+	
+	public static Hasher getGlobalHasher() {
+		if (GLOBAL_HASHER == null) {
+			return Constructors.HASHER_CONSTRUCTOR.get();
+		}
+		return GLOBAL_HASHER;
+	}
+	
+	public abstract long getHash(Board board);
+	
+	public abstract long getNextHash(Board previous, Move transition);
+	
+}

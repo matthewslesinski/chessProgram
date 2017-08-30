@@ -3,10 +3,15 @@ package support;
 import java.util.Collection;
 import java.util.function.Function;
 import java.util.function.IntFunction;
+import java.util.function.Supplier;
 
 import boardFeatures.Square;
 import convenienceDataStructures.UnmodifiableWrappedSet;
 import gamePlaying.Color;
+import hashing.Hasher;
+import hashing.PseudoRandomNumbers;
+import hashing.RandomNumberGenerator;
+import hashing.ZobristHasher;
 import immutableArrayBoard.ImmutableArrayBoard;
 import moves.BasicMove;
 import moves.LazyPreProcessing;
@@ -51,4 +56,10 @@ public class Constructors {
 	public static MoveBuilder<? extends Move> MOVE_BUILDER_CONSTRUCTOR(MoveType type, PieceType movingPiece, Square start, Square end, Color movingColor) {
 		return new BasicMove.Builder(type, movingPiece, start, end, movingColor);
 	}
+	
+	/** A constructor for a random number generator. Ideally the sequences produced by these generators should not have much linear dependence. */
+	public static final Supplier<RandomNumberGenerator> RANDOM_NUMBER_GENERATOR = PseudoRandomNumbers::new;
+	
+	/** A constructor for an object used to hash {@code Board}s to longs */
+	public static final Supplier<Hasher> HASHER_CONSTRUCTOR = ZobristHasher::new;	
 }

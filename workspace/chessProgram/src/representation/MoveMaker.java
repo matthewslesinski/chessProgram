@@ -1,6 +1,5 @@
 package representation;
 
-import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
 import moves.Move;
@@ -32,9 +31,9 @@ public abstract class MoveMaker<B extends Board> {
 		if (!board.getLegalMoves().contains(move)) {
 			return null;
 		}
-		BoardBuilder<B> builder = getNewBuilderFromBoard(board);
+		BoardBuilder<B> builder = getNewBuilderFromBoard(board).withPreviousBoardAndLastMove(board, move);
 		Color movingColor = move.getMovingColor();
-		switch (move.getMovingPiece()) {
+		switch (move.getMovingPieceType()) {
 		case PAWN:
 			// Pawns have special move possibilities
 			if (move.isEnPassant()) {
@@ -45,7 +44,7 @@ public abstract class MoveMaker<B extends Board> {
 				builder.withPieceAtSquare(Piece.NONE, move.getEnPassantCaptureSquare());
 			} else if (move.isPromotion()) {
 				// Replace the moving pawn with the promotion piece
-				switchSquares(builder, move.getPromotionPiece(), move.getStartSquare(), move.getEndSquare(), movingColor);
+				switchSquares(builder, move.getPromotionPieceType(), move.getStartSquare(), move.getEndSquare(), movingColor);
 			} else {
 				// If the pawn is moving two squares forwards, record the en passant might be possible in the resulting board
 				if (Math.abs(move.getStartSquare().getRank().getIndex() - move.getEndSquare().getRank().getIndex()) == 2) {
@@ -57,14 +56,11 @@ public abstract class MoveMaker<B extends Board> {
 		case KING:
 			if (move.isCastle()) {
 				// Moving the king will get done below, but the rook needs to get moved too
-				CastlingRights relevantRight = CastlingRights.getByColorAndSide(movingColor, Side.getByRelation(move.getEndSquare()));
+				CastlingRights relevantRight = move.getUsedCastlingRight();
 				switchSquares(builder, PieceType.ROOK, relevantRight.getRookSquare(), relevantRight.getTargetRookSquare(), movingColor);
 			}
 			// roll on down
 		case ROOK:
-			// For kings or rooks, make sure the piece can no longer castle
-			CastlingRights.getAffectedRightsByColorAndSquare(movingColor, move.getStartSquare())
-				.forEach(right -> builder.withCastlingRight(right, false));
 		default:
 			// perform the move
 			switchSquares(builder, move);
@@ -73,15 +69,9 @@ public abstract class MoveMaker<B extends Board> {
 			}
 			break;
 		}
-		// If we're capturing a rook, we need to get rid of the castling rights involving that rook. Although it may seem that this is
-		// unimportant, since once the rook's gone, castling won't be able to be done in that direction, it's actually important because
-		// otherwise two identical positions with the same move set would have different castling rights, which could mess up hashing
-		if (move.isCapture() && move.getCapturedPiece() == PieceType.ROOK) {
-			CastlingRights.getAffectedRightsByColorAndSquare(movingColor.getOtherColor(), move.getEndSquare())
-				.forEach(right -> builder.withCastlingRight(right, false));
-		}
+		move.newlyDisabledCastlingRights().stream().forEach(right -> builder.withCastlingRight(right, false));
 		// change whose move it is and record the last move
-		return builder.withLastMove(move).withColorToMove(movingColor.getOtherColor()).build();
+		return builder.withColorToMove(movingColor.getOtherColor()).build();
 	}	
 	
 	/**
@@ -91,7 +81,7 @@ public abstract class MoveMaker<B extends Board> {
 	 * @return The builder
 	 */
 	protected BoardBuilder<B> switchSquares(BoardBuilder<B> builder, Move move) {
-		return switchSquares(builder, move.getMovingPiece(), move.getStartSquare(), move.getEndSquare(), move.getMovingColor());
+		return switchSquares(builder, move.getMovingPieceType(), move.getStartSquare(), move.getEndSquare(), move.getMovingColor());
 	}
 	
 	/**

@@ -17,6 +17,11 @@ import representation.CastlingRights;
  */
 public interface ProcessedBoard<B extends Board> {
 
+	/**
+	 * Gets the {@code Board} this preprocessing is for
+	 * @return The {@code Board}
+	 */
+	public B getOriginalBoard();
 	
 	/**
 	 * Gets the color to move

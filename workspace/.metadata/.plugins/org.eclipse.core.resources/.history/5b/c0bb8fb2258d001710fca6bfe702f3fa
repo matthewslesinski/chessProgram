@@ -1,0 +1,39 @@
+package moves;
+
+import lines.File;
+import pieces.PieceType;
+import representation.Board;
+
+public interface MoveBuilder<M extends Move> {
+
+	
+	/**
+	 * Specifies the type of piece that this move captures. While en passants involve capturing, though, this should not be called for an en passant
+	 * @param capturedPiece The type of captured piece
+	 * @return This builder
+	 */
+	public MoveBuilder<M> withCapture(PieceType capturedPiece);
+	
+	/**
+	 * Specifies the type of piece that the move promotes to
+	 * @param promotionPiece The {@code PieceType}
+	 * @return This builder
+	 */
+	public MoveBuilder<M> withPromotion(PieceType promotionPiece);
+	
+	public MoveBuilder<M> withRemovedEnPassantPrivileges(File previousPrivileges);
+	
+	public MoveBuilder<M> withRemovedKingsideCastlingRights();
+
+	public MoveBuilder<M> withRemovedQueensideCastlingRights();
+
+	public MoveBuilder<M> withRemovedEnemyCastlingRights();
+
+	public MoveBuilder<M> withChangedRightsFromBoard(Board previousBoard);
+	
+	/**
+	 * Hatches this cocoon into a {@code Move}. 
+	 * @return The {@code Move}
+	 */
+	public M build();
+}

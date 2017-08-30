@@ -99,7 +99,7 @@ public class MoveSet implements UnmodifiableWrappedSet<Move> {
 	public static Map<PieceType, Map<Square, List<Move>>> mapEndSquaresToMovesForPieces(Set<Move> moves) {
 		Map<PieceType, Map<Square, List<Move>>> map = new EnumMap<>(PieceType.class);
 		moves.forEach(move -> {
-			PieceType piece = move.getMovingPiece();
+			PieceType piece = move.getMovingPieceType();
 			Map<Square, List<Move>> squareMapping = map.getOrDefault(piece, new EnumMap<>(Square.class));
 			map.putIfAbsent(piece, squareMapping);
 			Square endSquare = move.getEndSquare();

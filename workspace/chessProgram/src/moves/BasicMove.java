@@ -1,9 +1,13 @@
 package moves;
 
 
+import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
+import lines.File;
 import pieces.PieceType;
+import representation.Board;
+import representation.CastlingRights;
 import support.BadArgumentException;
 
 /**
@@ -29,6 +33,11 @@ public class BasicMove implements Move {
 	private final PieceType promotionPiece;
 	private final boolean isEnPassant;
 	private final Color movingColor;
+	private final boolean removesEnPassantPermissions;
+	private final File removedEnPassantFile;
+	private final boolean kingsideCastlingPrevented;
+	private final boolean queensideCastlingPrevented;
+	private final boolean preventsEnemyCastling;
 	
 	/**
 	 * Builds a basic move from a compressed version
@@ -47,6 +56,11 @@ public class BasicMove implements Move {
 		promotionPiece = isPromotion ? getObject(PieceType.getPromotionPieces(), MoveBitStringSection.PROMOTION_TYPE, compressedMove) : null;
 		isEnPassant = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.IS_EN_PASSANT, compressedMove);
 		movingColor = Color.getColor(getObject(BOOLEAN_OPTIONS, MoveBitStringSection.COLOR, compressedMove));
+		removesEnPassantPermissions = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.PREVIOUS_EN_PASSANT_PERMISSIONS, compressedMove);
+		removedEnPassantFile = removesEnPassantPermissions ? getObject(File.values(), MoveBitStringSection.PREVIOUS_EN_PASSANT_FILE, compressedMove) : null;
+		kingsideCastlingPrevented = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.KINGSIDE_CASTLE_DISALLOWED, compressedMove);
+		queensideCastlingPrevented = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.QUEENSIDE_CASTLE_DISALLOWED, compressedMove);
+		preventsEnemyCastling = getObject(BOOLEAN_OPTIONS, MoveBitStringSection.ENEMY_CASTLING_PREVENTED, compressedMove);
 	}
 	
 	/**
@@ -58,8 +72,13 @@ public class BasicMove implements Move {
 	 * @param capturedPiece The type of piece being captured, or null if none
 	 * @param promotionPiece The type of piece the move promotes a pawn to, or none
 	 * @param color The color making the move
+	 * @param removedEnPassantPrivileges The {@code File} of the en passant privileges that are removed, if any
+	 * @param kingsideCastlingPrevented If the right to castle kingside for the moving color gets removed
+	 * @param queensideCastlingPrevented If the right to castle queenside for the moving color gets removed
+	 * @param enemyCastlingPrevented If the right to castle to some side for the not moving color gets removed
 	 */
-	private BasicMove(MoveType type, PieceType movingPiece, Square start, Square end, PieceType capturedPiece, PieceType promotionPiece, Color color) {
+	private BasicMove(MoveType type, PieceType movingPiece, Square start, Square end, PieceType capturedPiece, PieceType promotionPiece, Color color,
+			File removedEnPassantPrivileges, boolean kingsideCastlingPrevented, boolean queensideCastlingPrevented, boolean enemyCastlingPrevented) {
 		this.start = start;
 		this.movingPiece = movingPiece;
 		this.movingColor = color;
@@ -72,6 +91,7 @@ public class BasicMove implements Move {
 		switch (type) {
 		case EN_PASSANT:
 			isEnPassantArg = true;
+			// fall through to capture
 		case CAPTURE:
 			isCaptureArg = true;
 			captureArg = capturedPiece;
@@ -99,6 +119,11 @@ public class BasicMove implements Move {
 		this.isEnPassant = isEnPassantArg;
 		this.promotionPiece = promotionArg;
 		this.capturedPiece = captureArg;
+		this.removesEnPassantPermissions = removedEnPassantPrivileges != null;
+		this.removedEnPassantFile = removesEnPassantPermissions ? removedEnPassantPrivileges : null;
+		this.kingsideCastlingPrevented = kingsideCastlingPrevented;
+		this.queensideCastlingPrevented = queensideCastlingPrevented;
+		this.preventsEnemyCastling = enemyCastlingPrevented;
 	}
 	
 	/**
@@ -128,7 +153,7 @@ public class BasicMove implements Move {
 	}
 	
 	@Override
-	public PieceType getMovingPiece() {
+	public PieceType getMovingPieceType() {
 		return movingPiece;
 	}
 	
@@ -138,7 +163,7 @@ public class BasicMove implements Move {
 	}
 	
 	@Override
-	public PieceType getCapturedPiece() {
+	public PieceType getCapturedPieceType() {
 		return capturedPiece;
 	}
 
@@ -148,7 +173,7 @@ public class BasicMove implements Move {
 	}
 	
 	@Override
-	public PieceType getPromotionPiece() {
+	public PieceType getPromotionPieceType() {
 		return promotionPiece;
 	}
 
@@ -171,20 +196,55 @@ public class BasicMove implements Move {
 	public Square getEndSquare() {
 		return end;
 	}
+	
+	@Override
+	public boolean removesEnPassantPrivileges() {
+		return removesEnPassantPermissions;
+	}
+	
+	@Override
+	public File removedEnPassantFile() {
+		return removedEnPassantFile;
+	}
+	
+	@Override
+	public boolean preventsWhiteKingsideCastling() {
+		return getMovingColor().isWhite() ? kingsideCastlingPrevented : (preventsEnemyCastling && getEndSquare() == CastlingRights.BLACK_KINGSIDE.getRookSquare());
+	}
+	
+	@Override
+	public boolean preventsWhiteQueensideCastling() {
+		return getMovingColor().isWhite() ? queensideCastlingPrevented : (preventsEnemyCastling && getEndSquare() == CastlingRights.BLACK_QUEENSIDE.getRookSquare());
+	}
+	
+	@Override
+	public boolean preventsBlackKingsideCastling() {
+		return getMovingColor().isWhite() ? (preventsEnemyCastling && getEndSquare() == CastlingRights.WHITE_KINGSIDE.getRookSquare()) : kingsideCastlingPrevented;
+	}
+	
+	@Override
+	public boolean preventsBlackQueensideCastling() {
+		return getMovingColor().isWhite() ? (preventsEnemyCastling && getEndSquare() == CastlingRights.WHITE_QUEENSIDE.getRookSquare()) : queensideCastlingPrevented;
+	}
 
 	@Override
 	public int compress() {
 		int compressedMove = 0;
-		compressedMove |= MoveBitStringSection.MOVING_PIECE.setValue(compressedMove, movingPiece.ordinal());
-		compressedMove |= MoveBitStringSection.IS_CAPTURE.setValue(compressedMove, isCapture ? 1 : 0);
-		compressedMove |= MoveBitStringSection.CAPTURE_PIECE.setValue(compressedMove, capturedPiece == null ? 0 : capturedPiece.ordinal());
-		compressedMove |= MoveBitStringSection.START_SQUARE.setValue(compressedMove, start.ordinal());
-		compressedMove |= MoveBitStringSection.END_SQUARE.setValue(compressedMove, end.ordinal());
-		compressedMove |= MoveBitStringSection.IS_CASTLE.setValue(compressedMove, isCastle ? 1 : 0);
-		compressedMove |= MoveBitStringSection.IS_PROMOTION.setValue(compressedMove, isPromotion ? 1 :0);
+		compressedMove |= MoveBitStringSection.MOVING_PIECE.setValue(compressedMove, movingPiece);
+		compressedMove |= MoveBitStringSection.IS_CAPTURE.setValue(compressedMove, isCapture);
+		compressedMove |= MoveBitStringSection.CAPTURE_PIECE.setValue(compressedMove, capturedPiece);
+		compressedMove |= MoveBitStringSection.START_SQUARE.setValue(compressedMove, start);
+		compressedMove |= MoveBitStringSection.END_SQUARE.setValue(compressedMove, end);
+		compressedMove |= MoveBitStringSection.IS_CASTLE.setValue(compressedMove, isCastle);
+		compressedMove |= MoveBitStringSection.IS_PROMOTION.setValue(compressedMove, isPromotion);
 		compressedMove |= MoveBitStringSection.PROMOTION_TYPE.setValue(compressedMove, promotionPiece == null ? 0 : (promotionPiece.ordinal() - 1));
-		compressedMove |= MoveBitStringSection.IS_EN_PASSANT.setValue(compressedMove, isEnPassant ? 1 : 0);
-		compressedMove |= MoveBitStringSection.COLOR.setValue(compressedMove, movingColor.isWhite() ? 1 : 0);
+		compressedMove |= MoveBitStringSection.IS_EN_PASSANT.setValue(compressedMove, isEnPassant);
+		compressedMove |= MoveBitStringSection.COLOR.setValue(compressedMove, movingColor.isWhite());
+		compressedMove |= MoveBitStringSection.PREVIOUS_EN_PASSANT_PERMISSIONS.setValue(compressedMove, removesEnPassantPermissions);
+		compressedMove |= MoveBitStringSection.PREVIOUS_EN_PASSANT_FILE.setValue(compressedMove, removedEnPassantFile);
+		compressedMove |= MoveBitStringSection.KINGSIDE_CASTLE_DISALLOWED.setValue(compressedMove, kingsideCastlingPrevented);
+		compressedMove |= MoveBitStringSection.QUEENSIDE_CASTLE_DISALLOWED.setValue(compressedMove, queensideCastlingPrevented);
+		compressedMove |= MoveBitStringSection.ENEMY_CASTLING_PREVENTED.setValue(compressedMove, preventsEnemyCastling);
 		return compressedMove;
 	}
 	
@@ -197,7 +257,7 @@ public class BasicMove implements Move {
 			return true;
 		}
 		Move that = (Move) o;
-		return this.start == that.getStartSquare() && this.end == that.getEndSquare();
+		return this.start == that.getStartSquare() && this.end == that.getEndSquare() && this.promotionPiece == that.getPromotionPieceType();
 	}
 	
 	@Override
@@ -219,6 +279,10 @@ public class BasicMove implements Move {
 		private MoveType type = null;
 		private PieceType capturedPiece = null;
 		private PieceType promotionPiece = null;
+		private File removedEnPassantPrivileges = null;
+		private boolean kingsideCastlingPrevented = false;
+		private boolean queensideCastlingPrevented = false;
+		private boolean enemyCastlingPrevented = false;
 		
 		/**
 		 * Constructs a {@code BasicMove.Builder} using the essential pieces of information for a move.
@@ -275,6 +339,61 @@ public class BasicMove implements Move {
 		}
 		
 		@Override
+		public Builder withRemovedEnPassantPrivileges(File previousPrivileges) {
+			this.removedEnPassantPrivileges = previousPrivileges;
+			return this;
+		}
+		
+		@Override
+		public Builder withRemovedKingsideCastlingRights() {
+			this.kingsideCastlingPrevented = true;
+			return this;
+		}
+
+		@Override
+		public Builder withRemovedQueensideCastlingRights() {
+			this.queensideCastlingPrevented = true;
+			return this;
+		}
+
+		@Override
+		public Builder withRemovedEnemyCastlingRights() {
+			this.enemyCastlingPrevented = true;
+			return this;
+		}
+		
+		@Override
+		public Builder withChangedRightsFromBoard(Board previousBoard) {
+			File previousEnPassantPrivileges = previousBoard.enPassantCaptureFile();
+			switch (this.movingPiece) {
+			case ROOK:
+			case KING:
+				for (CastlingRights right : CastlingRights.getAffectedRightsByColorAndSquare(movingColor, start)) {
+					if (previousBoard.canCastle(right)) {
+						if (right.getSide() == Side.KINGSIDE) {
+							withRemovedKingsideCastlingRights();
+						} else {
+							withRemovedQueensideCastlingRights();
+						}
+					}
+				}
+			// roll on down
+			default:
+				// If we're capturing a rook on its start square, we need to get rid of the castling rights involving that rook. Although it may seem that this is
+				// unimportant, since once the rook's gone, castling won't be able to be done in that direction, it's actually important because
+				// otherwise two identical positions with the same move set would have different castling rights, which could mess up hashing
+				for (CastlingRights right : CastlingRights.getAffectedRightsByColorAndSquare(movingColor.getOtherColor(), end)) {
+					if (previousBoard.canCastle(right)) {
+						withRemovedEnemyCastlingRights();
+					}
+				}
+				break;
+			}
+			withRemovedEnPassantPrivileges(previousEnPassantPrivileges);
+			return this;
+		}
+		
+		@Override
 		public BasicMove build() {
 			PieceType promotionArg = null;
 			PieceType capturedArg = null;
@@ -298,7 +417,8 @@ public class BasicMove implements Move {
 				break;
 			}
 			
-			return new BasicMove(type, movingPiece, start, end, capturedArg, promotionArg, movingColor);
+			return new BasicMove(type, movingPiece, start, end, capturedArg, promotionArg, movingColor,
+					removedEnPassantPrivileges, kingsideCastlingPrevented, queensideCastlingPrevented, enemyCastlingPrevented);
 		}
 		
 		

@@ -18,7 +18,12 @@ public enum MoveBitStringSection {
 	IS_PROMOTION(20, 1),
 	PROMOTION_TYPE(21, 2),
 	IS_EN_PASSANT(23, 1),
-	COLOR(24, 1)
+	COLOR(24, 1),
+	PREVIOUS_EN_PASSANT_PERMISSIONS(25, 1),
+	PREVIOUS_EN_PASSANT_FILE(26, 3),
+	KINGSIDE_CASTLE_DISALLOWED(29, 1),
+	QUEENSIDE_CASTLE_DISALLOWED(30, 1),
+	ENEMY_CASTLING_PREVENTED(31, 1)
 	;
 	
 	private final int startBit;
@@ -38,6 +43,26 @@ public enum MoveBitStringSection {
 	public int setValue(int receptacle, int value) {
 		int unshiftedValue = lengthMask & value;
 		return receptacle | (unshiftedValue << startBit);
+	}
+	
+	/**
+	 * Given an int that represents a move, this sets a value on that int in the place specified by this enum instance
+	 * @param receptacle The int to set the value on. It is assumed the place specified by this enum instance is already zeroized
+	 * @param value The value to set - 1 if true, 0 if false
+	 * @return The int with the value set
+	 */
+	public int setValue(int receptacle, boolean value) {
+		return setValue(receptacle, value ? 1 : 0);
+	}
+	
+	/**
+	 * Given an int that represents a move, this sets a value on that int in the place specified by this enum instance
+	 * @param receptacle The int to set the value on. It is assumed the place specified by this enum instance is already zeroized
+	 * @param value The value to set - its ordinal if the value is non null, otherwise 0
+	 * @return The int with the value set
+	 */
+	public int setValue(int receptacle, Enum<?> value) {
+		return setValue(receptacle, value == null ? 0 : value.ordinal());
 	}
 	
 	/**

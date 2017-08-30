@@ -9,7 +9,7 @@ public interface Promotion extends Move {
 
 		
 	@Override
-	public default PieceType getMovingPiece() {
+	public default PieceType getMovingPieceType() {
 		return PieceType.PAWN;
 	}
 

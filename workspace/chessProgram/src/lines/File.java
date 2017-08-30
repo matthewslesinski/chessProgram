@@ -1,5 +1,6 @@
 package lines;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -124,8 +125,8 @@ public enum File implements Line {
 	 */
 	public static void setContainedSquares() {
 		for (File file : values()) {
-			file.containedSquares = UtilityFunctions.getRange(0, 8).stream()
-					.map(index -> Square.getByFileAndRankIndices(file.getIndex(), index))
+			file.containedSquares = Arrays.stream(UtilityFunctions.getRange(0, 8))
+					.map(UtilityFunctions.bind(Square::getByFileAndRankIndices, file.getIndex()))
 					.collect(Collectors.toList());
 			file.reverseContainedSquares = UtilityFunctions.reverseList(file.containedSquares);
 		}

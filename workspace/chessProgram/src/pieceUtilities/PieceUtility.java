@@ -220,9 +220,9 @@ public abstract class PieceUtility {
 		default:
 			break;
 		}
-		return builder.build();
+		return builder.withChangedRightsFromBoard(board.getOriginalBoard()).build();
 	}
-	
+		
 	/**
 	 * Infers the type of move represented by the movement from the start and end squares in the context of a board
 	 * 
