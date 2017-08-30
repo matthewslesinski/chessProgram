@@ -9,7 +9,7 @@ public interface Castling extends Move {
 	
 	
 	@Override
-	public default PieceType getMovingPiece() {
+	public default PieceType getMovingPieceType() {
 		return PieceType.KING;
 	}
 

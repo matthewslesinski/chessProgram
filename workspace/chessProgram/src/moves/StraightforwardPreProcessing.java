@@ -25,6 +25,9 @@ import support.UtilityFunctions;
 
 public abstract class StraightforwardPreProcessing<B extends Board> implements ProcessedBoard<B> {
 
+	/** The {@code Board} this preprocessing is for */
+	protected final B originalBoard;
+	
 	/** The color to move */
 	protected final Color toMove;
 	
@@ -63,6 +66,7 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	 * @param board The board to decompress
 	 */
 	public StraightforwardPreProcessing(B board) {
+		this.originalBoard = board;
 		toMove = board.whoseMove();
 		oppositeColor = toMove.getOtherColor();
 		for (CastlingRights right : CastlingRights.values()) {
@@ -177,6 +181,11 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	@Override
 	public Square getKingSquare() {
 		return kingSquare;
+	}
+	
+	@Override
+	public B getOriginalBoard() {
+		return this.originalBoard;
 	}
 	
 	@Override

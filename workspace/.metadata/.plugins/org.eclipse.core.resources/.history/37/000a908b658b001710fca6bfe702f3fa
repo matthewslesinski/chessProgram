@@ -1,0 +1,38 @@
+package hashing;
+
+import java.util.List;
+
+import moves.Move;
+import representation.Board;
+
+public class ZobristHasher<B extends Board> implements Hasher<B>{
+
+	private static final int NUMBER_OF_FEATURES = 781;
+	private static final long[] FEATURE_VALUES = new PseudoRandomNumbers().generateNumbers(NUMBER_OF_FEATURES);
+	
+	public ZobristHasher(Class<B> boardType) {
+		
+	}
+	
+	protected List<Integer> getChangedFeatures(Move transition) {
+		// TODO
+		return null;
+	}
+	
+	
+	@Override
+	public long getHash(B board) {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+	
+	@Override
+	public long getNextHash(B previous, Move transition) {
+		long previousCode = previous.getHashCode();
+		for (Integer featureIndex : getChangedFeatures(transition)) {
+			previousCode ^= FEATURE_VALUES[featureIndex];
+		}
+		return previousCode;
+	}
+
+}

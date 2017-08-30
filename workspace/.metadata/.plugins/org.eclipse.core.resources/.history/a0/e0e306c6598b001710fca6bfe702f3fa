@@ -1,0 +1,12 @@
+package hashing;
+
+import representation.Board;
+
+public interface Hasher {
+
+	public long getHash(Board board);
+	
+	public default long getNextHash(Board previous, Board next) {
+		return getHash(next);
+	}
+}

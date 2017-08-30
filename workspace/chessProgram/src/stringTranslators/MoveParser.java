@@ -154,7 +154,7 @@ public class MoveParser {
 			Square candidateSquare = move.getStartSquare();
 			return (startFileFinal == null || candidateSquare.getFile() == startFileFinal) &&
 					(startRankFinal == null || candidateSquare.getRank() == startRankFinal) &&
-					move.getPromotionPiece() == promotionFinal;
+					move.getPromotionPieceType() == promotionFinal;
 		}).collect(Collectors.toList());
 		
 		// If we aren't left with one choice by now, then we need either more or less specificity

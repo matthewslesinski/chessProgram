@@ -187,6 +187,11 @@ public enum CastlingRights {
 		return Collections.emptyList();
 	}
 	
+	/**
+	 * Gets a {@code CastlingRights} by the character used to represent it in a FEN string
+	 * @param character The character
+	 * @return The {@code CastlingRights}
+	 */
 	public static CastlingRights getByCharacter(char character) {
 		switch (character) {
 		case 'K':

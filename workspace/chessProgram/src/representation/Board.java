@@ -18,7 +18,7 @@ import stringTranslators.BoardStringifier;
  *
  */
 public abstract class Board implements State {
-
+	
 	/**
 	 * Stores the legal moves this board supports. If null, the moves haven't been calculated yet. If empty, there are no moves.
 	 */
@@ -82,6 +82,11 @@ public abstract class Board implements State {
 	 */
 	public abstract Move lastMove();
 	
+	/**
+	 * Retrieves the long used as the hashcode for this board
+	 * @return The long
+	 */
+	public abstract long getHashCode();
 	
 	@Override
 	public Set<Move> getLegalMoves() {
@@ -107,5 +112,8 @@ public abstract class Board implements State {
 		return new BoardStringifier<>(this).stringify();
 	}
 	
-	
+	@Override
+	public int hashCode() {
+		return (int) getHashCode();
+	}
 }

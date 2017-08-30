@@ -70,11 +70,13 @@ public abstract class BoardBuilder<B extends Board> {
 	public abstract BoardBuilder<B> withFiftyMoveRuleCount(int count);
 	
 	/**
-	 * Sets the move made to reach this board to the given move
-	 * @param move The last move
+	 * Passes the board that occurred previous to this board to the new one
+	 * and sets the move made to reach this board to the given {@code Move}
+	 * @param board The previous board
+	 * @param move The {@code Move} to get to this board
 	 * @return This builder
 	 */
-	public abstract BoardBuilder<B> withLastMove(Move move);
+	public abstract BoardBuilder<B> withPreviousBoardAndLastMove(Board previousBoard, Move move);
 
 	/**
 	 * Builds the board from this builder

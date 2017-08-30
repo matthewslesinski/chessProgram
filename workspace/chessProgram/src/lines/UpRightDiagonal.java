@@ -1,5 +1,6 @@
 package lines;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -101,7 +102,7 @@ public enum UpRightDiagonal implements Line {
 	private static List<Square> getListOfContainedSquares(int index) {
 		// The length is 8 minus how far the index is from the center, which is at index 7
 		int length = MAX_LENGTH - Math.abs(index - CENTER_INDEX);
-		return UtilityFunctions.getRange(0, length).stream()
+		return Arrays.stream(UtilityFunctions.getRange(0, length))
 				.map(offset -> Square.getByFileAndRank(
 						// As you go rightward along the diagonal, the file of the square rises proportionally
 						// The start file is only either 0 or index minus the center diagonal index when the

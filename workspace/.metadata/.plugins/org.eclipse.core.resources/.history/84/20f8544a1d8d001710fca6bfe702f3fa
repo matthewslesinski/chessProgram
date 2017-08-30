@@ -1,0 +1,26 @@
+package hashing;
+
+import moves.Move;
+import representation.Board;
+import support.Constructors;
+
+public abstract class Hasher {
+
+	private static Hasher GLOBAL_HASHER = null;
+	
+	protected Hasher() {
+		GLOBAL_HASHER = this;
+	}
+	
+	public static Hasher getGlobalHasher() {
+		if (GLOBAL_HASHER == null) {
+			return Constructors.HASHER_CONSTRUCTOR.get();
+		}
+		return GLOBAL_HASHER;
+	}
+	
+	public abstract long getHash(Board board);
+	
+	public abstract long getNextHash(Board previous, Move transition);
+	
+}

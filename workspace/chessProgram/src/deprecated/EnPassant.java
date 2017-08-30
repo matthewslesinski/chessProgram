@@ -8,7 +8,7 @@ public interface EnPassant extends Capture {
 
 	
 	@Override
-	public default PieceType getCapturedPiece() {
+	public default PieceType getCapturedPieceType() {
 		return PieceType.PAWN;
 	}
 	

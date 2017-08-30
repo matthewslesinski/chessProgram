@@ -104,7 +104,7 @@ public class LazyPreProcessing<B extends Board> extends StraightforwardPreProces
 			for (Direction direction : Direction.getOutwardDirections()) {
 				Square nextWithOccupant = getNextSquareWithPiece(potentiallyAttackedSquare, direction);
 				Piece occupant = getPieceAtSquare(nextWithOccupant);
-				if (!isNotAPiece(occupant) || coveredAttackers.contains(nextWithOccupant)) {
+				if (isNotAPiece(occupant) || coveredAttackers.contains(nextWithOccupant)) {
 					continue;
 				}
 				// If the next along the line is an enemy we haven't seen yet, find the squares it attacks

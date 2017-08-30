@@ -1,0 +1,7 @@
+package hashing;
+
+@FunctionalInterface
+public interface RandomNumberGenerator {
+
+	public long[] generateNumbers(int length);
+}
