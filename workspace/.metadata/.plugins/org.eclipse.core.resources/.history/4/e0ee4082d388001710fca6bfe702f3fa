@@ -1,6 +1,0 @@
-package independentDataStructures;
-
-
-public class NestedMaps<T, U, V> implements Map<T, Map<U, V>> {
-
-}

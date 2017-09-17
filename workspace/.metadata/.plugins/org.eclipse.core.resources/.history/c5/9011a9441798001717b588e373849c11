@@ -1,0 +1,74 @@
+package independentDataStructures;
+
+import java.util.HashMap;
+import java.util.Map;
+
+public class Tree<E, V> {
+
+	private class Node {
+		
+		private final Node parent;
+		private final V value;
+		private E mainChild = null;
+		private final Map<E, Node> children = new HashMap<>();
+		
+		private Node(V value) {
+			this(null, value);
+		}
+		
+		private Node(Node parent, V value) {
+			this.parent = parent;
+			this.value = value;
+		}
+		
+		private Node getParent() {
+			return parent;
+		}
+		
+		private V getValue() {
+			return value;
+		}
+		
+		private Node getMainChild() {
+			return children.get(mainChild);
+		}
+		
+		private Node getChild(E edge) {
+			return children.get(edge);
+		}
+		
+		private E getMainEdge() {
+			return mainChild;
+		}
+		
+		private void designateMainChild(E edge) {
+			if (children.containsKey(edge)) {
+				mainChild = edge;
+			}
+		}
+		
+		private void addChild(E edge, V value, boolean designateMainChild) {
+			if (!children.containsKey(edge)) {
+				children.put(edge, new Node(this, value));
+				if (mainChild == null || designateMainChild) {
+					designateMainChild(edge);
+				}
+			}
+		}
+		
+		private void addChild(E edge, V value) {
+			addChild(edge, value, false);
+		}
+		
+		private void addMainChild(E edge, V value) {
+			addChild(edge, value, true);
+		}
+	}
+
+	private final Node root;
+	private Node currentNode;
+	
+	private Tree(Class<E> edgeType, V root) {
+		this.root = new Node(root);
+	}
+}

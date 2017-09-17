@@ -1,0 +1,82 @@
+package stringUtilities;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import gamePlaying.Color;
+import gamePlaying.Game;
+
+/**
+ * An enum with details for the seven pgn tags that must be provided for each game
+ * @author matthewslesinski
+ *
+ */
+public enum RequiredPGNTag implements PGNTag {
+
+	EVENT("Event", "chessProgram"),
+	SITE("Site", "localhost"),
+	DATE("Date", new Date()),
+	ROUND("Round"),
+	WHITE("White", game -> game.getPlayerByColor(Color.WHITE).getName()),
+	BLACK("Black", game -> game.getPlayerByColor(Color.BLACK).getName()),
+	RESULT("Result", game -> game.getLastPosition().getState().toString()),
+	;
+		
+	private final boolean isRequired;
+	private final String name;
+	private final Function<Game, String> detailsObtainer;
+	
+	private static final Map<String, RequiredPGNTag> NAME_MAP = new HashMap<>();
+	static {
+		for (RequiredPGNTag detail : values()) {
+			NAME_MAP.put(detail.getName(), detail);
+		}
+	}
+	
+	private RequiredPGNTag(String name) {
+		this.name = name;
+		this.detailsObtainer = game -> game.getDetails(this, null);
+		this.isRequired = false;
+	}
+	
+	private RequiredPGNTag(String name, String defaultValue) {
+		this.name = name;
+		this.detailsObtainer = game -> game.getDetails(this, defaultValue);
+		this.isRequired = true;
+	}
+	
+	private RequiredPGNTag(String name, Date date) {
+		this(name, new SimpleDateFormat("yyyy.MM.dd").format(date));
+	}
+	
+	private RequiredPGNTag(String name, Function<Game, String> detailsObtainer) {
+		this.detailsObtainer = detailsObtainer;
+		this.isRequired = true;
+		this.name = name;
+	}
+	
+	
+	
+	
+	public boolean isRequired() {
+		return isRequired;
+	}
+	
+	@Override
+	public String getName() {
+		return name;
+	}
+	
+	@Override
+	public String retrieveFromGame(Game game) {
+		return detailsObtainer.apply(game);
+	}
+	
+	public static RequiredPGNTag getByName(String name) {
+		return NAME_MAP.get(name);
+	}
+}
+

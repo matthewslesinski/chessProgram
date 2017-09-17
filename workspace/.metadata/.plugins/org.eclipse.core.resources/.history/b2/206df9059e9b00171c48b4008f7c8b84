@@ -1,0 +1,5 @@
+package gamePlaying;
+
+public interface GameInterface {
+
+}

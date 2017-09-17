@@ -1,0 +1,57 @@
+package pieces;
+
+import java.util.List;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+
+public abstract class Piece {
+	
+	/**
+	 * The color, white or black, of this piece
+	 */
+	protected final Color color;
+	
+	/**
+	 * The type of piece this is
+	 */
+	protected final PieceType pieceType;
+	
+	/**
+	 * Constructor for pieces in general. Establishes the color of the piece
+	 * @param color
+	 */
+	public Piece(Color color, String name, PieceType pieceType) {
+		this.color = color;
+		this.pieceType = pieceType;
+	}
+	
+	/**
+	 * Gets this piece's color
+	 * @return the {@code Color}
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return The {@code PieceType} describing this piece
+	 */
+	public PieceType getType() {
+		return this.pieceType;
+	}
+	
+	/**
+	 * Gets the {@code List} of moves
+	 * @return
+	 */
+	public List<Square> getLegalMoves(Square square) {
+		
+	}
+	
+	@Override
+	public String toString() {
+		return this.pieceType.toString();
+	}
+}

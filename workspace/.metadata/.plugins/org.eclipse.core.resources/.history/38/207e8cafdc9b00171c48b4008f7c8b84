@@ -1,0 +1,71 @@
+package stringUtilities;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import gamePlaying.Game;
+import io.FileHandler;
+import support.Constants;
+
+/**
+ * Houses the logic for turning a pgn formatted string into a {@code Game}
+ * @author matthewslesinski
+ */
+public class PGNParser {
+
+	/** A string for the name of the regex group matching a tag's name */
+	private final static String TAG_NAME = "tagName";
+	
+	/** A string for the name of the regex group matching a tag's value */
+	private final static String TAG_VALUE = "tagValue";
+	
+	/** The string of the regex that can be used to parse tags */
+	private final static String TAG_REGEX_AS_STRING = "\\[(?<" + TAG_NAME + ">\\w+)\\s+\"(?<" + TAG_VALUE + ">.+)\"\\]";
+	
+	/** The above tag-parsing regex turned into a {@code Pattern} */
+	private final static Pattern TAG_REGEX = Pattern.compile(TAG_REGEX_AS_STRING);
+	
+	
+	public static Game fromFile(String filepath) {
+		return fromLines(FileHandler.getLinesFromFile(filepath));
+	}
+	
+	private static Game fromLines(List<String> lines) {
+		Map<String, String> tags = new HashMap<>();
+		Iterator<String> iterator = lines.iterator();
+		Matcher matcher;
+		String line = null;
+		boolean matches = false;
+		while (iterator.hasNext() && (matches = (matcher = TAG_REGEX.matcher(line = iterator.next())).matches())) {
+			String name = matcher.group(TAG_NAME);
+			String value = matcher.group(TAG_VALUE);
+			tags.put(name, value);
+		}
+		
+		Game game = initializeGameFromTags(tags);
+		
+		// The only time matches is true is if the iterator ran out
+		if (matches) {
+			return null;
+		}
+		StringBuilder gameContentBuilder = new StringBuilder(line);
+		iterator.forEachRemaining((gameContentBuilder.append(Constants.SINGLE_SPACE))::append);
+		String gameContent = gameContentBuilder.toString();
+		
+		return addGameContent(game, gameContent) ? game : null;
+	}
+	
+	private static Game initializeGameFromTags(Map<String, String> tags) {
+		// TODO
+		return null;
+	}
+	
+	private static boolean addGameContent(Game game, String content) {
+		// TODO
+		return false;
+	}
+}

@@ -1,0 +1,78 @@
+package pieces;
+
+import java.util.List;
+
+import boardFeatures.Square;
+import gamePlaying.Color;
+import representation.Board;
+
+public abstract class Piece {
+	
+	/**
+	 * The color, white or black, of this piece
+	 */
+	protected final Color color;
+	
+	/**
+	 * The type of piece this is
+	 */
+	protected final PieceType pieceType;
+	
+	/**
+	 * Constructor for pieces in general. Establishes the color of the piece
+	 * @param color
+	 */
+	public Piece(Color color, String name, PieceType pieceType) {
+		this.color = color;
+		this.pieceType = pieceType;
+	}
+	
+	/**
+	 * Gets this piece's color
+	 * @return the {@code Color}
+	 */
+	public Color getColor() {
+		return this.color;
+	}
+	
+	/**
+	 * Gets the type of piece this is
+	 * @return The {@code PieceType} describing this piece
+	 */
+	public PieceType getType() {
+		return this.pieceType;
+	}
+	
+	/**
+	 * Gets the {@code List} of moves for this piece
+	 * @return
+	 */
+	public abstract List<Square> getLegalMoves(Square square, Board board);
+	
+	
+	@Override
+	public String toString() {
+		return this.pieceType.toString();
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((color == null) ? 0 : color.hashCode());
+		result = prime * result + ((pieceType == null) ? 0 : pieceType.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Piece))
+			return false;
+		Piece other = (Piece) obj;
+		return color == other.color && pieceType == other.pieceType;
+	}
+}

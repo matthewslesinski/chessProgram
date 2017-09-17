@@ -1,0 +1,31 @@
+package stringUtilities;
+
+import gamePlaying.Game;
+import support.BadArgumentException;
+
+public class OptionalPGNTag implements PGNTag {
+
+	private final String name;
+	
+	public OptionalPGNTag(String name) {
+		if (RequiredPGNTag.getByName(name) != null) {
+			throw new BadArgumentException(name, OptionalPGNTag.class, "The provided name is the same as a required tag");
+		}
+		this.name = name;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public String retrieveFromGame(Game game) {
+		return game.getDetails(this, null);
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.name.hashCode();
+	}
+}

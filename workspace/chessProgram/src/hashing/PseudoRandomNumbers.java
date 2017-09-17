@@ -7,10 +7,10 @@ import support.UtilityFunctions;
 /**
  * Generates random longs by using Java's {@code Random} class to randomly set each bit of the longs
  * @author matthewslesinski
- *
  */
 public class PseudoRandomNumbers implements RandomNumberGenerator {
 
+	/** A generator for supplying random numbers */
 	private static final Random generator = new Random();
 	
 	/**

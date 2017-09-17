@@ -76,6 +76,9 @@ public class Constants {
 	/** The symbol for checkmate */
 	public static final String CHECKMATE_SYMBOL = "#";
 	
+	/** The value to put for a required pgn tag if no value is known */
+	public static final String UNKNOWN_PGN_VALUE = "?";
+	
 	/** The {@code File} the king starts on */
 	public static final File KING_START_FILE = File.E;
 
