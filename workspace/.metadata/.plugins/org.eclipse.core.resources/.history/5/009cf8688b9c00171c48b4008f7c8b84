@@ -15,8 +15,8 @@ import java.util.Map;
  * which the tree can be iterated. This main child can also be replaced by another child when desired.
  * @author matthewslesinski
  *
- * @param <E> The type of values used as edges. These must be able to be stored as keys in a {@code HashMap}
- * @param <V> The type of values wrapped in nodes.
+ * @param <E>
+ * @param <V>
  */
 public class Tree<E, V> implements Iterable<V> {
 
@@ -150,36 +150,20 @@ public class Tree<E, V> implements Iterable<V> {
 	/** What depth the current node is at */
 	private int depth;
 	
-	/**
-	 * Initializes the tree with a root
-	 * @param root The root
-	 */
 	public Tree(V root) {
 		this.root = new Node(root);
 		this.currentNode = this.root;
 		depth = 1;
 	}
 	
-	/**
-	 * Retrieves the depth of the currently visible node
-	 * @return The depth
-	 */
 	public int getCurrentDepth() {
 		return depth;
 	}
 	
-	/**
-	 * Retrieves the value wrapped in the currently visible node
-	 * @return The value
-	 */
 	public V getCurrentNodeValue() {
 		return currentNode.getValue();
 	}
 	
-	/**
-	 * Moves the currently visible node up a level, and returns the node, or null if moving up is not possible
-	 * @return The new visible node, or null
-	 */
 	public Node moveUp() {
 		if (currentNode != root) {
 			currentNode = currentNode.getParent();
@@ -190,11 +174,6 @@ public class Tree<E, V> implements Iterable<V> {
 		}
 	}
 	
-	/**
-	 * Sets the currently visible node to the provided child, and increments the depth
-	 * @param child The child to move down to
-	 * @return The new visible node
-	 */
 	private Node moveDownHelper(Node child) {
 		if (child != null) {
 			currentNode = child;
@@ -203,45 +182,22 @@ public class Tree<E, V> implements Iterable<V> {
 		return child;
 	}
 	
-	/**
-	 * Moves the currently visible node downwards through the default main child.
-	 * @return The newly visible node, or null if there are no children
-	 */
 	public Node moveDown() {
 		return moveDownHelper(currentNode.getMainChild());
 	}
 	
-	/**
-	 * Moves the currently visible node downwards through the provided edge.
-	 * @param edge The edge to move along
-	 * @return The newly visible node, or null if there are no children
-	 */
 	public Node moveDown(E edge) {
 		return moveDownHelper(currentNode.getChild(edge));
 	}
 	
-	/**
-	 * Adds a child to the current node as its main child
-	 * @param edge The edge to the new node
-	 * @param value The value to be wrapped in the new node
-	 */
 	public void addMainChild(E edge, V value) {
 		currentNode.addMainChild(edge, value);
 	}
 	
-	/**
-	 * Adds a child to the current node as a not-necessarily-main child
-	 * @param edge The edge to the new node
-	 * @param value The value to be wrapped in the new node
-	 */
 	public void addChild(E edge, V value) {
 		currentNode.addChild(edge, value);
 	}
 	
-	/**
-	 * Gets the leaf node at the end of the main branch
-	 * @return The value in that node
-	 */
 	public V getMainLeafValue() {
 		V last = null;
 		for (V value : this) {
