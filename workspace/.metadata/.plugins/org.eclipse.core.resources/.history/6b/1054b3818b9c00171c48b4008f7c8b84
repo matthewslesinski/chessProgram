@@ -15,8 +15,8 @@ import java.util.Map;
  * which the tree can be iterated. This main child can also be replaced by another child when desired.
  * @author matthewslesinski
  *
- * @param <E> The type of values used as edges. These must be able to be stored as keys in a {@code HashMap}
- * @param <V> The type of values wrapped in nodes.
+ * @param <E>
+ * @param <V>
  */
 public class Tree<E, V> implements Iterable<V> {
 
