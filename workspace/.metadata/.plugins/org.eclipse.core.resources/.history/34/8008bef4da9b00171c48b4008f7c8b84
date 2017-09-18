@@ -1,0 +1,17 @@
+package stringUtilities;
+
+import gamePlaying.Game;
+
+public class PGNWriter {
+
+	public static String write(Game game) {
+		StringBuilder builder = new StringBuilder();
+		//TODO
+		return builder.toString();
+	}
+	
+	public static String writeToFile(Game game) {
+		// TODO
+		return null;
+	}
+}

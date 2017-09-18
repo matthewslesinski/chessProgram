@@ -5,7 +5,7 @@ import gamePlaying.Color;
 import lines.File;
 import moves.Move;
 import pieces.Piece;
-import stringTranslators.FENStringParser;
+import stringUtilities.FENStringParser;
 
 public abstract class BoardBuilder<B extends Board> {
 	

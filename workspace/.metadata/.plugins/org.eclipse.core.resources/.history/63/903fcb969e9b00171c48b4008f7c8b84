@@ -1,0 +1,7 @@
+package gamePlaying;
+
+public abstract class GameInterface {
+
+	/** Holds the current game being played, so that it is always accessible */
+	private static Game CURRENT_GAME;
+}

@@ -1,0 +1,85 @@
+package gamePlaying;
+
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
+
+import representation.Board;
+import representation.BoardBuilder;
+import stringUtilities.PGNTag;
+import support.Constants;
+import support.Constructors;
+
+public abstract class GameInterface {
+
+	/** Holds the current game being played, so that it is always accessible */
+	private static GameInterface CURRENT_GAME;
+	
+	private final Map<PGNTag, String> gameDetails = new HashMap<>();
+	
+	/** The {@code Player} representation of the first player */
+	private final Player player1;
+	
+	/** The {@code Player} representation of the second player */
+	private final Player player2;
+	
+	/** Keeps track of which player has which color */
+	private final Map<Color, Player> colorMapping = new EnumMap<>(Color.class);
+	
+	
+	/** Builds the {@code Game} using constants passed as System properties */
+	public GameInterface() {
+		this(Constants.PLAYER_1_TYPE, Constants.PLAYER_1_NAME, Constants.PLAYER_2_TYPE, Constants.PLAYER_2_NAME, Constructors.BOARD_BUILDER_CONSTRUCTOR);
+	}
+	
+	public GameInterface(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor) {
+		this(player1Type, name1, player2Type, name2, constructor, Constants.STANDARD_START_POSITION);
+	}
+	
+	public GameInterface(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor, String startPosition) {
+		this.player1 = player1Type.createNew(name1);
+		this.player2 = player2Type.createNew(name2);
+		colorMapping.put(Color.WHITE, player1);
+		colorMapping.put(Color.BLACK, player2);
+		positions.add(constructor.apply(startPosition).build());
+		CURRENT_GAME = this;
+	}
+	
+	/**
+	 * Retrieves the current position
+	 * @return The {@code Board}
+	 */
+	public abstract Board getCurrentPosition();
+	
+	/**
+	 * pops the last 'plies' number of positions from this game
+	 * @param plies The number of plies to go back
+	 */
+	public abstract void undoPlies(int plies);
+	
+	/**
+	 * Retrieves the {@code Player} object representing the player whose move it is
+	 * @return The {@code Player}
+	 */
+	public Player getCurrentPlayer() {
+		return colorMapping.get(getCurrentPosition().whoseMove());
+	}
+	
+	/**
+	 * Returns the {@code Player} of a particular color
+	 * @param color The color to get
+	 * @return The {@code Player} representing the player using that color of pieces
+	 */
+	public Player getPlayerByColor(Color color) {
+		return colorMapping.get(color);
+	}
+	
+	/**
+	 * Retrieves the {@code Player} object representing the player whose move it is not
+	 * @return The {@code Player}
+	 */
+	public Player getIdlePlayer() {
+		return colorMapping.get(getCurrentPosition().whoseMove().getOtherColor());
+	}
+}

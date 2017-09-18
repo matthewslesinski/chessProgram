@@ -10,10 +10,10 @@ import support.Constructors;
  * hiding the names of the implementation class, this class keeps track of a static reference
  * to that lone hashing object that can be accessed globally
  * @author matthewslesinski
- *
  */
 public abstract class Hasher {
 
+	/** A globally accessible instance of a {@code Hasher} */
 	private static Hasher GLOBAL_HASHER = null;
 	
 	protected Hasher() {

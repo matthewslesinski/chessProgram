@@ -2,28 +2,25 @@ package gamePlaying;
 
 import java.util.Collection;
 import java.util.EnumMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 import representation.Board;
 import representation.BoardBuilder;
+import stringUtilities.OptionalPGNTag;
+import stringUtilities.PGNTag;
+import stringUtilities.PGNWriter;
+import stringUtilities.RequiredPGNTag;
 import support.Constants;
 import support.Constructors;
 
-/**
- * Comprises a complete game
- * @author matthewslesinski
- *
- */
-public class Game {
+public abstract class Game {
 
 	/** Holds the current game being played, so that it is always accessible */
 	private static Game CURRENT_GAME;
 	
-	/** The list of positions that have occurred in this game. The last one is the current position */
-	private final List<Board> positions = new LinkedList<>();
+	private final Map<PGNTag, String> gameDetails = new HashMap<>();
 	
 	/** The {@code Player} representation of the first player */
 	private final Player player1;
@@ -33,6 +30,7 @@ public class Game {
 	
 	/** Keeps track of which player has which color */
 	private final Map<Color, Player> colorMapping = new EnumMap<>(Color.class);
+	
 	
 	/** Builds the {@code Game} using constants passed as System properties */
 	public Game() {
@@ -48,17 +46,51 @@ public class Game {
 		this.player2 = player2Type.createNew(name2);
 		colorMapping.put(Color.WHITE, player1);
 		colorMapping.put(Color.BLACK, player2);
-		positions.add(constructor.apply(startPosition).build());
+		initBoardStore(constructor.apply(startPosition).build());
 		CURRENT_GAME = this;
 	}
+	
+	/**
+	 * Initializes the data structure that keeps track of the game's positions
+	 * @param initialBoard The first position in the game
+	 */
+	protected abstract void initBoardStore(Board initialBoard);
 	
 	/**
 	 * Retrieves the current position
 	 * @return The {@code Board}
 	 */
-	public Board getCurrentPosition() {
-		return positions.get(positions.size() - 1);
-	}
+	public abstract Board getCurrentPosition();
+	
+	/**
+	 * Retrieves the final position played in the game
+	 * @return The {@code Board}
+	 */
+	public abstract Board getLastPosition();
+	
+	/**
+	 * Pushes a position onto the game stack
+	 * @param board The {@code Board} with the position to push
+	 */
+	public abstract void addPosition(Board board);
+	
+	/**
+	 * Adds a variation for the game proceeding from the current position
+	 * @param board The board resulting from the first move of the variation
+	 */
+	public abstract void addVariation(Board board);
+	
+	/**
+	 * pops the last 'plies' number of positions from this game
+	 * @param plies The number of plies to go back
+	 */
+	public abstract void undoPlies(int plies);
+	
+	/**
+	 * Gets the number of plies played in this game
+	 * @return The number
+	 */
+	public abstract int getPlyNumber();
 	
 	/**
 	 * Retrieves the {@code Player} object representing the player whose move it is
@@ -69,29 +101,20 @@ public class Game {
 	}
 	
 	/**
+	 * Returns the {@code Player} of a particular color
+	 * @param color The color to get
+	 * @return The {@code Player} representing the player using that color of pieces
+	 */
+	public Player getPlayerByColor(Color color) {
+		return colorMapping.get(color);
+	}
+	
+	/**
 	 * Retrieves the {@code Player} object representing the player whose move it is not
 	 * @return The {@code Player}
 	 */
 	public Player getIdlePlayer() {
 		return colorMapping.get(getCurrentPosition().whoseMove().getOtherColor());
-	}
-	
-	/**
-	 * pops the last 'plies' number of positions from this game
-	 * @param plies The number of plies to go back
-	 */
-	public void undoPlies(int plies) {
-		while (plies-- > 0) {
-			positions.remove(positions.size() - 1);
-		}
-	}
-	
-	/**
-	 * Gets the number of plies played in this game
-	 * @return
-	 */
-	public int getPlyNumber() {
-		return positions.size();
 	}
 	
 	/**
@@ -115,11 +138,31 @@ public class Game {
 	}
 	
 	/**
-	 * Pushes a position onto the game stack
-	 * @param board The {@code Board} with the position to push
+	 * Gets the details that are present for this game
+	 * @param detailType The tag for the detail
+	 * @param defaultValue The default value to supply
+	 * @return The tag's value for this game
 	 */
-	public void addPosition(Board board) {
-		positions.add(board);
+	public String getDetails(PGNTag detailType, String defaultValue) {
+		return gameDetails.getOrDefault(detailType, defaultValue);
+	}
+	
+	/**
+	 * Associates a detail with this game
+	 * @param name The tag name for the detail
+	 * @param value The value to associate
+	 */
+	public void addDetail(String name, String value) {
+		PGNTag tag = RequiredPGNTag.getByName(name);
+		if (tag == null) {
+			tag = new OptionalPGNTag(name);
+		}
+		gameDetails.put(tag, value);
+	}
+	
+	@Override
+	public String toString() {
+		return PGNWriter.write(this);
 	}
 	
 	/**
@@ -144,7 +187,7 @@ public class Game {
 	 * Sets up a game and plays it
 	 */
 	public static void startPlaying() {
-		Game game = new Game();
+		Game game = Constructors.GAME_CONSTRUCTOR.get();
 		game.play();
 	}
 	

@@ -4,8 +4,8 @@ import java.io.IOException;
 
 import moves.Move;
 import representation.Board;
-import stringTranslators.FENStringWriter;
-import stringTranslators.MoveParser;
+import stringUtilities.FENStringWriter;
+import stringUtilities.MoveParser;
 import support.Constants;
 
 /**
@@ -131,11 +131,17 @@ public class UserActions {
 		}
 		Board nextPosition = currentPosition.performMove(nextMove);
 		game.addPosition(nextPosition);
-		if (nextPosition.isOver()) {
-			return nextPosition.isInCheck() ? "Congratulations, " + game.getIdlePlayer().getName() + " has won" :
-				"It's a draw!";
+		switch (GameState.getByBoard(nextPosition)) {
+		case STALEMATE:
+			return "It's a draw!";
+		case WHITE_WINS:
+			return "Congratulations, " + game.getPlayerByColor(Color.WHITE).getName() + " has won";
+		case BLACK_WINS:
+			return "Congratulations, " + game.getPlayerByColor(Color.BLACK).getName() + " has won";
+		default:
+			return null;
 		}
-		return null;
+		
 	}
 	
 }

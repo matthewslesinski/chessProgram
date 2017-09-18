@@ -5,11 +5,12 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import boardFeatures.Square;
+import gamePlaying.GameState;
 import gamePlaying.State;
 import lines.File;
 import moves.Move;
 import pieces.Piece;
-import stringTranslators.BoardStringifier;
+import stringUtilities.BoardStringifier;
 
 /**
  * Instances of this class represent a board position at a given point in time. As opposed to {@code State},
@@ -101,6 +102,10 @@ public abstract class Board implements State {
 	 * @return true iff the player's king is in check
 	 */
 	public abstract boolean isInCheck();
+	
+	public GameState getState() {
+		return GameState.getByBoard(this);
+	}
 	
 	@Override
 	public boolean isOver() {

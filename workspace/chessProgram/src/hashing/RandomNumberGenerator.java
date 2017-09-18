@@ -3,7 +3,6 @@ package hashing;
 /**
  * Some implementation that generates a sequence of random numbers
  * @author matthewslesinski
- *
  */
 @FunctionalInterface
 public interface RandomNumberGenerator {

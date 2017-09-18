@@ -23,7 +23,6 @@ import support.UtilityFunctions;
  * For Zobrist Hashing, linear independence is important. It would be useful if the random number generator used in this class provides numbers that have
  * a high minimum for the size of the subset of numbers that are not linearly independent
  * @author matthewslesinski
- *
  */
 public class ZobristHasher extends Hasher {
 
@@ -38,6 +37,11 @@ public class ZobristHasher extends Hasher {
 	
 	public ZobristHasher() {}
 	
+	/**
+	 * Retrieves the feature with a given index in the array of values
+	 * @param index The index to retrieve
+	 * @return The random number for that feature
+	 */
 	private static long getFeatureWithIndex(int index) {
 		return FEATURE_VALUES[index];
 	}

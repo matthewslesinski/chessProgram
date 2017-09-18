@@ -1,0 +1,31 @@
+package pieces;
+
+import gamePlaying.Color;
+
+public abstract class Piece {
+
+	/**
+	 * The human-readable name for this type of piece
+	 */
+	protected final String name;
+	
+	/**
+	 * The color, white or black, of this piece
+	 */
+	protected final Color color;
+	
+	/**
+	 * Constructor for pieces in general. Establishes the color of the piece
+	 * @param color
+	 */
+	public Piece(Color color, String name) {
+		this.color = color;
+		this.name = name;
+	}
+	
+	
+	@Override
+	public String toString() {
+		return this.name;
+	}
+}
