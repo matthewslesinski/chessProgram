@@ -11,6 +11,7 @@ import lines.File;
 import moves.Move;
 import pieces.Piece;
 import stringUtilities.BoardStringifier;
+import support.Constructors;
 
 /**
  * Instances of this class represent a board position at a given point in time. As opposed to {@code State},
@@ -103,6 +104,7 @@ public abstract class Board implements State {
 	 */
 	public abstract boolean isInCheck();
 	
+	@Override
 	public GameState getState() {
 		return GameState.getByBoard(this);
 	}
@@ -110,6 +112,15 @@ public abstract class Board implements State {
 	@Override
 	public boolean isOver() {
 		return getLegalMoves().isEmpty();
+	}
+	
+	@Override
+	public double evaluate() {
+		GameState state = getState();
+		if (state != GameState.STILL_GOING) {
+			return state.getEvaluation();
+		}
+		else return Constructors.EVALUATOR_CONSTRUCTOR.get().evaluateBoard(this);
 	}
 	
 	@Override
