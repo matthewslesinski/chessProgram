@@ -36,5 +36,18 @@ public interface State {
 	 */
 	public Board performMove(Move move);
 	
+	/**
+	 * Returns the state the current position is in
+	 * @return The {@code GameState}
+	 */
+	public GameState getState();
+	
+	/**
+	 * Calculates a short-sighted evaluation of the position. 0 is equality, sign determines which side is winning, and
+	 * magnitude indicates confidence
+	 * @return The evaluation as a double
+	 */
+	public double evaluate();
+	
 	
 }

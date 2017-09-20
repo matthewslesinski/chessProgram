@@ -11,6 +11,7 @@ import lines.File;
 import lines.Rank;
 import pieces.Piece;
 import pieces.PieceType;
+import representation.Board;
 import representation.CastlingRights;
 
 /**
@@ -297,6 +298,16 @@ public interface Move {
 	 * @return The compressed move in int form
 	 */
 	public int compress();
+	
+	/**
+	 * Turns a {@code Move} into a string, assuming it would be played on a given board
+	 * @param board
+	 * @return
+	 */
+	public default String getMoveAsStringInContext(Board board) {
+		// TODO
+		return null;
+	}
 	
 	/**
 	 * Gets the string form of this move. Whether to include the start file or rank is inferred using

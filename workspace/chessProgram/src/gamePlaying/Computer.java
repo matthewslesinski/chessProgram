@@ -1,6 +1,9 @@
 package gamePlaying;
 
+import moves.Move;
 import representation.Board;
+import search.AI;
+import support.Constructors;
 
 /**
  * Holds the implementation to interface with a computer player
@@ -15,6 +18,9 @@ public class Computer extends Player {
 	/** After each move by the other player, print the board */
 	private static final UserInput DEFAULT_ADDON = new UserInput(InputType.PRINT_BOARD);
 	
+	/** The object that can perform the calculations necessary to evaluate positions for this chess engine and determine moves to make */
+	private AI engine = Constructors.AI_CONSTRUCTOR.get();
+	
 	public Computer() {
 		this(DEFAULT_NAME);
 	}
@@ -25,8 +31,8 @@ public class Computer extends Player {
 	
 	@Override
 	public UserInput getNextInput(Board currentPosition) {
-		// TODO
-		return null;
+		Move bestMove = engine.bestMove(currentPosition);
+		return new UserInput(bestMove.getMoveAsStringInContext(currentPosition));
 	}
 
 	@Override

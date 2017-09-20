@@ -7,6 +7,7 @@ import java.util.function.Supplier;
 
 import boardFeatures.Square;
 import convenienceDataStructures.UnmodifiableWrappedSet;
+import evaluation.Evaluator;
 import gamePlaying.Color;
 import gamePlaying.Game;
 import gamePlaying.GameTree;
@@ -25,6 +26,7 @@ import moves.ProcessedBoard;
 import pieces.PieceType;
 import representation.Board;
 import representation.BoardBuilder;
+import search.AI;
 
 
 /**
@@ -67,5 +69,11 @@ public class Constructors {
 	
 	/** A constructor for an object used to hash {@code Board}s to longs */
 	public static final Supplier<Hasher> HASHER_CONSTRUCTOR = ZobristHasher::new;
+	
+	/** A constructor that returns an object that can estimate who is winning in a position */
+	public static final Supplier<Evaluator> EVALUATOR_CONSTRUCTOR = null;
+	
+	/** A constructor that returns an object that can be used to determine what the computer and its algorithms think is the best move in a position */
+	public static final Supplier<AI> AI_CONSTRUCTOR = null;
 	
 }
