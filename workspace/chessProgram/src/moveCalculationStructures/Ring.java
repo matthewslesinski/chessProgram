@@ -19,7 +19,7 @@ import independentDataStructures.BreadthFirstTraversal;
 import independentDataStructures.Cluster;
 import independentDataStructures.EnumSequence;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 
 /**
@@ -157,7 +157,7 @@ public class Ring<E extends Enum<E>> extends EnumSequence<E> implements AttackSt
 		// If there's two elements
 		case LARGEST_EXPECTED_CLOSE_ELEMENTS:
 			// Make sure they're in an order so that we can tell apart which one is which
-			UtilityFunctions.sortTwoElements(closestElements, this.comparator());
+			sortTwoElements(closestElements, this.comparator());
 			E firstElement = closestElements.get(0);
 			E secondElement = closestElements.get(1);
 			// If we care about them, add them to the sets, otherwise get rid of them

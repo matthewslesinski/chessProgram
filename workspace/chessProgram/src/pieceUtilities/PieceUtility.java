@@ -25,7 +25,7 @@ import pieces.Piece;
 import pieces.PieceType;
 import representation.Board;
 import support.BadArgumentException;
-import support.Constructors;
+import static support.Constructors.*;
 
 /**
  * The classes that extend this abstract class hold the utility method(s) for calculating
@@ -205,7 +205,7 @@ public abstract class PieceUtility {
 	 */
 	protected Move convertSquareToMove(Square fromSquare, Square toSquare, ProcessedBoard<?> board, MoveType type, PieceType promotion) {
 		Piece mover = board.getPieceAtSquare(fromSquare);
-		MoveBuilder<? extends Move> builder = Constructors.MOVE_BUILDER_CONSTRUCTOR(type, mover.getType(), fromSquare, toSquare, board.whoseMove());
+		MoveBuilder<? extends Move> builder = MOVE_BUILDER_CONSTRUCTOR(type, mover.getType(), fromSquare, toSquare, board.whoseMove());
 		switch (type) {
 		case PROMOTION_WITH_CAPTURE:
 			builder.withPromotion(promotion);

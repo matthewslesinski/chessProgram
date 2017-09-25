@@ -10,7 +10,7 @@ import java.util.function.IntFunction;
 
 import convenienceDataStructures.IrreversibleWrappedCollection;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * A {@code Set} of elements that are ordered, but also are fixed, so it's easy to get elements some
@@ -43,7 +43,7 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	 * @return The neighbors on either side
 	 */
 	public default Collection<E> getNeighbors(E e, Set<E> elementsToExclude) {
-		return UtilityFunctions.constructListOfElements(lower(e, elementsToExclude), higher(e, elementsToExclude));
+		return constructListOfElements(lower(e, elementsToExclude), higher(e, elementsToExclude));
 	}
 	
 	/**
@@ -52,7 +52,7 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	 * @return The neighbors on either side
 	 */
 	public default Collection<E> getNeighbors(E e) {
-		return UtilityFunctions.constructListOfElements(lower(e), higher(e));
+		return constructListOfElements(lower(e), higher(e));
 	}
 	
 	/**
@@ -62,7 +62,7 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	 * @return The third element in that direction
 	 */
 	public default E getThirdInSequence(E first, E second) {
-		switch (UtilityFunctions.getSign(comparator().compare(first, second))) {
+		switch (getSign(comparator().compare(first, second))) {
 		case -1:
 			return higher(second);
 		case 1:

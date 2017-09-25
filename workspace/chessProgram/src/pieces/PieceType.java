@@ -11,6 +11,7 @@ import pieceUtilities.PieceUtility;
 import pieceUtilities.Queen;
 import pieceUtilities.Rook;
 import support.BadArgumentException;
+import static support.Constants.*;
 
 
 /**
@@ -20,16 +21,17 @@ import support.BadArgumentException;
  */
 public enum PieceType {
 
-	PAWN("pawn", "", "p", Pawn::new),
-	KNIGHT("knight", "N", "n", color -> new Knight()),
-	BISHOP("bishop", "B", "b", color -> new Bishop()),
-	ROOK("rook", "R", "r", color -> new Rook()),
-	QUEEN("queen", "Q", "q", color -> new Queen()),
-	KING("king", "K", "k", King::new);
+	PAWN("pawn", "", "p", ESTIMATED_PAWN_MATERIAL_VALUE, Pawn::new),
+	KNIGHT("knight", "N", "n", ESTIMATED_KNIGHT_MATERIAL_VALUE, color -> new Knight()),
+	BISHOP("bishop", "B", "b", ESTIMATED_BISHOP_MATERIAL_VALUE, color -> new Bishop()),
+	ROOK("rook", "R", "r", ESTIMATED_ROOK_MATERIAL_VALUE, color -> new Rook()),
+	QUEEN("queen", "Q", "q", ESTIMATED_QUEEN_MATERIAL_VALUE, color -> new Queen()),
+	KING("king", "K", "k", ESTIMATED_KING_MATERIAL_VALUE, King::new);
 	
 	private final String readableForm;
 	private final String moveLetter;
 	private final String pieceLetter;
+	private final double conventionalEvaluation;
 	private final static PieceType[] HORIZONTAL_MOVERS = {ROOK, QUEEN};
 	private final static PieceType[] PROMOTION_PIECES = {KNIGHT, BISHOP, ROOK, QUEEN};
 	private final static PieceType[] LINE_MOVERS = {BISHOP, ROOK, QUEEN};
@@ -46,15 +48,17 @@ public enum PieceType {
 	 * @param readableForm How to describe this piece type in plain english
 	 * @param moveLetter The letter used to represent this piece
 	 * @param pieceLetter The letter used to abbreviate this piece type
+	 * @param conventionalEvaluation The conventional values, in pawns, assumed to each piece type, when chess is taught to beginners (king's get 0)
 	 * @param constructor A constructor for the utility class for this type of piece. A constructor
 	 * is an argument here because the utility class can't be instantiated earlier, since its constructor
 	 * takes this {@code PieceType} as an argument.
 	 */
-	private PieceType(String readableForm, String moveLetter, String pieceLetter, Function<Color, PieceUtility> constructor) {
+	private PieceType(String readableForm, String moveLetter, String pieceLetter, double conventionalEvaluation, Function<Color, PieceUtility> constructor) {
 		this.readableForm = readableForm;
 		this.utilityInstanceConstructor = constructor;
 		this.moveLetter = moveLetter;
 		this.pieceLetter = pieceLetter;
+		this.conventionalEvaluation = conventionalEvaluation;
 	}
 	
 	
@@ -163,6 +167,15 @@ public enum PieceType {
 	 */
 	public String getAbbreviationLetter() {
 		return pieceLetter;
+	}
+	
+	/**
+	 * Gets the conventional value attributed to pieces of this type, when chess is taught to beginners. Kings are
+	 * given 0, so they don't overshadow the values of the other pieces
+	 * @return The double representation of the value
+	 */
+	public double getConventionalEvaluation() {
+		return conventionalEvaluation;
 	}
 	
 	@Override

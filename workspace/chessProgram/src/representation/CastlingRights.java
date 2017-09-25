@@ -9,7 +9,7 @@ import boardFeatures.Square;
 import gamePlaying.Color;
 import lines.File;
 import lines.Rank;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * Describes the important distinctions between the four different ways castling can be done
@@ -58,7 +58,7 @@ public enum CastlingRights {
 		this.side = side;
 		this.rank = color.isWhite() ? Rank.ONE : Rank.EIGHT;
 		this.rookFile = side.getRookFile();
-		this.kingSquare = Square.getByFileAndRank(Constants.KING_START_FILE, this.rank);
+		this.kingSquare = Square.getByFileAndRank(KING_START_FILE, this.rank);
 		this.rookSquare = Square.getByFileAndRank(side.getRookFile(), this.rank);
 		this.targetKingSquare = Square.getByFileAndRank(side.isKingside() ? File.G : File.C, rank);
 		this.targetRookSquare = Square.getByFileAndRank(side.isKingside() ? File.F : File.D, rank);

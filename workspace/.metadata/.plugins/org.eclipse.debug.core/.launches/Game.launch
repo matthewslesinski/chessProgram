@@ -9,5 +9,5 @@
 <booleanAttribute key="org.eclipse.jdt.launching.ATTR_USE_START_ON_FIRST_THREAD" value="true"/>
 <stringAttribute key="org.eclipse.jdt.launching.MAIN_TYPE" value="gamePlaying.Game"/>
 <stringAttribute key="org.eclipse.jdt.launching.PROJECT_ATTR" value="chessProgram"/>
-<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Declipse=true -Dplayer1=human -Dplayer1Name=&quot;Matthew&quot; -Dplayer2=human -Dplayer2Name=&quot;Luke&quot; -DprintMoves=true"/>
+<stringAttribute key="org.eclipse.jdt.launching.VM_ARGUMENTS" value="-Declipse=true -Dplayer1=human -Dplayer1Name=&quot;Matthew&quot; -Dplayer2=computer -Dplayer2Name=&quot;Luke&quot; -DprintMoves=true"/>
 </launchConfiguration>

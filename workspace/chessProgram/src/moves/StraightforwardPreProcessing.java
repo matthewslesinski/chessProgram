@@ -21,7 +21,10 @@ import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
 import support.BadArgumentException;
+import support.BadBoardException;
 import support.UtilityFunctions;
+
+import static support.UtilityFunctions.*;
 
 public abstract class StraightforwardPreProcessing<B extends Board> implements ProcessedBoard<B> {
 
@@ -75,7 +78,11 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 		enPassantFile = board.enPassantCaptureFile();
 		initializeLists(piecesToSquares, () -> new LinkedList<Square>(), Piece.realPieces());
 		parseBoard(board);
-		kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		try {
+			kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
+		} catch (IndexOutOfBoundsException e) {
+			throw new BadBoardException(board, "No king");
+		}
 	}
 	
 	/**
@@ -111,7 +118,7 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	 */
 	protected List<Square> getListOfSquaresForPiecesOfColor(Color color, PieceType... types) {
 		return Arrays.stream(types)
-			.map(UtilityFunctions.bind(Piece::getByColorAndType, color).andThen(this::getListOfSquaresForPiece))
+			.map(bind(Piece::getByColorAndType, color).andThen(this::getListOfSquaresForPiece))
 			.reduce(Collections.emptyList(), UtilityFunctions::concat);
 	}
 	

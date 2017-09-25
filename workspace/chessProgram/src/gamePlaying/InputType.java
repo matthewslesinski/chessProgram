@@ -9,7 +9,7 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Organizes the various types of actions a player can make into a central paradigm. 
@@ -108,7 +108,7 @@ public enum InputType {
 		if (args.length > maxArgs) {
 			return (game -> String.format("Less arguments were expected for this action type. At most %d arguments must be provided", maxArgs));
 		}
-		return UtilityFunctions.bind(action, args);
+		return bind(action, args);
 	}
 	
 	/**

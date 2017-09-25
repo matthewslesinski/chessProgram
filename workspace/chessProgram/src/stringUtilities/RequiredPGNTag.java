@@ -8,7 +8,7 @@ import java.util.function.Function;
 
 import gamePlaying.Color;
 import gamePlaying.Game;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * An enum with details for the seven pgn tags that must be provided for each game
@@ -49,7 +49,7 @@ public enum RequiredPGNTag implements PGNTag {
 	 */
 	private RequiredPGNTag(String name) {
 		this.name = name;
-		this.detailsObtainer = game -> game.getDetails(this, Constants.UNKNOWN_PGN_VALUE);
+		this.detailsObtainer = game -> game.getDetails(this, UNKNOWN_PGN_VALUE);
 		this.isRequired = false;
 	}
 	

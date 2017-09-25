@@ -12,7 +12,7 @@ import lines.Direction;
 import moveCalculationStructures.OutwardLinePortions;
 import moves.ProcessedBoard;
 import pieces.Piece;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * The utility super class for rooks, bishops, and queens, since they all move in a straight line for a possibly far distance
@@ -39,7 +39,7 @@ public abstract class LineMover extends PieceUtility {
 	
 	@Override
 	public Collection<Square> calculatePossibleSquaresToThreaten(Square fromSquare) {
-		return UtilityFunctions.concat(getMovementDirections().stream()
+		return concat(getMovementDirections().stream()
 				.map(direction -> fromSquare.getSquaresInDirection(direction))
 				.collect(Collectors.toList()));
 	}

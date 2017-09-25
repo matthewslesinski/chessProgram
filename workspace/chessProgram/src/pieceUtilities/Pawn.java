@@ -16,7 +16,7 @@ import moves.ProcessedBoard;
 import pieces.Piece;
 import pieces.PieceType;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Provides the utility method(s) for calculating a pawn's legal moves
@@ -84,8 +84,8 @@ public class Pawn extends PieceUtility {
 	
 	@Override
 	public SquareSet calculatePossibleSquaresToMoveTo(Square fromSquare) {
-		return new SquareSet(UtilityFunctions.concat(super.calculatePossibleSquaresToMoveTo(fromSquare), calculatePossibleNonCaptureMoves(fromSquare)),
-				fromSquare, UtilityFunctions.bind(this::getDirectionFromCenter, fromSquare));
+		return new SquareSet(concat(super.calculatePossibleSquaresToMoveTo(fromSquare), calculatePossibleNonCaptureMoves(fromSquare)),
+				fromSquare, bind(this::getDirectionFromCenter, fromSquare));
 	}
 
 	@Override

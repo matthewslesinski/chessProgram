@@ -11,12 +11,12 @@ import moves.Move;
 import moves.ProcessedBoard;
 import pieceUtilities.PieceUtility;
 import support.BadArgumentException;
-import support.Constants;
+import static support.Constants.*;
 
 public enum Piece {
 
 	
-	NONE(Constants.RUNNING_FROM_ECLIPSE ? 0x3000 : ' '),
+	NONE(RUNNING_FROM_ECLIPSE ? 0x3000 : ' '),
 	WHITE_PAWN(0x2659),
 	WHITE_KNIGHT(0x2658),
 	WHITE_BISHOP(0x2657),

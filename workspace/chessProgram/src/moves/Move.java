@@ -2,16 +2,13 @@ package moves;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 import boardFeatures.Side;
 import boardFeatures.Square;
 import gamePlaying.Color;
 import lines.File;
-import lines.Rank;
 import pieces.Piece;
 import pieces.PieceType;
-import representation.Board;
 import representation.CastlingRights;
 
 /**
@@ -298,76 +295,5 @@ public interface Move {
 	 * @return The compressed move in int form
 	 */
 	public int compress();
-	
-	/**
-	 * Turns a {@code Move} into a string, assuming it would be played on a given board
-	 * @param board
-	 * @return
-	 */
-	public default String getMoveAsStringInContext(Board board) {
-		// TODO
-		return null;
-	}
-	
-	/**
-	 * Gets the string form of this move. Whether to include the start file or rank is inferred using
-	 * the provided {@code Map}, which tells which moves involve moving a piece and end on a square.
-	 * @param endSquareMap
-	 * @return The string of the move
-	 */
-	public default String getMoveAsString(Map<PieceType, Map<Square, List<Move>>> endSquareMap) {
-		boolean includeFile = false;
-		boolean includeRank = false;
-		File startFile = getStartSquare().getFile();
-		Rank startRank = getStartSquare().getRank();
-		List<Move> candidates = endSquareMap.get(this.getMovingPieceType()).get(this.getEndSquare());
-		if (candidates.size() > 1) {
-			boolean otherCandidates = false;
-			for (Move candidate : candidates) {
-				if (!this.getStartSquare().equals(candidate.getStartSquare())) {
-					
-					// If the candidate has the same file or rank, then we need to include the corresponding bit of information.
-					// Also, we've found some other square that has a piece of the same moving piece which can move to the end
-					// square of this move
-					otherCandidates = true;
-					includeFile |= startFile == candidate.getStartSquare().getFile();
-					includeRank |= startRank == candidate.getStartSquare().getRank();
-				}
-			}
-			// If there would still be ambiguity about which square is moving to the end square, cut it off
-			if (!includeFile && !includeRank && otherCandidates) {
-				includeFile = true;
-			}
-		}
-		return getMoveAsString(includeFile, includeRank);
-	}
-	
-	/**
-	 * Converts this move into a string
-	 * @param includeFile Whether to include the start file
-	 * @param includeRank Whether to include the start rank
-	 * @return The string of the move
-	 */
-	public default String getMoveAsString(boolean includeFile, boolean includeRank) {
-		if (isCastle()) {
-			return Side.getByRelation(getEndSquare()).isKingside() ? "0-0" : "0-0-0";
-		}
-		StringBuilder builder = new StringBuilder();
-		builder.append(getMovingPieceType());
-		if (includeFile || (getMovingPieceType() == PieceType.PAWN && isCapture())) {
-			builder.append(getStartSquare().getFile().getHumanReadableForm());
-		}
-		if (includeRank) {
-			builder.append(getStartSquare().getRank().getHumanReadableForm());
-		}
-		if (isCapture()) {
-			builder.append("x");
-		}
-		builder.append(getEndSquare());
-		if (isPromotion()) {
-			builder.append("=").append(getPromotionPieceType());
-		}
-		return builder.toString();
-	}
 	
 }

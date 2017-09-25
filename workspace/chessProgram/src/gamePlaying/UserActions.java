@@ -6,7 +6,7 @@ import moves.Move;
 import representation.Board;
 import stringUtilities.FENStringWriter;
 import stringUtilities.MoveParser;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * A utility class used to define the methods used to perform the actions a player intends whenever they give some input. Ideally,
@@ -33,7 +33,7 @@ public class UserActions {
 	 */
 	public static String exit(String[] args, Game game) {
 		try {
-			Constants.INPUT_READER.close();
+			INPUT_READER.close();
 		} catch(IOException e) {
 			// TODO log this
 		}
@@ -107,7 +107,7 @@ public class UserActions {
 	 * @return The string of the board
 	 */
 	public static String printBoard(String[] args, Game game) {
-		return game.getCurrentPosition().toString();
+		return game.getCurrentPosition().fullToString();
 	}
 	
 	public static String poke(String[] args, Game game) {

@@ -1,0 +1,34 @@
+package search;
+
+import java.util.Comparator;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+
+import moves.Move;
+import representation.Board;
+import static support.UtilityFunctions.*;
+
+public class BasicDepthBasedMinimax implements AI {
+
+	private static final int MAX_PLIES = 5;
+	
+	@Override
+	public Move bestMove(Board board) {
+		Comparator<Double> comparator = board.whoseMove().isWhite() ? Comparator.naturalOrder() : Comparator.naturalOrder();//reverse
+		Function<Move, Double> translator = bindAtEnd(BasicDepthBasedMinimax::bestMoveHelper, MAX_PLIES).compose(board::performMove);
+		BinaryOperator<Move> operator = (move1, move2) -> argmax(comparator, translator, move1, move2);
+		return board.getLegalMoves().stream().reduce(operator).get();
+	}
+	
+	private static double bestMoveHelper(Board board, int pliesLeft) {
+		if (pliesLeft == 1) {
+			return board.evaluate();
+		}
+		BinaryOperator<Double> optimumFinder = board.whoseMove().isWhite() ? Math::max : Math::min;
+		return board.getLegalMoves().stream()
+				.map(bindAtEnd(BasicDepthBasedMinimax::bestMoveHelper, pliesLeft - 1).compose(board::performMove))
+				.reduce(optimumFinder).get();
+	}
+	
+
+}

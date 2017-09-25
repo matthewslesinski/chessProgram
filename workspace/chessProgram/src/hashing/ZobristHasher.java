@@ -9,8 +9,9 @@ import moves.Move;
 import pieces.Piece;
 import representation.Board;
 import representation.CastlingRights;
-import support.Constructors;
 import support.UtilityFunctions;
+
+import static support.Constructors.*;
 
 /**
  * Implements board hashing using Zobrist Hashing. It keeps track of 781 random longs, each of which signifies a possible feature on the board.
@@ -27,7 +28,7 @@ import support.UtilityFunctions;
 public class ZobristHasher extends Hasher {
 
 	private static final int NUMBER_OF_FEATURES = 781;
-	private static final long[] FEATURE_VALUES = Constructors.RANDOM_NUMBER_GENERATOR.get().generateNumbers(NUMBER_OF_FEATURES);
+	private static final long[] FEATURE_VALUES = RANDOM_NUMBER_GENERATOR.get().generateNumbers(NUMBER_OF_FEATURES);
 	private static final long STARTER_CODE = 0L;
 	private static final int NUMBER_OF_POSSIBLE_PIECES = 12;
 	private static final int PIECE_INDEX_BASE = 0;

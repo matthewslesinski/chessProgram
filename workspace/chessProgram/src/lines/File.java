@@ -6,8 +6,8 @@ import java.util.stream.Collectors;
 
 import boardFeatures.Square;
 import support.BadArgumentException;
-import support.Constants;
-import support.UtilityFunctions;
+import static support.Constants.*;
+import static support.UtilityFunctions.*;
 
 /**
  * Represents a vertical column of squares on the board, of which there are 8
@@ -117,7 +117,7 @@ public enum File implements Line {
 	
 	@Override
 	public String toString() {
-		return Constants.RUNNING_FROM_ECLIPSE ? eclipseSpecificLengthenedForm : getHumanReadableForm();
+		return RUNNING_FROM_ECLIPSE ? eclipseSpecificLengthenedForm : getHumanReadableForm();
 	}
     
 	/**
@@ -125,10 +125,10 @@ public enum File implements Line {
 	 */
 	public static void setContainedSquares() {
 		for (File file : values()) {
-			file.containedSquares = Arrays.stream(UtilityFunctions.getRange(0, 8))
-					.map(UtilityFunctions.bind(Square::getByFileAndRankIndices, file.getIndex()))
+			file.containedSquares = Arrays.stream(getRange(0, 8))
+					.map(bind(Square::getByFileAndRankIndices, file.getIndex()))
 					.collect(Collectors.toList());
-			file.reverseContainedSquares = UtilityFunctions.reverseList(file.containedSquares);
+			file.reverseContainedSquares = reverseList(file.containedSquares);
 		}
 	}
 }

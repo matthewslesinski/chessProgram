@@ -1,0 +1,27 @@
+package search;
+
+import java.util.Comparator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+
+import moves.Move;
+import representation.Board;
+import static support.UtilityFunctions.*;
+
+public class BasicDepthBasedMinimax implements AI {
+
+	private static final int MAX_PLIES = 5;
+	
+	@Override
+	public Move bestMove(Board board) {
+		
+	}
+	
+	private static double bestMoveHelper(Board board, int pliesLeft) {
+		if (pliesLeft == 0) {
+			return board.evaluate();
+		}
+		return board.getLegalMoves().stream().map(bindAtEnd(BasicDepthBasedMinimax::bestMoveHelper, pliesLeft - 1).compose(board::performMove)).reduce(Math::max).get();
+	}
+
+}

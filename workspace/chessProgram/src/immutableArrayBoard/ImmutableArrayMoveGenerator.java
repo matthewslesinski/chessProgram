@@ -18,8 +18,8 @@ import moves.Move;
 import representation.MoveGenerator;
 import representation.Board;
 import support.BadArgumentException;
-import support.Constructors;
-import support.UtilityFunctions;
+import static support.Constructors.*;
+import static support.UtilityFunctions.*;
 
 /**
  * Calculates the moves for a given position. This is a mutable object, and so it could technically be used to calculate moves
@@ -48,16 +48,16 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 	
 	@Override
 	public Set<Move> calculateMoves(ImmutableArrayBoard board) {
-		preprocessing = Constructors.PRE_PROCESSING_CONSTRUCTOR.apply(board);
+		preprocessing = PRE_PROCESSING_CONSTRUCTOR.apply(board);
 		preprocessing.calculateKingSafety();
 		checks = preprocessing.whoIsAttackingTheKing();
 		toMove = preprocessing.whoseMove();
 		moves = new LinkedList<>();
 		getSquaresForPiecesOfThisColor =
-				UtilityFunctions.bind(Piece::getByColorAndType, toMove).andThen(preprocessing::getListOfSquaresForPiece);
+				bind(Piece::getByColorAndType, toMove).andThen(preprocessing::getListOfSquaresForPiece);
 		kingSquare = preprocessing.getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
 		realizeMoves();
-		return Constructors.MOVESET_CONSTRUCTOR.apply(moves);
+		return MOVESET_CONSTRUCTOR.apply(moves);
 	}
 	
 	/**
@@ -65,7 +65,7 @@ public class ImmutableArrayMoveGenerator extends MoveGenerator<ImmutableArrayBoa
 	 */
 	private void realizeMoves() {
 		Collection<Square> pieceSquares = checks.size() > 1 ? Collections.singleton(kingSquare) :
-			UtilityFunctions.concat(Arrays.stream(PieceType.values()).map(getSquaresForPiecesOfThisColor).collect(Collectors.toList()));
+			concat(Arrays.stream(PieceType.values()).map(getSquaresForPiecesOfThisColor).collect(Collectors.toList()));
 		pieceSquares.stream().map(square -> preprocessing.getPieceAtSquare(square).getLegalMoves(square, preprocessing)).forEach(moves::addAll);
 	}
 

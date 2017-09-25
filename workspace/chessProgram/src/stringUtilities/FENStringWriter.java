@@ -12,8 +12,8 @@ import lines.Rank;
 import pieces.Piece;
 import representation.Board;
 import representation.CastlingRights;
-import support.Constants;
-import support.UtilityFunctions;
+import static support.Constants.*;
+import static support.UtilityFunctions.*;
 
 /**
  * Turns a board into a fen string.
@@ -41,9 +41,9 @@ public class FENStringWriter {
 		this.board = board;
 		this.moveNumber = moveNumber;
 		// Apply the arguments to the actions list
-		List<Runnable> appliedActions = (List<Runnable>) actions.stream().map(action -> UtilityFunctions.bind(action, this)).collect(Collectors.toList());
+		List<Runnable> appliedActions = (List<Runnable>) actions.stream().map(action -> bind(action, this)).collect(Collectors.toList());
 		// There should be a space after each segment
-		UtilityFunctions.joinActions(appliedActions, () -> builder.append(Constants.SINGLE_SPACE));
+		joinActions(appliedActions, () -> builder.append(SINGLE_SPACE));
 	}
 	
 	
@@ -62,7 +62,7 @@ public class FENStringWriter {
 	 */
 	private static void addPosition(Board board, StringBuilder builder) {
 		List<Runnable> actions = Arrays.stream(Rank.values()).map(rank -> (Runnable) () -> addFENForRank(board, rank, builder)).collect(Collectors.toList());
-		UtilityFunctions.joinActions(UtilityFunctions.reverseList(actions), () -> builder.append(Constants.SLASH));
+		joinActions(reverseList(actions), () -> builder.append(SLASH));
 	}
 	
 	/**
@@ -119,7 +119,7 @@ public class FENStringWriter {
 			addedCastleRight |= addCastlingRight(board, builder, right);
 		}
 		if (!addedCastleRight) {
-			builder.append(Constants.DASH);
+			builder.append(DASH);
 		}
 	}
 	
@@ -148,7 +148,7 @@ public class FENStringWriter {
 		if (enPassantFile != null) {
 			builder.append(Square.getByFileAndRank(enPassantFile, board.whoseMove().getEnPassantDestinationRank()));
 		} else {
-			builder.append(Constants.DASH);
+			builder.append(DASH);
 		}
 	}
 	
