@@ -2,7 +2,7 @@ package hashing;
 
 import moves.Move;
 import representation.Board;
-import support.Constructors;
+import static support.Constructors.*;
 
 /**
  * Implementations of this class provide functionality for hashing a board into a long.
@@ -26,7 +26,7 @@ public abstract class Hasher {
 	 */
 	public static Hasher getGlobalHasher() {
 		if (GLOBAL_HASHER == null) {
-			return Constructors.HASHER_CONSTRUCTOR.get();
+			return HASHER_CONSTRUCTOR.get();
 		}
 		return GLOBAL_HASHER;
 	}

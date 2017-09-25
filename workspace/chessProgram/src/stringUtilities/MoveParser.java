@@ -13,7 +13,6 @@ import boardFeatures.Square;
 import lines.File;
 import lines.Rank;
 import moves.Move;
-import moves.MoveSet;
 import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
@@ -70,7 +69,7 @@ public class MoveParser {
 		Set<Move> legalMoves = board.getLegalMoves();
 		
 		// Retrieve a mapping of which pieces can move to each end square
-		Map<PieceType, Map<Square, List<Move>>> endSquareMappings = MoveSet.mapEndSquaresToMovesForPieces(legalMoves);
+		Map<PieceType, Map<Square, List<Move>>> endSquareMappings = MoveWriter.mapEndSquaresToMovesForPieces(legalMoves);
 		
 		// Actually match the string. Not only will this determine if the input is of the right form, but it will put each named group
 		// according to the regex into groups in the matcher

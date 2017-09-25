@@ -11,7 +11,7 @@ import lines.File;
 import moves.Move;
 import pieces.Piece;
 import stringUtilities.BoardStringifier;
-import support.Constructors;
+import static support.Constructors.*;
 
 /**
  * Instances of this class represent a board position at a given point in time. As opposed to {@code State},
@@ -120,12 +120,29 @@ public abstract class Board implements State {
 		if (state != GameState.STILL_GOING) {
 			return state.getEvaluation();
 		}
-		else return Constructors.EVALUATOR_CONSTRUCTOR.get().evaluateBoard(this);
+		else return EVALUATOR_CONSTRUCTOR.get().evaluateBoard(this);
+	}
+	
+	/**
+	 * Turns a {@code Board} into a string that includes color for the squares but not the last move made
+	 * @return The {@code String} of the board
+	 */
+	public String basicToString() {
+		return new BoardStringifier<>(this, true, false).stringify();
+	}
+	
+	/**
+	 * Turns a {@code Board} into a string that includes the last move made and color for the squares
+	 * @return The {@code String} of the board
+	 */
+	public String fullToString() {
+		return new BoardStringifier<>(this, true).stringify();
 	}
 	
 	@Override
 	public String toString() {
-		return new BoardStringifier<>(this).stringify();
+		// This will not color the squares or include the last move
+		return new BoardStringifier<>(this, false, false).stringify();
 	}
 	
 	@Override

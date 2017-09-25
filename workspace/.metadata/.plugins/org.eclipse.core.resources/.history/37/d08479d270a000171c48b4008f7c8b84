@@ -1,0 +1,37 @@
+package support;
+
+import java.util.Comparator;
+import java.util.function.Function;
+import java.util.function.ToDoubleFunction;
+import java.util.function.ToIntFunction;
+
+public class UtilityMathFunctions {
+
+	public static <T, U> T argmax(Comparator<? super U> comparator, Function<T, U> translator, T arg1, T arg2) {
+		if (comparator.compare(translator.apply(arg1), translator.apply(arg2)) < 0) {
+			return arg2;
+		} else {
+			return arg1;
+		}
+	}
+	
+	public static <T, U extends Comparable<U>> T argmax(Function<T, U> translator, T arg1, T arg2) {
+		return argmax(Comparator.naturalOrder(), translator, arg1, arg2);
+	}
+	
+	public static <T> T argmax(ToDoubleFunction<T> translator, T arg1, T arg2) {
+		if (Double.compare(translator.applyAsDouble(arg1), translator.applyAsDouble(arg2)) < 0) {
+			return arg2;
+		} else {
+			return arg1;
+		}
+	}
+	
+	public static <T> T argmax(ToIntFunction<T> translator, T arg1, T arg2) {
+		if (Integer.compare(translator.applyAsInt(arg1), translator.applyAsInt(arg2)) < 0) {
+			return arg2;
+		} else {
+			return arg1;
+		}
+	}
+}

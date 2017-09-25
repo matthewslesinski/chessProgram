@@ -17,7 +17,7 @@ import moves.MoveType;
 import moves.ProcessedBoard;
 import pieces.PieceType;
 import representation.CastlingRights;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Provides the utility method(s) for calculating a king's legal moves
@@ -55,7 +55,7 @@ public class King extends PieceUtility {
 	
 	@Override
 	public SquareSet calculatePossibleSquaresToMoveTo(Square fromSquare) {
-		return new KingMoveSet(UtilityFunctions.concat(super.calculatePossibleSquaresToMoveTo(fromSquare), calculatePossibleCastleSquares(fromSquare)), fromSquare);
+		return new KingMoveSet(concat(super.calculatePossibleSquaresToMoveTo(fromSquare), calculatePossibleCastleSquares(fromSquare)), fromSquare);
 	}
 
 	@Override

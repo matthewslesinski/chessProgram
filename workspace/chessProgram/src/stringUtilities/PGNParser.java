@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 import gamePlaying.Game;
 import io.FileHandler;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * Houses the logic for turning a pgn formatted string into a {@code Game}
@@ -66,7 +66,7 @@ public class PGNParser {
 			return null;
 		}
 		StringBuilder gameContentBuilder = new StringBuilder(line);
-		iterator.forEachRemaining((gameContentBuilder.append(Constants.SINGLE_SPACE))::append);
+		iterator.forEachRemaining((gameContentBuilder.append(SINGLE_SPACE))::append);
 		String gameContent = gameContentBuilder.toString();
 		
 		return addGameContent(game, gameContent) ? game : null;

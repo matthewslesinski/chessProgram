@@ -37,6 +37,12 @@ public interface State {
 	public Board performMove(Move move);
 	
 	/**
+	 * Reverses the previous move to return to the previous position
+	 * @return The {@code Board}
+	 */
+	public Board getPreviousPosition();
+	
+	/**
 	 * Returns the state the current position is in
 	 * @return The {@code GameState}
 	 */

@@ -8,8 +8,8 @@ import lines.Rank;
 import moves.Move;
 import pieces.Piece;
 import representation.Board;
-import support.Constants;
-import support.UtilityFunctions;
+import static support.Constants.*;
+import static support.UtilityFunctions.*;
 
 public class BoardStringifier<B extends Board> {
 
@@ -17,20 +17,28 @@ public class BoardStringifier<B extends Board> {
 	private static final String LAST_MOVE_TEXT = "The previous move: ";
 	private final Board board;
 	private final Piece[] pieces;
+	private final boolean includeLastMove;
+	private final boolean includeAnsi;
 	
 	StringBuilder builder = new StringBuilder();
 	
-	public BoardStringifier(B board) {
+	public BoardStringifier(B board, boolean includeAnsi) {
+		this(board, includeAnsi, true);
+	}
+	
+	public BoardStringifier(B board, boolean includeAnsi, boolean includeLastMove) {
 		this.board = board;
 		pieces = board.toPieceArray();
+		this.includeLastMove = includeLastMove;
+		this.includeAnsi = includeAnsi;
 	}
 	
 	/**
 	 * Appends a dashed line
 	 */
 	private void addDashedLine() {
-		builder.append(Constants.NEWLINE);
-		builder.append(Constants.TRIPLE_SPACE);
+		builder.append(NEWLINE);
+		builder.append(TRIPLE_SPACE);
 		builder.append("-----------------------------");
 	}
 	
@@ -40,16 +48,16 @@ public class BoardStringifier<B extends Board> {
 	 */
 	private void stringifySquare(Square currentSquare) {
 		Piece piece = currentSquare.getValueOfSquareInArray(pieces);
-		if (currentSquare.isDarkSquare()) {
-			builder.append(Constants.ESCAPE_CHARACTER);
-			builder.append(Constants.ANSI_DARK_SQUARE);
+		if (currentSquare.isDarkSquare() && includeAnsi) {
+			builder.append(ESCAPE_CHARACTER);
+			builder.append(ANSI_DARK_SQUARE);
 		}
-		builder.append(Constants.SINGLE_SPACE);
+		builder.append(SINGLE_SPACE);
 		builder.append(piece);
-		builder.append(Constants.SINGLE_SPACE);
-		if (currentSquare.isDarkSquare()) {
-			builder.append(Constants.ESCAPE_CHARACTER);
-			builder.append(Constants.ANSI_RESET_ATTRIBUTES);
+		builder.append(SINGLE_SPACE);
+		if (currentSquare.isDarkSquare() && includeAnsi) {
+			builder.append(ESCAPE_CHARACTER);
+			builder.append(ANSI_RESET_ATTRIBUTES);
 		}
 	}
 	
@@ -57,25 +65,25 @@ public class BoardStringifier<B extends Board> {
 	 * Adds the letter names for the coordinates for each file below the board
 	 */
 	private void addFileNames() {
-		builder.append(Constants.DOUBLE_SPACE);
+		builder.append(DOUBLE_SPACE);
 		for (File file : File.values()) {
-			builder.append(Constants.DOUBLE_SPACE);
+			builder.append(DOUBLE_SPACE);
 			builder.append(file);
 		}
-		builder.append(Constants.NEWLINE);
+		builder.append(NEWLINE);
 	}
 	
 	/**
 	 * Shows the actual board
 	 */
 	private void stringifyBoard() {
-		builder.append(Constants.NEWLINE);
-		for (Rank rank : UtilityFunctions.reverseList(Arrays.asList(Rank.values()))) {
-			builder.append(rank + Constants.DOUBLE_SPACE);
+		builder.append(NEWLINE);
+		for (Rank rank : reverseList(Arrays.asList(Rank.values()))) {
+			builder.append(rank + DOUBLE_SPACE);
 			for (File file : File.values()) {
 				stringifySquare(Square.getByFileAndRank(file, rank));
 			}
-			builder.append(Constants.NEWLINE);
+			builder.append(NEWLINE);
 		}
 		addFileNames();
 	}
@@ -93,10 +101,10 @@ public class BoardStringifier<B extends Board> {
 	 * Includes which player has the current turn
 	 */
 	private void addPlayerToMove() {
-		builder.append(Constants.TRIPLE_SPACE);
+		builder.append(TRIPLE_SPACE);
 		builder.append(WHOSE_MOVE_TEXT);
 		builder.append(board.whoseMove());
-		builder.append(Constants.NEWLINE);
+		builder.append(NEWLINE);
 	}
 	
 	/**
@@ -106,15 +114,15 @@ public class BoardStringifier<B extends Board> {
 		Move last = board.lastMove();
 		if (last != null) {
 			builder.append(LAST_MOVE_TEXT);
-			builder.append(last.getMoveAsString(true, true));
+			builder.append(MoveWriter.getMoveAsStringInContext(last, board.getPreviousPosition()));
 			if (board.isInCheck()) {
 				if (board.isOver()) {
-					builder.append(Constants.CHECKMATE_SYMBOL);
+					builder.append(CHECKMATE_SYMBOL);
 				} else {
-					builder.append(Constants.CHECK_SYMBOL);
+					builder.append(CHECK_SYMBOL);
 				}
 			}
-			builder.append(Constants.NEWLINE);
+			builder.append(NEWLINE);
 		}
 	}
 	
@@ -127,7 +135,9 @@ public class BoardStringifier<B extends Board> {
 		stringifyBoard();
 		addCapturedPieces();
 		addPlayerToMove();
-		addLastMove();
+		if (includeLastMove) {
+			addLastMove();
+		}
 		addDashedLine();
 		return builder.toString();
 	}

@@ -14,8 +14,8 @@ import representation.BoardBuilder;
 import representation.CastlingRights;
 import representation.MoveGenerator;
 import representation.MoveMaker;
-import support.Constructors;
-import support.UtilityFunctions;
+import static support.Constructors.*;
+import static support.UtilityFunctions.*;
 
 /**
  * This is the most intuitive representation of a board. It holds a place for each square (at some index and some bit in the {@code board} array) and
@@ -90,24 +90,27 @@ public class ImmutableArrayBoard extends Board {
 	 */
 	private final int[] board;
 	
+	/** A reference to the previous board */
+	private final Board previousBoard;
+	
 	/** Used to construct a move generator */
 	private static final Supplier<MoveGenerator<ImmutableArrayBoard>> MOVE_GENERATOR_CONSTRUCTOR = ImmutableArrayMoveGenerator::new;
 		
-	private ImmutableArrayBoard(int[] board) {
+	private ImmutableArrayBoard(int[] board, Board previousBoard) {
 		this.board = board;
+		this.previousBoard = previousBoard;
+		withCalculatedHash(previousBoard);
 	}
 	
 	/**
 	 * Records hashcode, a long, for this {@code Board}, based on the board preceding this one and the move used to get to this one
 	 * @param previousBoard The {@code Board} preceding this one. Note the {@code Move} to get to this one is already stored in this board
-	 * @return This {@code Board}, for the sake of convenience
 	 */
-	private ImmutableArrayBoard withCalculatedHash(Board previousBoard) {
+	private void withCalculatedHash(Board previousBoard) {
 		Hasher hasher = Hasher.getGlobalHasher();
 		long code = previousBoard == null ? hasher.getHash(this) : hasher.getNextHash(previousBoard, lastMove());
 		board[HASHCODE_INDEX_1] = (int) code;
 		board[HASHCODE_INDEX_2] = (int) (code >>> INT_SIZE);
-		return this;
 	}
 	
 	@Override
@@ -141,7 +144,7 @@ public class ImmutableArrayBoard extends Board {
 	@Override
 	public Move lastMove() {
 		int compressed = board[LAST_MOVE_INDEX];
-		return compressed == 0 ? null : Constructors.MOVE_DECOMPRESSOR.apply(compressed);
+		return compressed == 0 ? null : MOVE_DECOMPRESSOR.apply(compressed);
 	}
 
 	@Override
@@ -153,6 +156,11 @@ public class ImmutableArrayBoard extends Board {
 	public Board performMove(Move move) {
 		MoveMaker<ImmutableArrayBoard> maker = new ImmutableArrayBoardMoveMaker();
 		return maker.performMove(move, this);
+	}
+	
+	@Override
+	public Board getPreviousPosition() {
+		return previousBoard;
 	}
 	
 
@@ -193,7 +201,7 @@ public class ImmutableArrayBoard extends Board {
 			return false;
 		}
 		ImmutableArrayBoard that = (ImmutableArrayBoard) o;
-		for (int index : UtilityFunctions.getPrimitiveRange(0, RIGHTS_INDEX)) {
+		for (int index : getPrimitiveRange(0, RIGHTS_INDEX)) {
 			if (this.board[index] != that.board[index]) {
 				return false;
 			}
@@ -305,7 +313,7 @@ public class ImmutableArrayBoard extends Board {
 
 		@Override
 		public ImmutableArrayBoard build() {
-			return new ImmutableArrayBoard(board).withCalculatedHash(previousBoard);
+			return new ImmutableArrayBoard(board, previousBoard);
 		}
 		
 		/**

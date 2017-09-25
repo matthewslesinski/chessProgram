@@ -15,7 +15,7 @@ import independentDataStructures.Cluster;
 import lines.Direction;
 import lines.Line;
 import lines.LineType;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * A set of {@code Square}s that all revolve around a center. Each {@code Square} is put in a list of all the {@code Square}s
@@ -38,7 +38,7 @@ public class SquareSet implements Cluster<Square> {
 	private final Map<Direction, List<Square>> outwardLines = new EnumMap<>(Direction.class);
 	
 	public SquareSet(Collection<Square> elementsWithoutCenter, Square center) {
-		this(elementsWithoutCenter, center, UtilityFunctions.bind(SquareSet::getDirectionFromCenter, center));
+		this(elementsWithoutCenter, center, bind(SquareSet::getDirectionFromCenter, center));
 	}
 	
 	@SuppressWarnings({ "unchecked", "rawtypes" })

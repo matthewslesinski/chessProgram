@@ -8,6 +8,7 @@ import lines.File;
 import pieces.PieceType;
 import representation.Board;
 import representation.CastlingRights;
+import stringUtilities.MoveWriter;
 import support.BadArgumentException;
 
 /**
@@ -267,7 +268,7 @@ public class BasicMove implements Move {
 	
 	@Override
 	public String toString() {
-		return getMoveAsString(true, true);
+		return MoveWriter.getMoveAsString(this, true, true);
 	}
 	
 	public static class Builder implements MoveBuilder<BasicMove> {

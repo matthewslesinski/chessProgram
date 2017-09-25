@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import boardFeatures.Square;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 public enum UpRightDiagonal implements Line {
 	
@@ -102,7 +102,7 @@ public enum UpRightDiagonal implements Line {
 	private static List<Square> getListOfContainedSquares(int index) {
 		// The length is 8 minus how far the index is from the center, which is at index 7
 		int length = MAX_LENGTH - Math.abs(index - CENTER_INDEX);
-		return Arrays.stream(UtilityFunctions.getRange(0, length))
+		return Arrays.stream(getRange(0, length))
 				.map(offset -> Square.getByFileAndRank(
 						// As you go rightward along the diagonal, the file of the square rises proportionally
 						// The start file is only either 0 or index minus the center diagonal index when the
@@ -133,7 +133,7 @@ public enum UpRightDiagonal implements Line {
 	public static void setContainedSquares() {
 		for (UpRightDiagonal diagonal : values()) {
 			diagonal.containedSquares = getListOfContainedSquares(diagonal.getIndex());
-			diagonal.reverseContainedSquares = UtilityFunctions.reverseList(diagonal.containedSquares);
+			diagonal.reverseContainedSquares = reverseList(diagonal.containedSquares);
 		}
 	}
 	

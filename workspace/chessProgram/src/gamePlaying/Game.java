@@ -12,8 +12,8 @@ import stringUtilities.OptionalPGNTag;
 import stringUtilities.PGNTag;
 import stringUtilities.PGNWriter;
 import stringUtilities.RequiredPGNTag;
-import support.Constants;
-import support.Constructors;
+import static support.Constants.*;
+import static support.Constructors.*;
 
 public abstract class Game {
 
@@ -34,11 +34,11 @@ public abstract class Game {
 	
 	/** Builds the {@code Game} using constants passed as System properties */
 	public Game() {
-		this(Constants.PLAYER_1_TYPE, Constants.PLAYER_1_NAME, Constants.PLAYER_2_TYPE, Constants.PLAYER_2_NAME, Constructors.BOARD_BUILDER_CONSTRUCTOR);
+		this(PLAYER_1_TYPE, PLAYER_1_NAME, PLAYER_2_TYPE, PLAYER_2_NAME, BOARD_BUILDER_CONSTRUCTOR);
 	}
 	
 	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor) {
-		this(player1Type, name1, player2Type, name2, constructor, Constants.STANDARD_START_POSITION);
+		this(player1Type, name1, player2Type, name2, constructor, STANDARD_START_POSITION);
 	}
 	
 	public Game(PlayerType player1Type, String name1, PlayerType player2Type, String name2, Function<String, BoardBuilder<? extends Board>> constructor, String startPosition) {
@@ -187,7 +187,7 @@ public abstract class Game {
 	 * Sets up a game and plays it
 	 */
 	public static void startPlaying() {
-		Game game = Constructors.GAME_CONSTRUCTOR.get();
+		Game game = GAME_CONSTRUCTOR.get();
 		game.play();
 	}
 	

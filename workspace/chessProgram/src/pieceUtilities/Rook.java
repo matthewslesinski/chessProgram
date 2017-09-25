@@ -4,7 +4,7 @@ import java.util.List;
 
 import lines.Direction;
 import pieces.PieceType;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * Provides the utility method(s) for calculating a rook's legal moves
@@ -26,7 +26,7 @@ public class Rook extends LineMover {
 
 	@Override
 	List<Direction> getMovementDirections() {
-		return Constants.ROOK_DIRECTIONS;
+		return ROOK_DIRECTIONS;
 	}
 
 }

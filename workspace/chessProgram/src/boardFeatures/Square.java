@@ -19,7 +19,8 @@ import moveCalculationStructures.SquareSet;
 import pieces.Piece;
 import pieces.PieceType;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+
+import static support.UtilityFunctions.*;
 
 public enum Square {
 
@@ -261,10 +262,10 @@ public enum Square {
 		// How to determine if the other square is in the same line as this: the magnitudes of
 		// the fileDelta and rankDelta must either be the same or one of them must be 0. Therefore, their
 		// product's magnitude must be a perfect square
-		if (this == that || !UtilityFunctions.isPerfectSquareUpTo64(Math.abs(fileDelta * rankDelta))) {
+		if (this == that || !isPerfectSquareUpTo64(Math.abs(fileDelta * rankDelta))) {
 			return Direction.NONE;
 		}
-		return Direction.getByDeltas(UtilityFunctions.getSign(fileDelta), UtilityFunctions.getSign(rankDelta));
+		return Direction.getByDeltas(getSign(fileDelta), getSign(rankDelta));
 	}
 	
 	/**
@@ -274,10 +275,7 @@ public enum Square {
 	 * @return The one that's closer to this
 	 */
 	public Square whichIsCloser(Square some, Square other) {
-		if (getManhattanDistance(this, some) > getManhattanDistance(this, other)) {
-			return other;
-		}
-		return some;
+		return argmin(bind(Square::getManhattanDistance, this), some, other);
 	}
 	
 	/**
@@ -305,7 +303,7 @@ public enum Square {
 	 * @return The element
 	 */
 	public <T> T getValueOfSquareInArray(T[] array) {
-		return UtilityFunctions.getValueFromArray(array, this);
+		return getValueFromArray(array, this);
 	}
 	
 	/**

@@ -9,6 +9,8 @@ import gamePlaying.PlayerType;
 import lines.Direction;
 import lines.File;
 
+import static support.UtilityFunctions.*;
+
 /**
  * Holds a bunch of constants
  * @author matthewslesinski
@@ -97,6 +99,24 @@ public class Constants {
 	public static final List<Direction> ROOK_DIRECTIONS = Arrays.asList(Direction.UP, Direction.RIGHT, Direction.DOWN, Direction.LEFT);
 	
 	/** The directions a queen can move */
-	public static final List<Direction> QUEEN_DIRECTIONS = UtilityFunctions.concat(BISHOP_DIRECTIONS, ROOK_DIRECTIONS);
+	public static final List<Direction> QUEEN_DIRECTIONS = concat(BISHOP_DIRECTIONS, ROOK_DIRECTIONS);
+	
+	/** The conventional estimate for a pawn's material worth */
+	public static final double ESTIMATED_PAWN_MATERIAL_VALUE = 1.;
+	
+	/** The conventional estimate for a knight's material worth */
+	public static final double ESTIMATED_KNIGHT_MATERIAL_VALUE = 3.;
+	
+	/** The conventional estimate for a bishop's material worth */
+	public static final double ESTIMATED_BISHOP_MATERIAL_VALUE = 3.;
+	
+	/** The conventional estimate for a rook's material worth */
+	public static final double ESTIMATED_ROOK_MATERIAL_VALUE = 5.;
+	
+	/** The conventional estimate for a queen's material worth */
+	public static final double ESTIMATED_QUEEN_MATERIAL_VALUE = 9.;
+	
+	/** The conventional estimate for a king's material worth */
+	public static final double ESTIMATED_KING_MATERIAL_VALUE = 0.;
 	
 }

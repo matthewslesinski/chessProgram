@@ -1,7 +1,7 @@
 package boardFeatures;
 
 import lines.File;
-import support.Constants;
+import static support.Constants.*;
 
 /**
  * Represents the two left/right sides of the chessboard, the kingside and the queenside.
@@ -17,7 +17,7 @@ public enum Side {
 	private final boolean isKingside = this.ordinal() == 0 ? true : false;
 	
 	/** The {@code File} that is on the edge of this side, and the rook from this side starts on */
-	private final File castlingRookFile = isKingside ? Constants.KINGSIDE_ROOK_START_FILE : Constants.QUEENSIDE_ROOK_START_FILE;
+	private final File castlingRookFile = isKingside ? KINGSIDE_ROOK_START_FILE : QUEENSIDE_ROOK_START_FILE;
 	
 	/**
 	 * Returns whether this side is the kingside or queenside

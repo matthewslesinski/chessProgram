@@ -6,7 +6,7 @@ import java.util.Arrays;
 import independentDataStructures.Tree;
 import moves.Move;
 import representation.Board;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Comprises a complete game
@@ -35,7 +35,7 @@ public class GameTree extends Game {
 	
 	@Override
 	public void undoPlies(int plies) {
-		Arrays.asList(UtilityFunctions.getRange(0, plies)).forEach(i -> positions.moveUp());
+		Arrays.asList(getRange(0, plies)).forEach(i -> positions.moveUp());
 	}
 	
 	@Override

@@ -1,0 +1,35 @@
+package stringUtilities;
+
+import java.util.EnumMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import boardFeatures.Square;
+import moves.Move;
+import pieces.PieceType;
+
+public class MoveWriter {
+
+	
+	/**
+	 * Maps each relevant piece/square combination to the list of moves involving that piece moving to that square.
+	 * This is important for figuring out how much information to include in the strings of moves that get printed.
+	 * @param moves The {@code Set} of {@code Move}s that can be made
+	 * @return
+	 */
+	public static Map<PieceType, Map<Square, List<Move>>> mapEndSquaresToMovesForPieces(Set<Move> moves) {
+		Map<PieceType, Map<Square, List<Move>>> map = new EnumMap<>(PieceType.class);
+		moves.forEach(move -> {
+			PieceType piece = move.getMovingPieceType();
+			Map<Square, List<Move>> squareMapping = map.getOrDefault(piece, new EnumMap<>(Square.class));
+			map.putIfAbsent(piece, squareMapping);
+			Square endSquare = move.getEndSquare();
+			List<Move> movesWithRelevantDestination = squareMapping.getOrDefault(endSquare, new LinkedList<>());
+			squareMapping.putIfAbsent(endSquare, movesWithRelevantDestination);
+			movesWithRelevantDestination.add(move);
+		});
+		return map;
+	}
+}

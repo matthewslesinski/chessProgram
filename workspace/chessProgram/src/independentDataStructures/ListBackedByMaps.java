@@ -14,7 +14,7 @@ import java.util.function.IntFunction;
 
 import convenienceDataStructures.UnmodifiableWrappedList;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * A list of elements, but it uses maps to allow the neighboring elements to be retrieved for each element
@@ -136,7 +136,7 @@ public class ListBackedByMaps<E extends Enum<E>> implements Isomorphism<E, E>, F
 
 	@Override
 	public NavigableSet<E> descendingSet() {
-		return new ListBackedByMaps<E>(UtilityFunctions.reverseList(elements));
+		return new ListBackedByMaps<E>(reverseList(elements));
 	}
 
 

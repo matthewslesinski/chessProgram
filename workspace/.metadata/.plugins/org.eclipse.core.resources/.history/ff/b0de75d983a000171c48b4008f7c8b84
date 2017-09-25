@@ -1,0 +1,48 @@
+package search;
+
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.BinaryOperator;
+import java.util.function.Function;
+
+import moves.Move;
+import representation.Board;
+import static support.UtilityFunctions.*;
+
+public class BasicDepthBasedMinimax implements AI {
+
+	private static final int MAX_PLIES = 3;
+	
+	private static final Comparator<Double> NATURAL_ORDER = Comparator.naturalOrder();
+	private static final Comparator<Double> REVERSE_ORDER = NATURAL_ORDER.reversed();
+	private static final Map<Long, Double> TRANSPOSITION_TABLE = new HashMap<>();
+	
+	@Override
+	public Move bestMove(Board board) {
+		Comparator<Double> comparator = board.whoseMove().isWhite() ? NATURAL_ORDER : REVERSE_ORDER;
+		Function<Move, Double> translator = bindAtEnd(BasicDepthBasedMinimax::bestMoveHelper, MAX_PLIES).compose(board::performMove);
+		BinaryOperator<Move> operator = (move1, move2) -> argmax(comparator, translator, move1, move2);
+		return board.getLegalMoves().stream().reduce(operator).get();
+	}
+	
+	private static double bestMoveHelper(Board board, int pliesLeft) {
+		if (TRANSPOSITION_TABLE.containsKey(board.getHashCode())) {
+			return TRANSPOSITION_TABLE.get(board.getHashCode());
+		}
+		if (pliesLeft == 1 || board.isOver()) {
+			return recordEvaluation(board, board.evaluate());
+		}
+		BinaryOperator<Double> optimumFinder = board.whoseMove().isWhite() ? Math::max : Math::min;
+		return recordEvaluation(board, board.getLegalMoves().stream()
+				.map(bindAtEnd(BasicDepthBasedMinimax::bestMoveHelper, pliesLeft - 1).compose(board::performMove))
+				.reduce(optimumFinder).get());
+	}
+	
+	private static double recordEvaluation(Board board, double evaluation) {
+		TRANSPOSITION_TABLE.put(board.getHashCode(), evaluation);
+		return evaluation;
+	}
+	
+
+}

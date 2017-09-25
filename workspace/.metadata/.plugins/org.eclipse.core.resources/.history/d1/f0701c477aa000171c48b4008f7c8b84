@@ -1,0 +1,12 @@
+package support;
+
+import representation.Board;
+
+public class BadBoardException extends BadArgumentException {
+
+	public BadBoardException(Board problemBoard, String message) {
+		super(problemBoard, Board.class, message);
+		// TODO Auto-generated constructor stub
+	}
+
+}

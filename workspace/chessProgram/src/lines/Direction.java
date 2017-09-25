@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Directions are used to indicate a relative motion along either a diagonal, file, or rank. If the motion is not along
@@ -153,7 +153,7 @@ public enum Direction {
 	 * @return The {@code Movement}
 	 */
 	private Movement determineMovement() {
-		switch (UtilityFunctions.getSign(CENTER_INDEX - this.ordinal())) {
+		switch (getSign(CENTER_INDEX - this.ordinal())) {
 		case -1:
 			return Movement.FORWARDS;
 		case 1:

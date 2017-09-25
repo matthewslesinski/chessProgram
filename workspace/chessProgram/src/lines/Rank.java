@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 
 import boardFeatures.Square;
 import support.BadArgumentException;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Represents a horizontal row of squares on the board, of which there are 8
@@ -120,10 +120,10 @@ public enum Rank implements Line {
 	 */
 	public static void setContainedSquares() {
 		for (Rank rank : values()) {
-			rank.containedSquares = Arrays.stream(UtilityFunctions.getRange(0, 8))
-					.map(UtilityFunctions.bindAtEnd(Square::getByFileAndRankIndices, rank.getIndex()))
+			rank.containedSquares = Arrays.stream(getRange(0, 8))
+					.map(bindAtEnd(Square::getByFileAndRankIndices, rank.getIndex()))
 					.collect(Collectors.toList());
-			rank.reverseContainedSquares = UtilityFunctions.reverseList(rank.containedSquares);
+			rank.reverseContainedSquares = reverseList(rank.containedSquares);
 		}
 	}
 }

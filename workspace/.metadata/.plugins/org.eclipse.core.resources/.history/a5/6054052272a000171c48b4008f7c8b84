@@ -1,0 +1,54 @@
+package support;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+
+
+/**
+ * This class provides static utility functions
+ * @author matthewslesinski
+ *
+ */
+public class UtilityFunctions extends FunctionalUtilityFunctions {
+	
+	public static boolean isNull(Object obj) {
+		return obj == null;
+	}
+	
+	/**
+	 * Determines if a string does not actually contain any characters
+	 * @param string The string to check
+	 * @return true iff it's null or empty
+	 */
+	public static boolean isEmpty(String string) {
+		return !isNull(string) || string.equals("");
+	}
+	
+	/**
+	 * Performs some action on each of the items, as well as some intermediate action in between each action
+	 * @param items The items to perform the actions on
+	 * @param action The main action to perform
+	 * @param joiner The action to perform in between each main action
+	 */
+	public static <T> void joinActions(Iterable<Runnable> actions, Runnable joiner) {
+		Iterator<Runnable> iterator = actions.iterator();
+		if (!iterator.hasNext()) {
+			return;
+		}
+		iterator.next().run();
+		iterator.forEachRemaining(action -> {
+			joiner.run();
+			action.run();
+		});
+	}
+}

@@ -13,7 +13,7 @@ import java.util.function.Function;
 import boardFeatures.Square;
 import boardFeatures.StaticInitializer;
 import pieces.Piece;
-import support.UtilityFunctions;
+import static support.UtilityFunctions.*;
 
 /**
  * Contains a clumped set of squares, such as the squares around a king. This class can also build an iterator over the squares in it that
@@ -44,7 +44,7 @@ public class KingMoveSet extends SquareSet {
 	 * Calculates the {@code Square}s in this {@code KingMoveSet} that are threatened by any {@code Piece} at any {@code Square}.
 	 */
 	private void calculateThreats() {
-		Set<Square> elements = EnumSet.copyOf(UtilityFunctions.concat(this.squares, Collections.singleton(center)));
+		Set<Square> elements = EnumSet.copyOf(concat(this.squares, Collections.singleton(center)));
 		for (Piece piece : Piece.realPieces()) {
 			Map<Square, BiFunction<Function<Square, Piece>, Square, Square>> innerMap = new EnumMap<>(Square.class);
 			potentialThreats.put(piece, innerMap);
@@ -63,7 +63,7 @@ public class KingMoveSet extends SquareSet {
 	public Iterable<Square> getAttackedSquares(Square perspective, Function<Square, Piece> occupants) {
 		
 		Piece occupant = occupants.apply(perspective);
-		Function<Square, Square> getNextFunction = UtilityFunctions.bind(potentialThreats.get(occupant).get(perspective), occupants);
+		Function<Square, Square> getNextFunction = bind(potentialThreats.get(occupant).get(perspective), occupants);
 		return new Iterable<Square>() {
 
 			@Override
