@@ -122,6 +122,9 @@ public class FENStringParser<B extends Board> {
 				boardBuilder.withCastlingRight(CastlingRights.WHITE_QUEENSIDE, true);
 				break;
 			}
+			default:
+				// TODO handle wtf
+				break;
 			}
 		}
 		for (CastlingRights right : missingRights) {

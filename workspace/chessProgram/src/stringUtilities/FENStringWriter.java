@@ -41,7 +41,7 @@ public class FENStringWriter {
 		this.board = board;
 		this.moveNumber = moveNumber;
 		// Apply the arguments to the actions list
-		List<Runnable> appliedActions = (List<Runnable>) actions.stream().map(action -> bind(action, this)).collect(Collectors.toList());
+		List<Runnable> appliedActions = actions.stream().map(action -> bind(action, this)).collect(Collectors.toList());
 		// There should be a space after each segment
 		joinActions(appliedActions, () -> builder.append(SINGLE_SPACE));
 	}
@@ -57,12 +57,12 @@ public class FENStringWriter {
 	
 	/**
 	 * Adds a position to the FEN by adding to each of its board's ranks 
-	 * @param board
-	 * @param builder
+	 * @param board The board being turned into a FEN
+	 * @param builder The builder of the FEN string
 	 */
 	private static void addPosition(Board board, StringBuilder builder) {
-		List<Runnable> actions = Arrays.stream(Rank.values()).map(rank -> (Runnable) () -> addFENForRank(board, rank, builder)).collect(Collectors.toList());
-		joinActions(reverseList(actions), () -> builder.append(SLASH));
+		List<Runnable> appendActions = Arrays.stream(Rank.values()).map(rank -> (Runnable) () -> addFENForRank(board, rank, builder)).collect(Collectors.toList());
+		joinActions(reverseList(appendActions), () -> builder.append(SLASH));
 	}
 	
 	/**

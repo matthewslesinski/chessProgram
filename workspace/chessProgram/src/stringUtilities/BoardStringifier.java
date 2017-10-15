@@ -92,8 +92,8 @@ public class BoardStringifier<B extends Board> {
 	/**
 	 * Details which pieces have been captured for each side
 	 */
-	private void addCapturedPieces() {
-		// TODO
+	private static void addCapturedPieces() {
+		// TODO complete and make not static
 		return;
 	}
 	

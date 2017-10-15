@@ -104,11 +104,11 @@ public class ImmutableArrayBoard extends Board {
 	
 	/**
 	 * Records hashcode, a long, for this {@code Board}, based on the board preceding this one and the move used to get to this one
-	 * @param previousBoard The {@code Board} preceding this one. Note the {@code Move} to get to this one is already stored in this board
+	 * @param previousBoardArg The {@code Board} preceding this one. Note the {@code Move} to get to this one is already stored in this board
 	 */
-	private void withCalculatedHash(Board previousBoard) {
+	private void withCalculatedHash(Board previousBoardArg) {
 		Hasher hasher = Hasher.getGlobalHasher();
-		long code = previousBoard == null ? hasher.getHash(this) : hasher.getNextHash(previousBoard, lastMove());
+		long code = previousBoardArg == null ? hasher.getHash(this) : hasher.getNextHash(previousBoardArg, lastMove());
 		board[HASHCODE_INDEX_1] = (int) code;
 		board[HASHCODE_INDEX_2] = (int) (code >>> INT_SIZE);
 	}
@@ -305,9 +305,9 @@ public class ImmutableArrayBoard extends Board {
 
 		
 		@Override
-		public Builder withPreviousBoardAndLastMove(Board previousBoard, Move move) {
+		public Builder withPreviousBoardAndLastMove(Board previousBoardArg, Move move) {
 			this.board[LAST_MOVE_INDEX] = move.compress();
-			this.previousBoard = previousBoard;
+			this.previousBoard = previousBoardArg;
 			return this;
 		}
 
@@ -350,7 +350,7 @@ public class ImmutableArrayBoard extends Board {
 	 * @param board The board containing the piece
 	 * @return The bit representation, where 0 is nothing, 1-6 is a white piece, and 7-12 is a black piece
 	 */
-	private int getBitsAtSquare(Square square, int[] board) {
+	private static int getBitsAtSquare(Square square, int[] board) {
 		return (board[square.getFile().getIndex()] >>> (square.getRank().getIndex() << LOG_OF_LOG_OF_NUM_PIECES)) & FOUR_ONES;
 	}
 	

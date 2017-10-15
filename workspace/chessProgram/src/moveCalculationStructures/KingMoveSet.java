@@ -64,11 +64,11 @@ public class KingMoveSet extends SquareSet {
 		
 		Piece occupant = occupants.apply(perspective);
 		Function<Square, Square> getNextFunction = bind(potentialThreats.get(occupant).get(perspective), occupants);
-		return new Iterable<Square>() {
+		return new Iterable<>() {
 
 			@Override
 			public Iterator<Square> iterator() {
-				Iterator<Square> iterator = new Iterator<Square>() {
+				Iterator<Square> iterator = new Iterator<>() {
 					Square curr = getNextFunction.apply(null);
 					@Override
 					public boolean hasNext() {

@@ -110,12 +110,12 @@ public class Tree<E, V> implements Iterable<V> {
 		/**
 		 * Adds a child node along a given edge, and possibly makes it the main child
 		 * @param edge The edge leading to the node
-		 * @param value The value to put in the new node
+		 * @param childValue The value to put in the new node
 		 * @param designateMainChild Whether it should be the main child if there is already a main child
 		 */
-		private void addChild(E edge, V value, boolean designateMainChild) {
+		private void addChild(E edge, V childValue, boolean designateMainChild) {
 			if (!children.containsKey(edge)) {
-				children.put(edge, new Node(this, value));
+				children.put(edge, new Node(this, childValue));
 				if (mainChild == null || designateMainChild) {
 					designateMainChild(edge);
 				}
@@ -125,19 +125,19 @@ public class Tree<E, V> implements Iterable<V> {
 		/**
 		 * Adds a child along an edge, and does not demand it be the main child
 		 * @param edge The edge
-		 * @param value The value to put in the child to put at the other end of that edge
+		 * @param childValue The value to put in the child to put at the other end of that edge
 		 */
-		private void addChild(E edge, V value) {
-			addChild(edge, value, false);
+		private void addChild(E edge, V childValue) {
+			addChild(edge, childValue, false);
 		}
 		
 		/**
 		 * Adds a child along an edge, and makes it the main child
 		 * @param edge The edge
-		 * @param value The value to put in the child node along that edge
+		 * @param childValue The value to put in the child node along that edge
 		 */
-		private void addMainChild(E edge, V value) {
-			addChild(edge, value, true);
+		private void addMainChild(E edge, V childValue) {
+			addChild(edge, childValue, true);
 		}
 	}
 
@@ -185,9 +185,8 @@ public class Tree<E, V> implements Iterable<V> {
 			currentNode = currentNode.getParent();
 			depth -= 1;
 			return currentNode;
-		} else {
-			return null;
 		}
+		return null;
 	}
 	
 	/**
@@ -252,7 +251,7 @@ public class Tree<E, V> implements Iterable<V> {
 
 	@Override
 	public Iterator<V> iterator() {
-		return new Iterator<V>() {
+		return new Iterator<>() {
 			Node next = currentNode;
 			
 			@Override

@@ -76,7 +76,7 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 			castlingRights.put(right, board.canCastle(right));
 		}
 		enPassantFile = board.enPassantCaptureFile();
-		initializeLists(piecesToSquares, () -> new LinkedList<Square>(), Piece.realPieces());
+		initializeLists(piecesToSquares, () -> new LinkedList<>(), Piece.realPieces());
 		parseBoard(board);
 		try {
 			kingSquare = getListOfSquaresForPiece(Piece.getByColorAndType(toMove, PieceType.KING)).get(0);
@@ -90,7 +90,7 @@ public abstract class StraightforwardPreProcessing<B extends Board> implements P
 	 * @param arr The array to put the lists in
 	 * @param constructor How to initialize each list
 	 */
-	private <S, T> void initializeLists(Map<S, T> map, Supplier<T> constructor, S[] keys) {
+	private static <S, T> void initializeLists(Map<S, T> map, Supplier<T> constructor, S[] keys) {
 		for (S key : keys) {
 			map.put(key, constructor.get());
 		}

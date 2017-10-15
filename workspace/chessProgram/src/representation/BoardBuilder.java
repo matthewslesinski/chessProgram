@@ -29,7 +29,7 @@ public abstract class BoardBuilder<B extends Board> {
 	 * @param fen: a FEN string representing the board.
 	 */
 	protected static <T extends Board> BoardBuilder<T> fromFen(String fen, BoardBuilder<T> boardBuilder) {
-		return new FENStringParser<T>(boardBuilder).parse(fen);
+		return new FENStringParser<>(boardBuilder).parse(fen);
 	}
 	
 	/**

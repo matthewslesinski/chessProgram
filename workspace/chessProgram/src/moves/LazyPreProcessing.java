@@ -81,6 +81,7 @@ public class LazyPreProcessing<B extends Board> extends StraightforwardPreProces
 		return getNextSquareWithPieceUnderConstraint(curr, direction, UtilityFunctions::isNull);
 	}
 	
+	@SuppressWarnings("null")
 	@Override
 	protected void calculateSquareAttackers(Square potentiallyAttackedSquare, KingMoveSet kingMoves,
 			Set<Square> coveredAttackers, Set<Square> squaresToIgnore) {
@@ -121,6 +122,7 @@ public class LazyPreProcessing<B extends Board> extends StraightforwardPreProces
 					for (Square attackedSquare : kingMoves.getAttackedSquares(nextWithOccupant, this::getPieceAtSquare)) {
 						// Check if the attack is blocked and record that in the map
 						Direction toAttackedSquare = nextWithOccupant.getDirectionToSquare(attackedSquare);
+						// unblockedDirections won't be null if accessed because it was initialized if lineMover is true
 						if (lineMover && !unblockedDirections.containsKey(toAttackedSquare)) {
 							unblockedDirections.put(toAttackedSquare, !isMovementBlocked(nextWithOccupant, attackedSquare));
 						}

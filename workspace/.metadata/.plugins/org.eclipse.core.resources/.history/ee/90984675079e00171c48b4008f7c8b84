@@ -1,9 +1,0 @@
-package evaluation;
-
-import representation.Board;
-
-public interface Evaluator {
-
-	
-	public double evaluateBoard(Board board);
-}

@@ -62,7 +62,7 @@ public class SolidPreProcessing<B extends Board> extends StraightforwardPreProce
 	 * @param arr The array to put the preprocessing in for storage
 	 */
 	private void preProcessLine(Line line, Map<Line, FixedOrderingSet<Square>> map) {
-		FixedOrderingSet<Square> list = new EnumSequence<Square>(Square.class, line.getLength(),
+		FixedOrderingSet<Square> list = new EnumSequence<>(Square.class, line.getLength(),
 										square -> square.getNeighbor(line.getForwardDirection().getOppositeDirection()), line::containsSquare);
 		line.getContainedSquares().forEach(square -> {
 			Piece piece = getPieceAtSquare(square);

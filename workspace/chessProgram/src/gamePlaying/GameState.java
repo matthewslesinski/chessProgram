@@ -47,11 +47,9 @@ public enum GameState {
 		if (board.isOver()) {
 			if (board.isInCheck()) {
 				return board.whoseMove().isWhite() ? BLACK_WINS : WHITE_WINS;
-			} else {
-				return STALEMATE;
 			}
-		} else {
-			return STILL_GOING;
+			return STALEMATE;
 		}
+		return STILL_GOING;
 	}
 }

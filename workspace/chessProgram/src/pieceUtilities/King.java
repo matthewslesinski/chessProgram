@@ -89,7 +89,7 @@ public class King extends PieceUtility {
 	 * @param castleValidation A function to determine if castling is allowed in the position
 	 * @return The list of squares that the king can move to
 	 */
-	private List<Square> getLegalSquaresToMoveTo(Square square, ProcessedBoard<?> board, BiPredicate<Square, ProcessedBoard<?>> castleValidation) {
+	private static List<Square> getLegalSquaresToMoveTo(Square square, ProcessedBoard<?> board, BiPredicate<Square, ProcessedBoard<?>> castleValidation) {
 		return board.getSafeKingDestinations().stream()
 				.filter(endSquare -> (board.isNotSameColor(endSquare) &&
 						(Math.abs(endSquare.getFile().getIndex() - square.getFile().getIndex()) < 2 || castleValidation.test(endSquare, board))))

@@ -115,14 +115,13 @@ public enum Square {
 	/** For each {@code Piece}, the set of squares it can move to from this one, in general */
 	private Map<Piece, SquareSet> moveSquares;
 	
-	
 	private Square() {
-		int file = this.ordinal() / 8;
-		int rank = this.ordinal() % 8;
-		this.threatSquares = new EnumMap<Piece, SquareSet>(Piece.class);
-		this.moveSquares = new EnumMap<Piece, SquareSet>(Piece.class);
-		this.file = File.getByIndex(file);
-		this.rank = Rank.getByIndex(rank);
+		int fileInt = this.ordinal() / 8;
+		int rankInt = this.ordinal() % 8;
+		this.threatSquares = new EnumMap<>(Piece.class);
+		this.moveSquares = new EnumMap<>(Piece.class);
+		this.file = File.getByIndex(fileInt);
+		this.rank = Rank.getByIndex(rankInt);
 		this.upRightDiagonal = UpRightDiagonal.getBySquare(this);
 		this.downRightDiagonal = DownRightDiagonal.getBySquare(this);		
 	}
@@ -233,18 +232,18 @@ public enum Square {
 		if (!areRealSquareIndices(fileIndex, rankIndex)) {
 			return null;
 		}
-		File file;
-		Rank rank;
+		File fileToGet;
+		Rank rankToGet;
 		try {
-			file = File.getByIndex(fileIndex);
-			rank = Rank.getByIndex(rankIndex);
+			fileToGet = File.getByIndex(fileIndex);
+			rankToGet = Rank.getByIndex(rankIndex);
 		} catch (BadArgumentException e) {
 			// TODO log this
 			e.printStackTrace();
 			System.exit(1);
 			return null;
 		}
-		return getByFileAndRank(file, rank);
+		return getByFileAndRank(fileToGet, rankToGet);
 	}
 	
 	

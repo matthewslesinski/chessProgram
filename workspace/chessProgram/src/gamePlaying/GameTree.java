@@ -20,7 +20,7 @@ public class GameTree extends Game {
 	
 	@Override
 	protected void initBoardStore(Board initialBoard) {
-		positions = new Tree<Move, Board>(initialBoard);
+		positions = new Tree<>(initialBoard);
 	}
 	
 	@Override
