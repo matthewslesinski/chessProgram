@@ -41,7 +41,7 @@ public class CollectionUtilityFunctions extends ComparisonUtilityFunctions {
 	 * @return The flattened collection
 	 */
 	public static <T> List<T> concat(Collection<? extends Collection<? extends T>> lists) {
-		List<T> result = new LinkedList<T>();
+		List<T> result = new LinkedList<>();
 		// Get the iterators for each collection
 		List<Iterator<? extends T>> iterators = lists.stream()
 				.map(collection -> collection.iterator()).filter(iterator -> iterator.hasNext())

@@ -1,7 +1,0 @@
-package gamePlaying;
-
-public interface GameInterface {
-
-	/** Holds the current game being played, so that it is always accessible */
-	public static GameInterface CURRENT_GAME;
-}

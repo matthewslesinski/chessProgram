@@ -34,9 +34,8 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T, U> T argmax(Comparator<? super U> comparator, Function<T, U> translator, T arg1, T arg2) {
 		if (comparator.compare(translator.apply(arg1), translator.apply(arg2)) < 0) {
 			return arg2;
-		} else {
-			return arg1;
-		}
+		} 
+		return arg1;
 	}
 	
 	/**
@@ -60,9 +59,8 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T> T argmax(ToDoubleFunction<T> translator, T arg1, T arg2) {
 		if (Double.compare(translator.applyAsDouble(arg1), translator.applyAsDouble(arg2)) < 0) {
 			return arg2;
-		} else {
-			return arg1;
 		}
+		return arg1;
 	}
 	
 	/**
@@ -75,9 +73,8 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T> T argmax(ToIntFunction<T> translator, T arg1, T arg2) {
 		if (Integer.compare(translator.applyAsInt(arg1), translator.applyAsInt(arg2)) < 0) {
 			return arg2;
-		} else {
-			return arg1;
 		}
+		return arg1;
 	}
 	
 	/**
@@ -91,9 +88,8 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T, U> T argmin(Comparator<? super U> comparator, Function<T, U> translator, T arg1, T arg2) {
 		if (comparator.compare(translator.apply(arg1), translator.apply(arg2)) > 0) {
 			return arg2;
-		} else {
-			return arg1;
 		}
+		return arg1;
 	}
 	/**
 	 * Returns the argument that translates, via the translator function, to the smallest value according to the natural ordering
@@ -116,9 +112,8 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T> T argmin(ToDoubleFunction<T> translator, T arg1, T arg2) {
 		if (Double.compare(translator.applyAsDouble(arg1), translator.applyAsDouble(arg2)) > 0) {
 			return arg2;
-		} else {
-			return arg1;
 		}
+		return arg1;
 	}
 	
 	/**
@@ -131,8 +126,7 @@ public class ComparisonUtilityFunctions extends MathUtilityFunctions {
 	public static <T> T argmin(ToIntFunction<T> translator, T arg1, T arg2) {
 		if (Integer.compare(translator.applyAsInt(arg1), translator.applyAsInt(arg2)) > 0) {
 			return arg2;
-		} else {
-			return arg1;
 		}
+		return arg1;
 	}
 }

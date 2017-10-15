@@ -32,7 +32,7 @@ public class OutwardLinePortions implements Cluster<Square> {
 	 * A comparator of squares that sorts them into segments with the same direction to the center. Within the segments, the closest ones
 	 * are put earlier in the sorting
 	 */
-	private final Comparator<Square> comparator = new Comparator<Square>() {
+	private final Comparator<Square> comparator = new Comparator<>() {
 
 		@Override
 		public int compare(Square o1, Square o2) {

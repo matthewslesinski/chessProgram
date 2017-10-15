@@ -75,7 +75,7 @@ public class ListBackedByMaps<E extends Enum<E>> implements Isomorphism<E, E>, F
 	 */
 	private static <T> Collection<T> checkNonEmpty(Collection<T> collection) {
 		if (collection == null || collection.isEmpty()) {
-			throw new BadArgumentException(collection, collection.getClass(), "Expected a non-empty collection");
+			throw new BadArgumentException(collection, collection == null ? Collection.class : collection.getClass(), "Expected a non-empty collection");
 		}
 		return collection;
 	}
@@ -125,7 +125,7 @@ public class ListBackedByMaps<E extends Enum<E>> implements Isomorphism<E, E>, F
 
 	@Override
 	public Comparator<? super E> comparator() {
-		return new Comparator<E>() {
+		return new Comparator<>() {
 			@Override
 			public int compare(E o1, E o2) {
 				return o1.ordinal() - o2.ordinal();
@@ -136,7 +136,7 @@ public class ListBackedByMaps<E extends Enum<E>> implements Isomorphism<E, E>, F
 
 	@Override
 	public NavigableSet<E> descendingSet() {
-		return new ListBackedByMaps<E>(reverseList(elements));
+		return new ListBackedByMaps<>(reverseList(elements));
 	}
 
 
@@ -150,7 +150,7 @@ public class ListBackedByMaps<E extends Enum<E>> implements Isomorphism<E, E>, F
 		if (!toInclusive) {
 			toIndex += 1;
 		}
-		return new ListBackedByMaps<E>(elements.subList(fromIndex, toIndex));
+		return new ListBackedByMaps<>(elements.subList(fromIndex, toIndex));
 	}
 
 

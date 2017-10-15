@@ -140,7 +140,7 @@ public interface FixedOrderingSet<E> extends NavigableSet<E>, IrreversibleWrappe
 	
 	@Override
 	public default Iterator<E> descendingIterator() {
-		return new Iterator<E>() {
+		return new Iterator<>() {
 			private int currentIndex = size();
 			@Override
 			public boolean hasNext() {

@@ -19,7 +19,7 @@ import static support.UtilityFunctions.*;
 public class ConventionalMaterialEvaluation implements Evaluator {
 
 	/** Holds a mapping from type of piece to value */
-	private static final Map<Piece, Double> MATERIAL_VALUES = new EnumMap<Piece, Double>(Piece.class);
+	private static final Map<Piece, Double> MATERIAL_VALUES = new EnumMap<>(Piece.class);
 	/** Populates the map */
 	static {
 		initializeMaterialValues();

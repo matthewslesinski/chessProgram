@@ -116,7 +116,7 @@ public enum InputType {
 	 * @param input The user input
 	 * @return The array of strings containing their arguments
 	 */
-	private String[] getArgsFromInput(String input) {
+	private static String[] getArgsFromInput(String input) {
 		Matcher matcher = ARGUMENT_EXTRACTOR.matcher(input);
 		List<String> args = new LinkedList<>();
 		while(matcher.find()) {

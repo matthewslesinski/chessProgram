@@ -52,7 +52,7 @@ public class ZobristHasher extends Hasher {
 	 * @param board The board to get the features for
 	 * @return The {@code List}, where each entry is an index referring to a number in {@code FEATURE_VALUES}
 	 */
-	private List<Integer> getPresentFeatures(Board board) {
+	private static List<Integer> getPresentFeatures(Board board) {
 		List<Integer> presentFeatures = new LinkedList<>();
 		for (Square square : Square.values()) {
 			Piece occupant = board.getPieceAtSquare(square);
@@ -80,7 +80,7 @@ public class ZobristHasher extends Hasher {
 	 * @param transition The {@code Move}
 	 * @return The {@code List} of the indices in {@code FEATURE_VALUES} for the features that would get changed when performing the {@code Move}
 	 */
-	private List<Integer> getChangedFeatures(Move transition) {
+	private static List<Integer> getChangedFeatures(Move transition) {
 		List<Integer> changedFeatures = new LinkedList<>();
 		addPieceMovement(transition, changedFeatures);
 		if (transition.isCapture()) {
@@ -110,7 +110,7 @@ public class ZobristHasher extends Hasher {
 	 * @param transition The {@code Move} describing the movement, among other things
 	 * @param presentFeatures The list of feature indices to add to
 	 */
-	private void addPieceMovement(Move transition, List<Integer> presentFeatures) {
+	private static void addPieceMovement(Move transition, List<Integer> presentFeatures) {
 		addPieceAtSquareFeature(transition.getStartSquare(), transition.getMovingPiece(), presentFeatures);
 		addPieceAtSquareFeature(transition.getDestinationSquare(), transition.getEndPiece(), presentFeatures);
 	}
@@ -121,7 +121,7 @@ public class ZobristHasher extends Hasher {
 	 * @param occupant The piece
 	 * @param presentFeatures The list of feature indices to add to
 	 */
-	private void addPieceAtSquareFeature(Square square, Piece occupant, List<Integer> presentFeatures) {
+	private static void addPieceAtSquareFeature(Square square, Piece occupant, List<Integer> presentFeatures) {
 		int index = square.getIndex() * NUMBER_OF_POSSIBLE_PIECES + occupant.getBitRepresentation() - 1 + PIECE_INDEX_BASE;
 		presentFeatures.add(index);
 	}
@@ -130,7 +130,7 @@ public class ZobristHasher extends Hasher {
 	 * Adds the feature associated with the change of color of the moving player
 	 * @param presentFeatures The list of feature indices to add to
 	 */
-	private void addColorFeature(List<Integer> presentFeatures) {
+	private static void addColorFeature(List<Integer> presentFeatures) {
 		presentFeatures.add(COLOR_BASE);
 	}
 	
@@ -139,7 +139,7 @@ public class ZobristHasher extends Hasher {
 	 * @param right The way of castling
 	 * @param presentFeatures The list of feature indices to add to
 	 */
-	private void addCastlingRightsFeature(CastlingRights right, List<Integer> presentFeatures) {
+	private static void addCastlingRightsFeature(CastlingRights right, List<Integer> presentFeatures) {
 		int index = right.getIndex() + CASTLING_RIGHTS_BASE;
 		presentFeatures.add(index);
 	}
@@ -149,7 +149,7 @@ public class ZobristHasher extends Hasher {
 	 * @param enPassantFile The en passant {@code File}
 	 * @param presentFeatures The list of feature indices to add to
 	 */
-	private void addEnPassantFileFeature(File enPassantFile, List<Integer> presentFeatures) {
+	private static void addEnPassantFileFeature(File enPassantFile, List<Integer> presentFeatures) {
 		int index = enPassantFile.getIndex() + EN_PASSANT_BASE;
 		presentFeatures.add(index);
 	}

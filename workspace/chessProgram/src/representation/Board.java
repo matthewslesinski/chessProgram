@@ -120,7 +120,7 @@ public abstract class Board implements State {
 		if (state != GameState.STILL_GOING) {
 			return state.getEvaluation();
 		}
-		else return EVALUATOR_CONSTRUCTOR.get().evaluateBoard(this);
+		return EVALUATOR_CONSTRUCTOR.get().evaluateBoard(this);
 	}
 	
 	/**

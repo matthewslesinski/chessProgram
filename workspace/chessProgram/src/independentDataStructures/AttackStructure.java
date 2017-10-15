@@ -22,7 +22,7 @@ public interface AttackStructure<E> extends Set<E> {
 	 * @return An instance of {@code Iterable} to iterate over
 	 */
 	public default Iterable<E> traverseRelevantElements(Cluster<E> target, Predicate<E> shouldTraverse) {
-		return new Iterable<E>() {
+		return new Iterable<>() {
 
 			@Override
 			public Iterator<E> iterator() {

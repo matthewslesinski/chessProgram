@@ -142,7 +142,7 @@ public interface UnmodifiableWrappedList<E> extends List<E>, UnmodifiableWrapped
 
 	@Override
 	public default List<E> subList(int fromIndex, int toIndex) {
-		return new UnmodifiableWrappedList<E>() {
+		return new UnmodifiableWrappedList<>() {
 			@Override
 			public List<E> getWrappedList() {
 				return getWrappedList().subList(fromIndex, toIndex);

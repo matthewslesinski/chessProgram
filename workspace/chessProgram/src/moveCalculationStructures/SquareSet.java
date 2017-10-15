@@ -54,7 +54,7 @@ public class SquareSet implements Cluster<Square> {
 			for (LineType type : LineType.values()) {
 				// record the square as occurring on each of the lines it occurs on
 				Line line = type.getLineBySquare(square);
-				lineToSquares.putIfAbsent(type, new EnumMap((Class<? extends Enum<? extends Line>>) line.getClass()));
+				lineToSquares.putIfAbsent(type, new EnumMap(line.getClass()));
 				Map<Line, Set<Square>> innerMap = lineToSquares.get(type);
 				innerMap.putIfAbsent(line, EnumSet.noneOf(Square.class));
 				innerMap.get(line).add(square);

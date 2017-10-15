@@ -132,7 +132,7 @@ public abstract class Game {
 	 * Prints the responses to the action(s) performed.
 	 * @param responses The responses to print sequentially
 	 */
-	private void printResponses(Collection<String> responses) {
+	private static void printResponses(Collection<String> responses) {
 		// TODO send this to the Players instead of System.out
 		responses.stream().filter(string -> string != null).forEach(System.out::println);
 	}

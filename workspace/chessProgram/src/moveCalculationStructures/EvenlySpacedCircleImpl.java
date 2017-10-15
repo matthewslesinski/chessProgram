@@ -24,7 +24,7 @@ import support.BadArgumentException;
 public class EvenlySpacedCircleImpl implements EvenlySpacedCircle {
 
 	/** A {@code Map} detailing which {@code Square} in this circle is within each {@code SixteenthSector} */
-	private Map<SixteenthSector, Square> relations = new EnumMap<SixteenthSector, Square>(SixteenthSector.class);
+	private Map<SixteenthSector, Square> relations = new EnumMap<>(SixteenthSector.class);
 	
 	/** A list of the {@code Square}s that were added to this, to neatly describe this as a wrapped collection */
 	private List<Square> addedSquares = new LinkedList<>();

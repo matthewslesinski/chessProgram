@@ -78,7 +78,7 @@ public class Ring<E extends Enum<E>> extends EnumSequence<E> implements AttackSt
 
 	@Override
 	public Iterator<E> getIteratorFromPerspective(Cluster<E> target, Predicate<E> shouldTraverse) {
-		return new BreadthFirstTraversal<E>(constructNeighborFunction(target.getCenter(), shouldTraverse), setConstructor);
+		return new BreadthFirstTraversal<>(constructNeighborFunction(target.getCenter(), shouldTraverse), setConstructor);
 	}
 	
 	@Override
@@ -111,7 +111,7 @@ public class Ring<E extends Enum<E>> extends EnumSequence<E> implements AttackSt
 		if (current == null) {
 			return getStartElement(target, shouldTraverse, goingDown, goingUp);
 		}
-		List<E> toReturn  = new LinkedList<E>();
+		List<E> toReturn  = new LinkedList<>();
 		E candidate;
 		if (goingDown.contains(current)) {
 			candidate = this.lower(current);
@@ -136,7 +136,7 @@ public class Ring<E extends Enum<E>> extends EnumSequence<E> implements AttackSt
 	 * @param shouldTraverse Whether we care about the element(s)
 	 * @param goingDown The set of elements covered as we go leftward around the ring
 	 * @param goingUp The set of elements covered as we go rightward around the ring
-	 * @return
+	 * @return The list of closest element(s)
 	 */
 	private List<E> getStartElement(E target, Predicate<E> shouldTraverse, Set<E> goingDown, Set<E> goingUp) {
 		// Determine the closest element(s)
@@ -150,10 +150,9 @@ public class Ring<E extends Enum<E>> extends EnumSequence<E> implements AttackSt
 				goingDown.add(loneElement);
 				goingUp.add(loneElement);
 				return closestElements;
-			} else {
-				// If we don't care about it, ignore it
-				return Collections.emptyList();
 			}
+			// If we don't care about it, ignore it
+			return Collections.emptyList();
 		// If there's two elements
 		case LARGEST_EXPECTED_CLOSE_ELEMENTS:
 			// Make sure they're in an order so that we can tell apart which one is which

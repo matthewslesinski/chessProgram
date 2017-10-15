@@ -52,9 +52,9 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 	 * @param isPossibleValue A function to determine if the given element could possibly belong in this sequence
 	 */
 	public EnumSequence(Class<E> type, int maxSize, Function<E, E> getPreviousPossibleValue, Predicate<E> isPossibleValue) {
-		this.indicesMap = new EnumMap<E, Integer>(type);
+		this.indicesMap = new EnumMap<>(type);
 		this.maxSize = maxSize;
-		this.elements = new ArrayList<E>(maxSize);
+		this.elements = new ArrayList<>(maxSize);
 		this.getPreviousPossibleValue = getPreviousPossibleValue;
 		this.type = type;
 		this.isPossibleValue = isPossibleValue;
@@ -192,7 +192,7 @@ public class EnumSequence<E extends Enum<E>> implements FixedOrderingSet<E> {
 			}
 		}
 		Function<E, E> replacementPredecessorFunction = getPreviousPossibleValue != null ? element -> predecessorMapping.get(element) : null;
-		NavigableSet<E> toReturn = new EnumSequence<E>(type, elements.size(), replacementPredecessorFunction, isPossibleValue);
+		NavigableSet<E> toReturn = new EnumSequence<>(type, elements.size(), replacementPredecessorFunction, isPossibleValue);
 		Iterator<E> descent = descendingIterator();
 		while (descent.hasNext()){
 			toReturn.add(descent.next());

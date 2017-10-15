@@ -54,7 +54,7 @@ public class MoveSet implements UnmodifiableWrappedSet<Move> {
 
 	@Override
 	public Iterator<Move> iterator() {
-		return new Iterator<Move>() {
+		return new Iterator<>() {
 
 			private int index = 0;
 			@Override

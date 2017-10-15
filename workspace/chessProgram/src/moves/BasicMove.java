@@ -133,7 +133,7 @@ public class BasicMove implements Move {
 	 * @param toMove The {@code Color} of the moving player
 	 * @return The {@code Square} the moving pawn would move to
 	 */
-	private Square calculateEnPassantDestination(Square captureSquare, Color toMove) {
+	private static Square calculateEnPassantDestination(Square captureSquare, Color toMove) {
 		return Square.getByFileAndRank(captureSquare.getFile(), toMove.getEnPassantDestinationRank());
 	}
 	
@@ -142,9 +142,9 @@ public class BasicMove implements Move {
 	 * @param options The array to retrieve from
 	 * @param section The bit section of the int that has the index
 	 * @param compressedMove The compressed representation of this move.
-	 * @return
+	 * @return The object that the section of the bit string holds
 	 */
-	private <T> T getObject(T[] options, MoveBitStringSection section, int compressedMove) {
+	private static <T> T getObject(T[] options, MoveBitStringSection section, int compressedMove) {
 		return options[section.getValue(compressedMove)];
 	}
 	
@@ -317,24 +317,24 @@ public class BasicMove implements Move {
 		}
 		
 		@Override
-		public Builder withCapture(PieceType capturedPiece) {
+		public Builder withCapture(PieceType capturedPieceArg) {
 			argCheck(this.capturedPiece, PieceType.class, null);
 			if (this.type == MoveType.CAPTURE || this.type == MoveType.PROMOTION_WITH_CAPTURE) {
-				this.capturedPiece = capturedPiece;
+				this.capturedPiece = capturedPieceArg;
 			} else {
-				throw new BadArgumentException(this.type, MoveType.class, "This move type cannot involve capture a " + capturedPiece.toString());
+				throw new BadArgumentException(this.type, MoveType.class, "This move type cannot involve capture a " + capturedPieceArg.toString());
 			}
 			return this;
 		}
 		
 		@Override
-		public Builder withPromotion(PieceType promotionPiece) {
+		public Builder withPromotion(PieceType promotionPieceArg) {
 			argCheck(this.promotionPiece, PieceType.class, null);
 			
-			if ((this.type == MoveType.PROMOTION || this.type == MoveType.PROMOTION_WITH_CAPTURE) && promotionPiece.isPromotionPiece()) {
-				this.promotionPiece = promotionPiece;
+			if ((this.type == MoveType.PROMOTION || this.type == MoveType.PROMOTION_WITH_CAPTURE) && promotionPieceArg.isPromotionPiece()) {
+				this.promotionPiece = promotionPieceArg;
 			} else {
-				throw new BadArgumentException(this.type, MoveType.class, "This move cannot involve promoting to a " + promotionPiece.toString());
+				throw new BadArgumentException(this.type, MoveType.class, "This move cannot involve promoting to a " + promotionPieceArg.toString());
 			}
 			return this;
 		}
