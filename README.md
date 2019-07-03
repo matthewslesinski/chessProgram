@@ -1,5 +1,5 @@
 # chessProgram
-This is a chess implementation by Matthew Slesinski and Luke Pane.
+This is a chess implementation by Matthew Slesinski.
 
 A summary of the folders so far in the src folder:
 
